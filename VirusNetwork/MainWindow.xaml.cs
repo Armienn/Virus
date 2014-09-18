@@ -21,15 +21,14 @@ namespace VirusNetwork {
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
 	public partial class MainWindow : Window {
+		private bool master = false;
 		private TcpListener tcpListener;
 		private Thread listenThread;
+		NetworkStream clientStream;
 
 		public MainWindow() {
 			InitializeComponent();
-			this.tcpListener = new TcpListener(IPAddress.Any, 3000);
-			this.listenThread = new Thread(new ThreadStart(ListenForClients));
-			this.listenThread.Start();
-			SetText(InTextBox, getOwnIp());
+			
 		}
 
 		private void ListenForClients() {
@@ -92,30 +91,56 @@ namespace VirusNetwork {
 		}
 
 		private void StartButton_Click(object sender, RoutedEventArgs e) {
-			TcpClient client = new TcpClient();
-			IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse(IpBox.Text), int.Parse(PortBox.Text));
-			client.Connect(serverEndPoint);
-			NetworkStream clientStream = client.GetStream();
+			if (master) {
+				this.tcpListener = new TcpListener(IPAddress.Any, 3000);
+				this.listenThread = new Thread(new ThreadStart(ListenForClients));
+				this.listenThread.Start();
+				StartButton.Content = "Listening";
+				StartButton.IsEnabled = false;
+			}
+			else if (StartButton.Content=="Connect") {
+				TcpClient client = new TcpClient();
+				IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse(IpBox.Text), 3000);
+				client.Connect(serverEndPoint);
+				clientStream = client.GetStream();
+				
+				Thread clientThread = new Thread(new ParameterizedThreadStart(HandleClientComm));
+				clientThread.Start(client);
+
+				StartButton.Content = "Disconnect";
+				
+				/*ASCIIEncoding encoder = new ASCIIEncoding();
+				byte[] buffer = encoder.GetBytes("Hello");
+
+				clientStream.Write(buffer, 0, buffer.Length);
+				clientStream.Flush();
+				clientStream.Close();*/
+			}
+			else {
+				clientStream.Close();
+			}
+		}
+
+		private void MasterCheckbox_Checked(object sender, RoutedEventArgs e) {
+			master = true;
+			StartButton.Content = "Start Listening";
+			IpBox.IsEnabled = false;
+			IpBox.Text = "x.x.x.x";
+		}
+
+		private void MasterCheckbox_UnChecked(object sender, RoutedEventArgs e) {
+			master = false;
+			StartButton.Content = "Connect";
+			IpBox.IsEnabled = true;
+			IpBox.Text = "";
+		}
+
+		private void SendButton_Click(object sender, RoutedEventArgs e) {
 			ASCIIEncoding encoder = new ASCIIEncoding();
 			byte[] buffer = encoder.GetBytes("Hello");
 
 			clientStream.Write(buffer, 0, buffer.Length);
 			clientStream.Flush();
-			clientStream.Close();
-		}
-
-		public string getOwnIp(){
-			IPHostEntry host;
-			string localIP = "?";
-			host = Dns.GetHostEntry(Dns.GetHostName());
-			foreach (IPAddress ip in host.AddressList)
-			{
-				if (ip.AddressFamily == AddressFamily.InterNetwork)
-				{
-					localIP = ip.ToString();
-				}	
-			}
-			return localIP;		
 		}
 	}
 }
