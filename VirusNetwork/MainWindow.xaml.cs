@@ -77,6 +77,7 @@ namespace VirusNetwork {
 			}
 
 			tcpClient.Close();
+			Thread.CurrentThread.Abort();
 		}
 
 		delegate void SetTextCallback(TextBlock control, string text);
@@ -92,14 +93,21 @@ namespace VirusNetwork {
 		}
 
 		private void StartButton_Click(object sender, RoutedEventArgs e) {
-			if (master) {
+			if (master && ((String)StartButton.Content) == "Start Listening") {
+				MasterCheckbox.IsEnabled = false;
 				this.tcpListener = new TcpListener(IPAddress.Any, 3000);
 				this.listenThread = new Thread(new ThreadStart(ListenForClients));
 				this.listenThread.Start();
-				StartButton.Content = "Listening";
-				StartButton.IsEnabled = false;
+				StartButton.Content = "Stop Listening";
+			}
+			else if (master) {
+				MasterCheckbox.IsEnabled = true;
+				tcpListener.Stop();
+				listenThread.Abort();
+				StartButton.Content = "Start Listening";
 			}
 			else if (((String)StartButton.Content)=="Connect") {
+				MasterCheckbox.IsEnabled = false;
 				TcpClient client = new TcpClient();
 				IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse(IpBox.Text), 3000);
 				client.Connect(serverEndPoint);
@@ -111,6 +119,7 @@ namespace VirusNetwork {
 				StartButton.Content = "Disconnect";
 			}
 			else {
+				MasterCheckbox.IsEnabled = true;
 				foreach (TcpClient ns in clientList) {
 					ns.Close();
 				}
