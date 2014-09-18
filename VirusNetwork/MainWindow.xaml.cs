@@ -104,6 +104,10 @@ namespace VirusNetwork {
 				MasterCheckbox.IsEnabled = true;
 				tcpListener.Stop();
 				listenThread.Abort();
+				foreach (TcpClient ns in clientList) {
+					ns.Close();
+				}
+				clientList = new List<TcpClient>();
 				StartButton.Content = "Start Listening";
 			}
 			else if (((String)StartButton.Content)=="Connect") {
@@ -120,6 +124,7 @@ namespace VirusNetwork {
 			}
 			else {
 				MasterCheckbox.IsEnabled = true;
+				StartButton.Content = "Connect";
 				foreach (TcpClient ns in clientList) {
 					ns.Close();
 				}
