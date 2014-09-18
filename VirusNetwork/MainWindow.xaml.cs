@@ -134,7 +134,8 @@ namespace VirusNetwork {
 
 		private void SendButton_Click(object sender, RoutedEventArgs e) {
 			ASCIIEncoding encoder = new ASCIIEncoding();
-			byte[] buffer = encoder.GetBytes("Hello");
+			byte[] buffer = encoder.GetBytes(messageBox.Text);
+			messageBox.Text = "";
 
 			foreach (TcpClient ns in clientList) {
 				ns.GetStream().Write(buffer, 0, buffer.Length);
