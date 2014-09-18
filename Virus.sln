@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirusConsole", "VirusConsol
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirusGUI", "VirusGUI\VirusGUI.csproj", "{47A7D56F-8197-448A-A5AA-0CC3609C408F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirusNetwork", "VirusNetwork\VirusNetwork.csproj", "{4511327B-452E-4E51-B625-CA73A20BEE8F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{47A7D56F-8197-448A-A5AA-0CC3609C408F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{47A7D56F-8197-448A-A5AA-0CC3609C408F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{47A7D56F-8197-448A-A5AA-0CC3609C408F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4511327B-452E-4E51-B625-CA73A20BEE8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4511327B-452E-4E51-B625-CA73A20BEE8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4511327B-452E-4E51-B625-CA73A20BEE8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4511327B-452E-4E51-B625-CA73A20BEE8F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
