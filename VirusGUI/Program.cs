@@ -11,7 +11,7 @@ namespace VirusGUI
 	static class Program
 	{
 		/// <summary>
-		/// The main entry point for the application.
+		/// The main entry point for the application. Du må ikke kigge kristjan !
 		/// </summary>
 		[STAThread]
 		static void Main(String[] args) {
