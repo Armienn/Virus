@@ -32,7 +32,16 @@ namespace VirusNetwork {
 		}
 
 		private void StartButton_Click(object sender, RoutedEventArgs e) {
+			TcpClient client = new TcpClient();
+			IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse(IpBox.Text), int.Parse(PortBox.Text));
+			client.Connect(serverEndPoint);
+			NetworkStream clientStream = client.GetStream();
+			ASCIIEncoding encoder = new ASCIIEncoding();
+			byte[] buffer = encoder.GetBytes("Hello");
 
+			clientStream.Write(buffer, 0, buffer.Length);
+			clientStream.Flush();
+			clientStream.Close();
 		}
 	}
 }
