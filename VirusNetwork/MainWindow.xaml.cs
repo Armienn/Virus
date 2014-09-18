@@ -125,7 +125,7 @@ namespace VirusNetwork {
 			master = true;
 			StartButton.Content = "Start Listening";
 			IpBox.IsEnabled = false;
-			IpBox.Text = "x.x.x.x";
+			IpBox.Text = getOwnIp();
 		}
 
 		private void MasterCheckbox_UnChecked(object sender, RoutedEventArgs e) {
@@ -141,6 +141,21 @@ namespace VirusNetwork {
 
 			clientStream.Write(buffer, 0, buffer.Length);
 			clientStream.Flush();
+		}
+
+		public string getOwnIp()
+		{
+			IPHostEntry host;
+			string localIP = "?";
+			host = Dns.GetHostEntry(Dns.GetHostName());
+			foreach (IPAddress ip in host.AddressList)
+			{
+				if (ip.AddressFamily == AddressFamily.InterNetwork)
+				{
+					localIP = ip.ToString();
+				}
+			}
+			return localIP;
 		}
 	}
 }
