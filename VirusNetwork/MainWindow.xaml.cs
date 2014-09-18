@@ -71,11 +71,23 @@ namespace VirusNetwork {
 
 				//message has successfully been received
 				ASCIIEncoding encoder = new ASCIIEncoding();
-				this.InTextBox.Text = encoder.GetString(message, 0, bytesRead);
+				SetText(InTextBox, encoder.GetString(message, 0, bytesRead));
 				//System.Diagnostics.Debug.WriteLine(encoder.GetString(message, 0, bytesRead));
 			}
 
 			tcpClient.Close();
+		}
+
+		delegate void SetTextCallback(TextBlock control, string text);
+
+		private void SetText(TextBlock control, string text) {
+			if (control.Dispatcher.CheckAccess()) {
+				control.Text = text;
+			}
+			else {
+				SetTextCallback d = new SetTextCallback(SetText);
+				control.Dispatcher.Invoke(d, new object[] { control, text });
+			}
 		}
 
 		private void StartButton_Click(object sender, RoutedEventArgs e) {
