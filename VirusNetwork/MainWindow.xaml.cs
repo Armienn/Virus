@@ -24,7 +24,7 @@ namespace VirusNetwork {
 		private bool master = false;
 		private TcpListener tcpListener;
 		private Thread listenThread;
-		NetworkStream clientStream;
+		List<TcpClient> clientList = new List<TcpClient>();
 
 		public MainWindow() {
 			InitializeComponent();
@@ -37,6 +37,7 @@ namespace VirusNetwork {
 			while (true) {
 				//blocks until a client has connected to the server
 				TcpClient client = this.tcpListener.AcceptTcpClient();
+				clientList.Add(client);
 
 				//create a thread to handle communication 
 				//with connected client
@@ -98,26 +99,22 @@ namespace VirusNetwork {
 				StartButton.Content = "Listening";
 				StartButton.IsEnabled = false;
 			}
-			else if (StartButton.Content=="Connect") {
+			else if (((String)StartButton.Content)=="Connect") {
 				TcpClient client = new TcpClient();
 				IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse(IpBox.Text), 3000);
 				client.Connect(serverEndPoint);
-				clientStream = client.GetStream();
+				clientList.Add(client);
 				
 				Thread clientThread = new Thread(new ParameterizedThreadStart(HandleClientComm));
 				clientThread.Start(client);
 
 				StartButton.Content = "Disconnect";
-				
-				/*ASCIIEncoding encoder = new ASCIIEncoding();
-				byte[] buffer = encoder.GetBytes("Hello");
-
-				clientStream.Write(buffer, 0, buffer.Length);
-				clientStream.Flush();
-				clientStream.Close();*/
 			}
 			else {
-				clientStream.Close();
+				foreach (TcpClient ns in clientList) {
+					ns.Close();
+				}
+				clientList = new List<TcpClient>();
 			}
 		}
 
@@ -139,8 +136,10 @@ namespace VirusNetwork {
 			ASCIIEncoding encoder = new ASCIIEncoding();
 			byte[] buffer = encoder.GetBytes("Hello");
 
-			clientStream.Write(buffer, 0, buffer.Length);
-			clientStream.Flush();
+			foreach (TcpClient ns in clientList) {
+				ns.GetStream().Write(buffer, 0, buffer.Length);
+				ns.GetStream().Flush();
+			}
 		}
 
 		public string getOwnIp()
