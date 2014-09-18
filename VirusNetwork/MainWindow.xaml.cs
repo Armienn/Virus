@@ -26,6 +26,9 @@ namespace VirusNetwork {
 
 		public MainWindow() {
 			InitializeComponent();
+			this.tcpListener = new TcpListener(IPAddress.Any, 3000);
+			this.listenThread = new Thread(new ThreadStart(ListenForClients));
+			this.listenThread.Start();
 		}
 
 		private void StartButton_Click(object sender, RoutedEventArgs e) {
