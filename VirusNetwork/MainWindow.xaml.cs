@@ -29,6 +29,7 @@ namespace VirusNetwork {
 			this.tcpListener = new TcpListener(IPAddress.Any, 3000);
 			this.listenThread = new Thread(new ThreadStart(ListenForClients));
 			this.listenThread.Start();
+			SetText(InTextBox, getOwnIp());
 		}
 
 		private void ListenForClients() {
@@ -101,6 +102,20 @@ namespace VirusNetwork {
 			clientStream.Write(buffer, 0, buffer.Length);
 			clientStream.Flush();
 			clientStream.Close();
+		}
+
+		public string getOwnIp(){
+			IPHostEntry host;
+			string localIP = "?";
+			host = Dns.GetHostEntry(Dns.GetHostName());
+			foreach (IPAddress ip in host.AddressList)
+			{
+				if (ip.AddressFamily == AddressFamily.InterNetwork)
+				{
+					localIP = ip.ToString();
+				}	
+			}
+			return localIP;		
 		}
 	}
 }
