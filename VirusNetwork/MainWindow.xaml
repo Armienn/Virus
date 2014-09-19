@@ -14,6 +14,7 @@
 		<ScrollViewer HorizontalAlignment="Left" Margin="13,93,0,64" VerticalAlignment="Stretch" Width="161">
 			<TextBlock x:Name="InTextBox" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Width="142"/>
 		</ScrollViewer>
+		<Canvas x:Name="VirusCanvas" HorizontalAlignment="Stretch" Margin="179,10,10,10" VerticalAlignment="Stretch"/>
 
 	</Grid>
 </Window>
