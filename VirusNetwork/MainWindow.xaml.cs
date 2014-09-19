@@ -54,7 +54,7 @@ namespace VirusNetwork {
 			byte[] message = new byte[4096];
 			int bytesRead;
 
-			while (tcpClient.Connected) {
+			while (true) {
 				bytesRead = 0;
 
 				try {
@@ -86,6 +86,7 @@ namespace VirusNetwork {
 			}
 
 			tcpClient.Close();
+			clientList.Remove(tcpClient);
 			Thread.CurrentThread.Abort();
 		}
 
