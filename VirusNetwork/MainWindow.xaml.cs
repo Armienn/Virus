@@ -29,7 +29,7 @@ namespace VirusNetwork {
 
 		public MainWindow() {
 			InitializeComponent();
-			
+			messageBox.KeyDown += new KeyEventHandler(messageBox_keyDown);
 		}
 
 		private void ListenForClients() {
@@ -217,6 +217,25 @@ namespace VirusNetwork {
 			}
 			foreach (TcpClient ns in clientList) {
 				ns.Close();
+			}
+		}
+
+		private void messageBox_keyDown(object sender, KeyEventArgs e)
+		{
+			if (e.Key == Key.Enter && messageBox.Text != "")
+			{
+				ASCIIEncoding encoder = new ASCIIEncoding();
+				String message = PlayerNameBox.Text + ":\n  " + messageBox.Text + "\n";
+				byte[] buffer = encoder.GetBytes(message);
+				if (master)
+					AddText(InTextBox, message);
+				messageBox.Text = "";
+
+				foreach (TcpClient ns in clientList)
+				{
+					ns.GetStream().Write(buffer, 0, buffer.Length);
+					ns.GetStream().Flush();
+				}
 			}
 		}
 	}
