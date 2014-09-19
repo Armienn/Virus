@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using System.Threading;
 using System.Net.Sockets;
 using System.Net;
+using System.ComponentModel;
 
 namespace VirusNetwork {
 	/// <summary>
@@ -93,14 +94,14 @@ namespace VirusNetwork {
 		}
 
 		private void StartButton_Click(object sender, RoutedEventArgs e) {
-			if (master && ((String)StartButton.Content) == "Start Listening") {
+			if (master && ((String)StartButton.Content) == "Start Listening") {   // Listening
 				MasterCheckbox.IsEnabled = false;
 				this.tcpListener = new TcpListener(IPAddress.Any, 3000);
 				this.listenThread = new Thread(new ThreadStart(ListenForClients));
 				this.listenThread.Start();
 				StartButton.Content = "Stop Listening";
 			}
-			else if (master) {
+			else if (master) {   // Disconnecting
 				MasterCheckbox.IsEnabled = true;
 				tcpListener.Stop();
 				listenThread.Abort();
@@ -110,19 +111,32 @@ namespace VirusNetwork {
 				clientList = new List<TcpClient>();
 				StartButton.Content = "Start Listening";
 			}
-			else if (((String)StartButton.Content)=="Connect") {
-				MasterCheckbox.IsEnabled = false;
-				TcpClient client = new TcpClient();
-				IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse(IpBox.Text), 3000);
-				client.Connect(serverEndPoint);
-				clientList.Add(client);
+			else if (((String)StartButton.Content)=="Connect") {   // Connecting
 				
-				Thread clientThread = new Thread(new ParameterizedThreadStart(HandleClientComm));
-				clientThread.Start(client);
+				IPAddress ip;
+				if (IPAddress.TryParse(IpBox.Text, out ip)) {
+					try {
+						TcpClient client = new TcpClient();
+						IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse(IpBox.Text), 3000);
+						client.Connect(serverEndPoint);
+						clientList.Add(client);
 
-				StartButton.Content = "Disconnect";
+						Thread clientThread = new Thread(new ParameterizedThreadStart(HandleClientComm));
+						clientThread.Start(client);
+
+						StartButton.Content = "Disconnect";
+						MasterCheckbox.IsEnabled = false;
+					}
+					catch (Exception exc) {
+						IpBox.Text = "Failed to connect";
+					}
+				}
+				else {
+					IpBox.Text = "Not valid IP";
+				}
+				
 			}
-			else {
+			else {   // Disconnecting
 				MasterCheckbox.IsEnabled = true;
 				StartButton.Content = "Connect";
 				foreach (TcpClient ns in clientList) {
@@ -170,6 +184,17 @@ namespace VirusNetwork {
 				}
 			}
 			return localIP;
+		}
+
+		void MainWindow_Closing(object sender, CancelEventArgs e) {
+			if (master) {
+				tcpListener.Stop();
+				listenThread.Abort();
+			}
+			foreach (TcpClient ns in clientList) {
+				ns.Close();
+			}
+			clientList = new List<TcpClient>();
 		}
 	}
 }
