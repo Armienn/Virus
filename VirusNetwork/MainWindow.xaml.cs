@@ -54,7 +54,7 @@ namespace VirusNetwork {
 			byte[] message = new byte[4096];
 			int bytesRead;
 
-			while (true) {
+			while (tcpClient.Connected) {
 				bytesRead = 0;
 
 				try {
@@ -73,8 +73,16 @@ namespace VirusNetwork {
 
 				//message has successfully been received
 				ASCIIEncoding encoder = new ASCIIEncoding();
-				SetText(InTextBox, encoder.GetString(message, 0, bytesRead));
-				//System.Diagnostics.Debug.WriteLine(encoder.GetString(message, 0, bytesRead));
+				String intext = encoder.GetString(message, 0, bytesRead);
+				AddText(InTextBox, intext);
+				if (master) {
+					byte[] buffer = encoder.GetBytes(intext);
+
+					foreach (TcpClient ns in clientList) {
+						ns.GetStream().Write(buffer, 0, buffer.Length);
+						ns.GetStream().Flush();
+					}
+				}
 			}
 
 			tcpClient.Close();
@@ -89,6 +97,18 @@ namespace VirusNetwork {
 			}
 			else {
 				SetTextCallback d = new SetTextCallback(SetText);
+				control.Dispatcher.Invoke(d, new object[] { control, text });
+			}
+		}
+
+		delegate void AddTextCallback(TextBlock control, string text);
+
+		private void AddText(TextBlock control, string text) {
+			if (control.Dispatcher.CheckAccess()) {
+				control.Text += text;
+			}
+			else {
+				AddTextCallback d = new AddTextCallback(AddText);
 				control.Dispatcher.Invoke(d, new object[] { control, text });
 			}
 		}
@@ -150,7 +170,7 @@ namespace VirusNetwork {
 			master = true;
 			StartButton.Content = "Start Listening";
 			IpBox.IsEnabled = false;
-			IpBox.Text = getOwnIp();
+			IpBox.Text = GetOwnIP();
 		}
 
 		private void MasterCheckbox_UnChecked(object sender, RoutedEventArgs e) {
@@ -162,7 +182,10 @@ namespace VirusNetwork {
 
 		private void SendButton_Click(object sender, RoutedEventArgs e) {
 			ASCIIEncoding encoder = new ASCIIEncoding();
-			byte[] buffer = encoder.GetBytes(messageBox.Text);
+			String message = GetOwnIP() + ":\n  " + messageBox.Text + "\n";
+			byte[] buffer = encoder.GetBytes(message);
+			if(master)
+				AddText(InTextBox, message);
 			messageBox.Text = "";
 
 			foreach (TcpClient ns in clientList) {
@@ -171,11 +194,10 @@ namespace VirusNetwork {
 			}
 		}
 
-		public string getOwnIp()
+		public string GetOwnIP()
 		{
-			IPHostEntry host;
 			string localIP = "?";
-			host = Dns.GetHostEntry(Dns.GetHostName());
+			IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
 			foreach (IPAddress ip in host.AddressList)
 			{
 				if (ip.AddressFamily == AddressFamily.InterNetwork)
@@ -188,13 +210,14 @@ namespace VirusNetwork {
 
 		void MainWindow_Closing(object sender, CancelEventArgs e) {
 			if (master) {
-				tcpListener.Stop();
-				listenThread.Abort();
+				if (tcpListener != null) {
+					tcpListener.Stop();
+					listenThread.Abort();
+				}
 			}
 			foreach (TcpClient ns in clientList) {
 				ns.Close();
 			}
-			clientList = new List<TcpClient>();
 		}
 	}
 }

@@ -4,13 +4,16 @@
 				Closing="MainWindow_Closing"
         Title="Virus" Height="350" Width="525">
 	<Grid>
-		<CheckBox x:Name="MasterCheckbox" Content="Master" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Checked="MasterCheckbox_Checked" Unchecked="MasterCheckbox_UnChecked"/>
-		<Label Content="IP" HorizontalAlignment="Left" Margin="10,31,0,0" VerticalAlignment="Top"/>
-		<TextBox x:Name="IpBox" HorizontalAlignment="Left" Height="23" Margin="68,33,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="106" UndoLimit="10" MaxLength="15"/>
-		<Button x:Name="StartButton" Content="Connect" HorizontalAlignment="Left" Margin="68,7,0,0" VerticalAlignment="Top" Width="106" Click="StartButton_Click"/>
-		<TextBlock x:Name="InTextBox" HorizontalAlignment="Left" Margin="13,62,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="179" Width="161"/>
-		<Button x:Name="SendButton" Content="Send" HorizontalAlignment="Left" Margin="13,281,0,0" VerticalAlignment="Top" Width="161" Click="SendButton_Click"/>
-		<TextBox x:Name="messageBox" HorizontalAlignment="Left" Height="30" Margin="13,246,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="161"/>
+		<CheckBox x:Name="MasterCheckbox" Content="Master" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" Checked="MasterCheckbox_Checked" Unchecked="MasterCheckbox_UnChecked"/>
+		<Label Content="IP" HorizontalAlignment="Left" Margin="10,62,0,0" VerticalAlignment="Top"/>
+		<TextBox x:Name="IpBox" HorizontalAlignment="Left" Height="23" Margin="68,64,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="106" UndoLimit="10" MaxLength="15"/>
+		<Button x:Name="StartButton" Content="Connect" HorizontalAlignment="Left" Margin="68,38,0,0" VerticalAlignment="Top" Width="106" Click="StartButton_Click"/>
+		<Button x:Name="SendButton" Content="Send" HorizontalAlignment="Left" Margin="13,288,0,0" VerticalAlignment="Top" Width="161" Click="SendButton_Click"/>
+		<TextBox x:Name="messageBox" HorizontalAlignment="Left" Height="30" Margin="13,253,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="161"/>
+		<TextBox x:Name="PlayerNameBox" HorizontalAlignment="Left" Height="23" Margin="10,10,0,0" TextWrapping="Wrap" Text="Player1" VerticalAlignment="Top" Width="164"/>
+		<ScrollViewer HorizontalAlignment="Left" Height="155" Margin="13,93,0,0" VerticalAlignment="Top" Width="161">
+			<TextBlock x:Name="InTextBox" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Width="142"/>
+		</ScrollViewer>
 
 	</Grid>
 </Window>
