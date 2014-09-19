@@ -209,6 +209,16 @@ namespace VirusNetwork {
 			return localIP;
 		}
 
+		private void Window_Loaded(object sender, RoutedEventArgs e) {
+			// Create the interop host control.
+			System.Windows.Forms.Integration.WindowsFormsHost host =
+					new System.Windows.Forms.Integration.WindowsFormsHost();
+
+			VirusInterfaceMod viruscontrol = new VirusInterfaceMod();
+			host.Child = viruscontrol;
+			this.VirusGrid.Children.Add(host);
+		}
+
 		void MainWindow_Closing(object sender, CancelEventArgs e) {
 			if (master) {
 				if (tcpListener != null) {
