@@ -8,10 +8,10 @@
 		<Label Content="IP" HorizontalAlignment="Left" Margin="10,62,0,0" VerticalAlignment="Top"/>
 		<TextBox x:Name="IpBox" HorizontalAlignment="Left" Height="23" Margin="68,64,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="106" UndoLimit="10" MaxLength="15"/>
 		<Button x:Name="StartButton" Content="Connect" HorizontalAlignment="Left" Margin="68,38,0,0" VerticalAlignment="Top" Width="106" Click="StartButton_Click"/>
-		<Button x:Name="SendButton" Content="Send" HorizontalAlignment="Left" Margin="13,288,0,0" VerticalAlignment="Top" Width="161" Click="SendButton_Click"/>
-		<TextBox x:Name="messageBox" HorizontalAlignment="Left" Height="30" Margin="13,253,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="161"/>
-		<TextBox x:Name="PlayerNameBox" HorizontalAlignment="Left" Height="23" Margin="10,10,0,0" TextWrapping="Wrap" Text="Player1" VerticalAlignment="Top" Width="164"/>
-		<ScrollViewer HorizontalAlignment="Left" Height="155" Margin="13,93,0,0" VerticalAlignment="Top" Width="161">
+		<Button x:Name="SendButton" Content="Send" HorizontalAlignment="Left" Margin="13,0,0,10" VerticalAlignment="Bottom" Width="161" Click="SendButton_Click"/>
+		<TextBox x:Name="messageBox" HorizontalAlignment="Left" Margin="13,0,0,37" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="161" MaxLength="1000" Height="22"/>
+		<TextBox x:Name="PlayerNameBox" HorizontalAlignment="Left" Height="23" Margin="10,10,0,0" TextWrapping="Wrap" Text="Player1" VerticalAlignment="Top" Width="164" MaxLines="1" MaxLength="12"/>
+		<ScrollViewer HorizontalAlignment="Left" Margin="13,93,0,64" VerticalAlignment="Stretch" Width="161">
 			<TextBlock x:Name="InTextBox" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Width="142"/>
 		</ScrollViewer>
 

@@ -182,7 +182,7 @@ namespace VirusNetwork {
 
 		private void SendButton_Click(object sender, RoutedEventArgs e) {
 			ASCIIEncoding encoder = new ASCIIEncoding();
-			String message = GetOwnIP() + ":\n  " + messageBox.Text + "\n";
+			String message = PlayerNameBox.Text + ":\n  " + messageBox.Text + "\n";
 			byte[] buffer = encoder.GetBytes(message);
 			if(master)
 				AddText(InTextBox, message);
