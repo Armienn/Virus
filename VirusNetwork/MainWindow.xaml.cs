@@ -72,7 +72,7 @@ namespace VirusNetwork {
 				}
 
 				//message has successfully been received
-				ASCIIEncoding encoder = new ASCIIEncoding();
+				UnicodeEncoding encoder = new UnicodeEncoding();
 				String intext = encoder.GetString(message, 0, bytesRead);
 				AddText(InTextBox, intext);
 				if (master) {
@@ -182,7 +182,7 @@ namespace VirusNetwork {
 		}
 
 		private void SendButton_Click(object sender, RoutedEventArgs e) {
-			ASCIIEncoding encoder = new ASCIIEncoding();
+			UnicodeEncoding encoder = new UnicodeEncoding();
 			String message = PlayerNameBox.Text + ":\n  " + messageBox.Text + "\n";
 			byte[] buffer = encoder.GetBytes(message);
 			if(master)
@@ -225,7 +225,7 @@ namespace VirusNetwork {
 		{
 			if (e.Key == Key.Enter && messageBox.Text != "")
 			{
-				ASCIIEncoding encoder = new ASCIIEncoding();
+				UnicodeEncoding encoder = new UnicodeEncoding();
 				String message = PlayerNameBox.Text + ":\n  " + messageBox.Text + "\n";
 				byte[] buffer = encoder.GetBytes(message);
 				if (master)
