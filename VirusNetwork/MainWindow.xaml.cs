@@ -183,7 +183,7 @@ namespace VirusNetwork {
 		}
 
 		private void SendButton_Click(object sender, RoutedEventArgs e) {
-			viruscontrol.StartGame(new VirusNameSpace.Virus(),false,"mig","dig");
+			viruscontrol.StartGame(new VirusNameSpace.Virus(),);
 			UnicodeEncoding encoder = new UnicodeEncoding();
 			String message = PlayerNameBox.Text + ":\n  " + messageBox.Text + "\n";
 			byte[] buffer = encoder.GetBytes(message);

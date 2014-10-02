@@ -12,6 +12,17 @@ using System.IO;
 
 namespace VirusNetwork
 {
+	public class VirusPlayer {
+		public string Name;
+		public string IP;
+		public Color PlayerColor;
+		public VirusPlayer(string name, string ip, Color color) {
+			Name = name;
+			IP = ip;
+			PlayerColor = color;
+		}
+	}
+
 	public partial class VirusInterfaceMod : UserControl
 	{
 		Virus virus;
@@ -22,33 +33,35 @@ namespace VirusNetwork
 		bool readyToMove = false;
 		bool gameWon = false;
 		String message = "Game on!";
-		List<String> names = new List<String>();
-		Color[] colors;
+		List<VirusPlayer> players = new List<VirusPlayer>();
+		//Color[] colors;
 		Agent[] agents;
 
 		public VirusInterfaceMod() {
 			InitializeComponent();
 		}
 
-		public void StartGame(Virus virus, bool immediateAI = false, params String[] names) {
+		public void StartGame(Virus virus, params VirusPlayer[] players) {
+			Random rand = new Random();
 			this.virus = virus;
-			int smallestSide = this.Size.Height < this.Size.Width ? this.Size.Height : this.Size.Width;
-			tileSize = smallestSide / virus.Size;
-			this.immediateAI = immediateAI;
+			this.immediateAI = false;
 			this.MouseClick += MouseClickHandler1;
+			tileSize = 20;
 			this.Size = new Size(
 				virus.Size * tileSize + 17,
 				virus.Size * tileSize + 55);
-			this.names.Add("Player 0");
-			this.names.AddRange(names);
-			while (this.names.Count < virus.Players + 1) {
-				this.names.Add("Player " + this.names.Count);
+			int smallestSide = this.Size.Height < this.Size.Width ? this.Size.Height : this.Size.Width;
+			tileSize = smallestSide / virus.Size;
+			this.players.Add(new VirusPlayer("Player 0", "", Color.White));
+			this.players.AddRange(players);
+			while (this.players.Count < virus.Players + 1) {
+				this.players.Add(new VirusPlayer("BruteAI","AI",Color.FromArgb(rand.Next(256), rand.Next(256), rand.Next(256)));
 			}
 			//Save("Lalalafil");
-			agents = new Agent[this.names.Count];
+			agents = new Agent[this.players.Count];
 			int n = 1;
-			for (byte i = 1; i < this.names.Count; i++) {
-				String p = this.names[i];
+			for (byte i = 1; i < this.players.Count; i++) {
+				String p = this.players[i].Name;
 				switch (p) {
 					case "QAI":
 						agents[i] = new QAgent(i);
@@ -57,12 +70,12 @@ namespace VirusNetwork
 							((QAgent)agents[i]).TurnOffExploration();
 							((QAgent)agents[i]).TurnOffLearning();
 						}
-						this.names[i] = "AI " + n;
+						this.players[i].Name = "AI " + n;
 						n++;
 						break;
 					case "MinimaxAI":
 						agents[i] = new MinimaxAgent(4,i);
-						this.names[i] = "AI " + n;
+						this.players[i].Name = "AI " + n;
 						n++;
 						break;
 					case "MiniMaxMixAI":
@@ -70,35 +83,35 @@ namespace VirusNetwork
 							agents[i] = new MiniMaxMixAgent("TrainingData", 2, i);
 						else
 							agents[i] = new BruteForceAgent(i);
-						this.names[i] = "AI " + n;
+						this.players[i].Name = "AI " + n;
 						n++;
 						break;
 					case "MixedAI":
 						agents[i] = new MixedAgent(0.5,false,i);
-						this.names[i] = "AI " + n;
+						this.players[i].Name = "AI " + n;
 						n++;
 						break;
 					case "BruteAI":
 						agents[i] = new BruteForceAgent(i);
-						this.names[i] = "AI " + n;
+						this.players[i].Name = "AI " + n;
 						n++;
 						break;
 					case "RandomAI":
 						agents[i] = new RandomAgent(i);
-						this.names[i] = "AI " + n;
+						this.players[i].Name = "AI " + n;
 						n++;
 						break;
 					case "SimpleAI":
 						agents[i] = new SimpleAgent(i);
-						this.names[i] = "AI " + n;
+						this.players[i].Name = "AI " + n;
 						n++;
 						break;
 				}
 			}
 
-			message = this.names[1] + "'s turn";
+			message = this.players[1].Name + "'s turn";
 
-			colors = new Color[virus.Players + 1];
+			/*colors = new Color[virus.Players + 1];
 			colors[0] = Color.White;
 			colors[1] = Color.FromArgb(128, 160, 255);
 			colors[2] = Color.FromArgb(96, 255, 96);
@@ -106,9 +119,9 @@ namespace VirusNetwork
 				colors[3] = Color.FromArgb(255, 96, 96);
 			if(virus.Players > 3)
 				colors[4] = Color.FromArgb(255, 255, 64);
-			Random rand = new Random();
+			
 			for (int i = 5; i <= virus.Players; i++)
-				colors[i] = Color.FromArgb(rand.Next(256), rand.Next(256), rand.Next(256));
+				colors[i] = Color.FromArgb(rand.Next(256), rand.Next(256), rand.Next(256));*/
 		}
 
 		protected override void OnPaint(PaintEventArgs e) {
@@ -133,7 +146,7 @@ namespace VirusNetwork
 
 							g.DrawRectangle(pen, i * tileSize, j * tileSize, tileSize, tileSize);
 
-							pen.Color = colors[virus[i, boardlength - j - 1]];
+							pen.Color = players[virus[i, boardlength - j - 1]].PlayerColor;
 							g.FillRectangle(pen.Brush, i * tileSize + 1, j * tileSize + 1, tileSize - 1, tileSize - 1);
 
 							if (readyToMove && i == x && (boardlength - j - 1) == y) {
@@ -147,7 +160,7 @@ namespace VirusNetwork
 				}
 
 				g.FillRectangle(
-					new Pen(colors[virus.CurrentPlayer]).Brush,
+					new Pen(players[virus.CurrentPlayer].PlayerColor).Brush,
 					new Rectangle(0, boardlength * tileSize + 1, this.Width, 20)
 					);
 				g.DrawString(
@@ -156,7 +169,7 @@ namespace VirusNetwork
 					pen.Brush,
 					new Rectangle(0, boardlength * tileSize, 200, 20)
 					);
-				if ((!immediateAI) && (names[virus.CurrentPlayer].StartsWith("AI"))) {
+				if ((!immediateAI) && (players[virus.CurrentPlayer].Name.StartsWith("AI"))) {
 					g.FillRectangle(
 						new Pen(Color.LightGray).Brush,
 						new Rectangle(this.Width - 60, boardlength * tileSize + 2, 43, 13)
@@ -173,7 +186,7 @@ namespace VirusNetwork
 
 		private void ImmediateHandler() {
 			immediateRunning = true;
-			while (names[virus.CurrentPlayer].StartsWith("AI")) {
+			while (players[virus.CurrentPlayer].Name.StartsWith("AI")) {
 				AIMove();
 
 				if (gameWon) {
@@ -193,7 +206,7 @@ namespace VirusNetwork
 		}
 
 		private void MouseClickHandler1(Object sender, MouseEventArgs args) {
-			if (names[virus.CurrentPlayer].StartsWith("AI")) {
+			if (players[virus.CurrentPlayer].Name.StartsWith("AI")) {
 				if (!immediateAI) {
 					if ((args.X > this.Width - 60) && (args.Y > virus.Size * tileSize)) {
 						AIMove();
@@ -290,7 +303,7 @@ namespace VirusNetwork
 		private void CheckForWinner(byte winner) {
 			this.Invalidate(new Rectangle(0, virus.Size * tileSize + 1, this.Width, 40)); //message area
 
-			message = names[winner];
+			message = players[winner].Name;
 
 			if (message != "Player 0") {
 				gameWon = true;
@@ -309,12 +322,12 @@ namespace VirusNetwork
 
 				String s = "Free: " + pieces[0] + "\n";
 				for (int i = 1; i <= virus.Players; i++) {
-					s += names[i] + ": " + pieces[i] + "\n";
+					s += players[i].Name + ": " + pieces[i] + "\n";
 				}
 				MessageBox.Show(w + " is the winner\n" + s);
 			}
 			else {
-				message = names[virus.CurrentPlayer];
+				message = players[virus.CurrentPlayer].Name;
 				message += "'s turn";
 				this.Update();
 			}
