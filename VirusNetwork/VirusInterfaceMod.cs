@@ -30,9 +30,10 @@ namespace VirusNetwork
 			InitializeComponent();
 		}
 
-		public void StartGame(Virus virus, int tilesize = 20, bool immediateAI = false, params String[] names) {
+		public void StartGame(Virus virus, bool immediateAI = false, params String[] names) {
 			this.virus = virus;
-			this.tileSize = tilesize;
+			int smallestSide = this.Size.Height < this.Size.Width ? this.Size.Height : this.Size.Width;
+			tileSize = smallestSide / virus.Size;
 			this.immediateAI = immediateAI;
 			this.MouseClick += MouseClickHandler1;
 			this.Size = new Size(
@@ -115,6 +116,8 @@ namespace VirusNetwork
 				Graphics g = e.Graphics;
 				Pen pen = new Pen(Color.Black);
 				int boardlength = virus.Size;
+				int smallestSide = this.Size.Height < this.Size.Width ? this.Size.Height : this.Size.Width;
+				tileSize = smallestSide/virus.Size;
 
 				int xStart = e.ClipRectangle.Left / tileSize;
 				int yStart = e.ClipRectangle.Top / tileSize;

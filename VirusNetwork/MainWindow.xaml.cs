@@ -26,6 +26,7 @@ namespace VirusNetwork {
 		private TcpListener tcpListener;
 		private Thread listenThread;
 		List<TcpClient> clientList = new List<TcpClient>();
+		VirusInterfaceMod viruscontrol;
 
 		public MainWindow() {
 			InitializeComponent();
@@ -182,6 +183,7 @@ namespace VirusNetwork {
 		}
 
 		private void SendButton_Click(object sender, RoutedEventArgs e) {
+			viruscontrol.StartGame(new VirusNameSpace.Virus(),false,"mig","dig");
 			UnicodeEncoding encoder = new UnicodeEncoding();
 			String message = PlayerNameBox.Text + ":\n  " + messageBox.Text + "\n";
 			byte[] buffer = encoder.GetBytes(message);
@@ -214,7 +216,7 @@ namespace VirusNetwork {
 			System.Windows.Forms.Integration.WindowsFormsHost host =
 					new System.Windows.Forms.Integration.WindowsFormsHost();
 
-			VirusInterfaceMod viruscontrol = new VirusInterfaceMod();
+			viruscontrol = new VirusInterfaceMod();
 			host.Child = viruscontrol;
 			this.VirusGrid.Children.Add(host);
 		}
