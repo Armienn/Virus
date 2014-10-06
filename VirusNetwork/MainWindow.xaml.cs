@@ -256,5 +256,200 @@ namespace VirusNetwork {
 				}
 			}
 		}
+
+		private void redColor_Checked(object sender, RoutedEventArgs e)
+		{
+			if (blueColor.IsChecked == false && greenColor.IsChecked == false && blackColor.IsChecked == false && goldColor.IsChecked == false)
+			{
+				UnicodeEncoding encoder = new UnicodeEncoding();
+				string message = PlayerNameBox.Text + " is red... \n";
+				byte[] buffer = encoder.GetBytes(message);
+				if (master)
+					AddText(InTextBox, message);
+				messageBox.Text = "";
+
+				foreach (TcpClient ns in clientList)
+				{
+					ns.GetStream().Write(buffer, 0, buffer.Length);
+					ns.GetStream().Flush();
+				}
+			}
+			else
+			{
+				redColor.IsChecked = false;
+			}
+		}
+
+		private void redColor_Unchecked(object sender, RoutedEventArgs e)
+		{
+			UnicodeEncoding encoder = new UnicodeEncoding();
+			string message = PlayerNameBox.Text + " is no longer red... \n";
+			byte[] buffer = encoder.GetBytes(message);
+			if (master)
+				AddText(InTextBox, message);
+			messageBox.Text = "";
+
+			foreach (TcpClient ns in clientList)
+			{
+				ns.GetStream().Write(buffer, 0, buffer.Length);
+				ns.GetStream().Flush();
+			}
+		}
+
+		private void blueColor_Checked(object sender, RoutedEventArgs e)
+		{
+			if (redColor.IsChecked == false && greenColor.IsChecked == false && blackColor.IsChecked == false && goldColor.IsChecked == false)
+			{
+				UnicodeEncoding encoder = new UnicodeEncoding();
+				string message = PlayerNameBox.Text + " is blue... \n";
+				byte[] buffer = encoder.GetBytes(message);
+				if (master)
+					AddText(InTextBox, message);
+				messageBox.Text = "";
+
+				foreach (TcpClient ns in clientList)
+				{
+					ns.GetStream().Write(buffer, 0, buffer.Length);
+					ns.GetStream().Flush();
+				}
+			}
+			else
+			{
+				blueColor.IsChecked = false;
+			}
+		}
+
+		private void blueColor_Unchecked(object sender, RoutedEventArgs e)
+		{
+			UnicodeEncoding encoder = new UnicodeEncoding();
+			string message = PlayerNameBox.Text + " is no longer blue... \n";
+			byte[] buffer = encoder.GetBytes(message);
+			if (master)
+				AddText(InTextBox, message);
+			messageBox.Text = "";
+
+			foreach (TcpClient ns in clientList)
+			{
+				ns.GetStream().Write(buffer, 0, buffer.Length);
+				ns.GetStream().Flush();
+			}
+		}
+
+		private void greenColor_Checked(object sender, RoutedEventArgs e)
+		{
+			if (blueColor.IsChecked == false && redColor.IsChecked == false && blackColor.IsChecked == false && goldColor.IsChecked == false)
+			{
+				UnicodeEncoding encoder = new UnicodeEncoding();
+				string message = PlayerNameBox.Text + " is green... \n";
+				byte[] buffer = encoder.GetBytes(message);
+				if (master)
+					AddText(InTextBox, message);
+				messageBox.Text = "";
+
+				foreach (TcpClient ns in clientList)
+				{
+					ns.GetStream().Write(buffer, 0, buffer.Length);
+					ns.GetStream().Flush();
+				}
+			}
+			else
+			{
+				greenColor.IsChecked = false;
+			}
+		}
+
+		private void greenColor_Unchecked(object sender, RoutedEventArgs e)
+		{
+			UnicodeEncoding encoder = new UnicodeEncoding();
+			string message = PlayerNameBox.Text + " is no longer green... \n";
+			byte[] buffer = encoder.GetBytes(message);
+			if (master)
+				AddText(InTextBox, message);
+			messageBox.Text = "";
+
+			foreach (TcpClient ns in clientList)
+			{
+				ns.GetStream().Write(buffer, 0, buffer.Length);
+				ns.GetStream().Flush();
+			}
+		}
+
+		private void blackColor_Checked(object sender, RoutedEventArgs e)
+		{
+			if (blueColor.IsChecked == false && greenColor.IsChecked == false && redColor.IsChecked == false && goldColor.IsChecked == false)
+			{
+				UnicodeEncoding encoder = new UnicodeEncoding();
+				string message = PlayerNameBox.Text + " is black... \n";
+				byte[] buffer = encoder.GetBytes(message);
+				if (master)
+					AddText(InTextBox, message);
+				messageBox.Text = "";
+
+				foreach (TcpClient ns in clientList)
+				{
+					ns.GetStream().Write(buffer, 0, buffer.Length);
+					ns.GetStream().Flush();
+				}
+			}
+			else
+			{
+				blackColor.IsChecked = false;
+			}
+		}
+
+		private void blackColor_Unchecked(object sender, RoutedEventArgs e)
+		{
+			UnicodeEncoding encoder = new UnicodeEncoding();
+			string message = PlayerNameBox.Text + " is no longer black... \n";
+			byte[] buffer = encoder.GetBytes(message);
+			if (master)
+				AddText(InTextBox, message);
+			messageBox.Text = "";
+
+			foreach (TcpClient ns in clientList)
+			{
+				ns.GetStream().Write(buffer, 0, buffer.Length);
+				ns.GetStream().Flush();
+			}
+		}
+
+		private void goldColor_Checked(object sender, RoutedEventArgs e)
+		{
+			if (blueColor.IsChecked == false && greenColor.IsChecked == false && blackColor.IsChecked == false && redColor.IsChecked == false)
+			{
+				UnicodeEncoding encoder = new UnicodeEncoding();
+				string message = PlayerNameBox.Text + " is gold... \n";
+				byte[] buffer = encoder.GetBytes(message);
+				if (master)
+					AddText(InTextBox, message);
+				messageBox.Text = "";
+
+				foreach (TcpClient ns in clientList)
+				{
+					ns.GetStream().Write(buffer, 0, buffer.Length);
+					ns.GetStream().Flush();
+				}
+			}
+			else
+			{
+				goldColor.IsChecked = false;
+			}
+		}
+
+		private void goldColor_Unchecked(object sender, RoutedEventArgs e)
+		{
+			UnicodeEncoding encoder = new UnicodeEncoding();
+			string message = PlayerNameBox.Text + " is no longer gold... \n";
+			byte[] buffer = encoder.GetBytes(message);
+			if (master)
+				AddText(InTextBox, message);
+			messageBox.Text = "";
+
+			foreach (TcpClient ns in clientList)
+			{
+				ns.GetStream().Write(buffer, 0, buffer.Length);
+				ns.GetStream().Flush();
+			}
+		}
 	}
 }
