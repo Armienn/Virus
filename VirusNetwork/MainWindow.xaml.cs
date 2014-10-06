@@ -33,6 +33,7 @@ namespace VirusNetwork {
 		public MainWindow() {
 			InitializeComponent();
 			messageBox.KeyDown += new KeyEventHandler(messageBox_keyDown);
+			Jeg vil også gerne kode Virus, i stedet for det her RSD værk ;_;
 		}
 
 		private void ListenForClients() {
