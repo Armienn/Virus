@@ -28,6 +28,8 @@ namespace VirusNetwork {
 		List<TcpClient> clientList = new List<TcpClient>();
 		VirusInterfaceMod viruscontrol;
 
+		private bool runOnce = true;
+
 		public MainWindow() {
 			InitializeComponent();
 			messageBox.KeyDown += new KeyEventHandler(messageBox_keyDown);
@@ -183,7 +185,11 @@ namespace VirusNetwork {
 		}
 
 		private void SendButton_Click(object sender, RoutedEventArgs e) {
-			viruscontrol.StartGame(new VirusNameSpace.Virus(),);
+			if (runOnce == true)
+			{
+				viruscontrol.StartGame(new VirusNameSpace.Virus());
+				runOnce = false;
+			}
 			UnicodeEncoding encoder = new UnicodeEncoding();
 			String message = PlayerNameBox.Text + ":\n  " + messageBox.Text + "\n";
 			byte[] buffer = encoder.GetBytes(message);
@@ -215,7 +221,6 @@ namespace VirusNetwork {
 			// Create the interop host control.
 			System.Windows.Forms.Integration.WindowsFormsHost host =
 					new System.Windows.Forms.Integration.WindowsFormsHost();
-
 			viruscontrol = new VirusInterfaceMod();
 			host.Child = viruscontrol;
 			this.VirusGrid.Children.Add(host);

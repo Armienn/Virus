@@ -55,7 +55,7 @@ namespace VirusNetwork
 			this.players.Add(new VirusPlayer("Player 0", "", Color.White));
 			this.players.AddRange(players);
 			while (this.players.Count < virus.Players + 1) {
-				this.players.Add(new VirusPlayer("BruteAI","AI",Color.FromArgb(rand.Next(256), rand.Next(256), rand.Next(256)));
+				this.players.Add(new VirusPlayer("BruteAI","AI",Color.FromArgb(rand.Next(256), rand.Next(256), rand.Next(256))));
 			}
 			//Save("Lalalafil");
 			agents = new Agent[this.players.Count];
