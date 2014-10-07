@@ -6,20 +6,21 @@
 	<Grid>
 		<CheckBox x:Name="MasterCheckbox" Content="Master" HorizontalAlignment="Left" Margin="10,69,0,0" VerticalAlignment="Top" Checked="MasterCheckbox_Checked" Unchecked="MasterCheckbox_UnChecked"/>
 		<Label Content="IP" HorizontalAlignment="Left" Margin="10,90,0,0" VerticalAlignment="Top"/>
-		<TextBox x:Name="IpBox" HorizontalAlignment="Left" Height="23" Margin="68,92,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="106" UndoLimit="10" MaxLength="15"/>
-		<Button x:Name="StartButton" Content="Connect" HorizontalAlignment="Left" Margin="68,66,0,0" VerticalAlignment="Top" Width="106" Click="StartButton_Click"/>
-		<Button x:Name="SendButton" Content="Send" HorizontalAlignment="Left" Margin="13,0,0,10" VerticalAlignment="Bottom" Width="161" Click="SendButton_Click"/>
-		<TextBox x:Name="messageBox" HorizontalAlignment="Left" Margin="13,0,0,37" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="161" MaxLength="1000" Height="22" KeyDown="messageBox_keyDown"/>
-		<TextBox x:Name="PlayerNameBox" HorizontalAlignment="Left" Height="23" Margin="10,38,0,0" TextWrapping="Wrap" Text="Player1" VerticalAlignment="Top" Width="164" MaxLines="1" MaxLength="12"/>
-		<ScrollViewer HorizontalAlignment="Left" Margin="13,126,0,64" VerticalAlignment="Stretch" Width="161">
+		<TextBox x:Name="IpBox" HorizontalAlignment="Left" Height="23" Margin="68,92,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="103" UndoLimit="10" MaxLength="15"/>
+		<Button x:Name="StartButton" Content="Connect" HorizontalAlignment="Left" Margin="68,66,0,0" VerticalAlignment="Top" Width="103" Click="StartButton_Click"/>
+		<Button x:Name="SendButton" Content="Send" HorizontalAlignment="Left" Margin="10,0,0,37" VerticalAlignment="Bottom" Width="161" Click="SendButton_Click"/>
+		<TextBox x:Name="messageBox" HorizontalAlignment="Left" Margin="10,0,0,64" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="161" MaxLength="1000" Height="22" KeyDown="messageBox_keyDown"/>
+		<TextBox x:Name="PlayerNameBox" HorizontalAlignment="Left" Height="23" Margin="10,38,0,0" TextWrapping="Wrap" Text="Player1" VerticalAlignment="Top" Width="161" MaxLines="1" MaxLength="12" LostFocus="PlayerNameBox_LostFocus"/>
+		<ScrollViewer HorizontalAlignment="Left" Margin="13,126,0,91" VerticalAlignment="Stretch" Width="158">
 			<TextBlock x:Name="InTextBox" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Width="142"/>
 		</ScrollViewer>
-		<Grid x:Name="VirusGrid" HorizontalAlignment="Stretch" Margin="179,10,10,10" VerticalAlignment="Stretch"/>
-		
-		<CheckBox x:Name="redColor" Content="" HorizontalAlignment="Left" Height="23" Margin="10,10,0,0" VerticalAlignment="Top" Width="20" Background="Red" Foreground="Red" BorderBrush="Red" Checked="redColor_Checked" Unchecked="redColor_Unchecked"/>
-		<CheckBox x:Name="blueColor" Content="" HorizontalAlignment="Left" Height="23" Margin="30,10,0,0" VerticalAlignment="Top" Width="20" Background="Blue" Foreground="Blue" BorderBrush="Blue" Checked="blueColor_Checked" Unchecked="blueColor_Unchecked"/>
-		<CheckBox x:Name="greenColor" Content="" HorizontalAlignment="Left" Height="23" Margin="50,10,0,0" VerticalAlignment="Top" Width="20" Background="Green" Foreground="Green" BorderBrush="Green" Checked="greenColor_Checked" Unchecked="greenColor_Unchecked"/>
-		<CheckBox x:Name="blackColor" Content="" HorizontalAlignment="Left" Height="23" Margin="70,10,0,0" VerticalAlignment="Top" Width="20" Background="Black" Foreground="Black" BorderBrush="Black" Checked="blackColor_Checked" Unchecked="blackColor_Unchecked"/>
-		<CheckBox x:Name="goldColor" Content="" HorizontalAlignment="Left" Height="23" Margin="90,10,0,0" VerticalAlignment="Top" Width="20" Background="Gold" Foreground="Gold" BorderBrush="Gold" Checked="goldColor_Checked" Unchecked="goldColor_Unchecked"/>
+		<Grid x:Name="VirusGrid" HorizontalAlignment="Stretch" Margin="176,10,10,10" VerticalAlignment="Stretch"/>
+		<Button x:Name="ReadyButton" Content="Ready" HorizontalAlignment="Left" Margin="10,338,0,0" VerticalAlignment="Top" Width="89" Click="ReadyButton_Click" IsEnabled="False"/>
+		<Label x:Name="ReadyLabel" Content="Not ready" HorizontalAlignment="Left" Margin="104,336,0,0" VerticalAlignment="Top" Width="67"/>
+		<RadioButton x:Name="greenColor" Content="" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Background="Lime" BorderBrush="Lime" Foreground="Lime" GroupName="Colours" Checked="greenColor_Checked"/>
+		<RadioButton x:Name="redColor" Content="" HorizontalAlignment="Left" Margin="31,10,0,0" VerticalAlignment="Top" Background="Red" BorderBrush="Red" Foreground="Red" GroupName="Colours" Checked="redColor_Checked"/>
+		<RadioButton x:Name="goldColor" Content="" HorizontalAlignment="Left" Margin="52,10,0,0" VerticalAlignment="Top" Background="Gold" BorderBrush="Gold" Foreground="Gold" GroupName="Colours" Checked="goldColor_Checked"/>
+		<RadioButton x:Name="blackColor" Content="" HorizontalAlignment="Left" Margin="73,10,0,0" VerticalAlignment="Top" Background="Black" BorderBrush="Black" Foreground="Black" GroupName="Colours" Checked="blackColor_Checked"/>
+		<RadioButton x:Name="blueColor" Content="" HorizontalAlignment="Left" Margin="94,10,0,0" VerticalAlignment="Top" Background="Blue" BorderBrush="Blue" Foreground="Blue" GroupName="Colours" Checked="blueColor_Checked"/>
 	</Grid>
 </Window>

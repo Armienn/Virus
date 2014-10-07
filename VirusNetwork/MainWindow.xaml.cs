@@ -18,22 +18,37 @@ using System.Net;
 using System.ComponentModel;
 
 namespace VirusNetwork {
+	class PlayerClient {
+		public readonly TcpClient TcpClient;
+		public readonly String ID;
+		public Color Color;
+		public String Name;
+		public bool Ready;
+
+		public PlayerClient(TcpClient cl, String id) {
+			this.TcpClient = cl;
+			this.ID = id;
+			this.Color = Colors.Red;
+			this.Name = "PlayerX";
+			this.Ready = false;
+		}
+	}
+
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
 	public partial class MainWindow : Window {
 		private bool master = false;
+		private bool ready = false;
 		private TcpListener tcpListener;
 		private Thread listenThread;
-		List<TcpClient> clientList = new List<TcpClient>();
+		List<PlayerClient> playerList = new List<PlayerClient>();
 		VirusInterfaceMod viruscontrol;
-
-		private bool runOnce = true;
+		Random rand = new Random();
 
 		public MainWindow() {
 			InitializeComponent();
 			messageBox.KeyDown += new KeyEventHandler(messageBox_keyDown);
-			nej nej, du skal blive ved med at lave RSD ;) vi skulle egentlig have kigget på noget schedulering i dag ?? ;P 
 		}
 
 		private void ListenForClients() {
@@ -41,8 +56,8 @@ namespace VirusNetwork {
 
 			while (true) {
 				//blocks until a client has connected to the server
-				TcpClient client = this.tcpListener.AcceptTcpClient();
-				clientList.Add(client);
+				PlayerClient client = new PlayerClient(this.tcpListener.AcceptTcpClient(), rand.Next().ToString());
+				playerList.Add(client);
 
 				//create a thread to handle communication 
 				//with connected client
@@ -52,7 +67,8 @@ namespace VirusNetwork {
 		}
 
 		private void HandleClientComm(object client) {
-			TcpClient tcpClient = (TcpClient)client;
+			PlayerClient player = (PlayerClient)client;
+			TcpClient tcpClient = player.TcpClient;
 			NetworkStream clientStream = tcpClient.GetStream();
 
 			byte[] message = new byte[4096];
@@ -78,19 +94,55 @@ namespace VirusNetwork {
 				//message has successfully been received
 				UnicodeEncoding encoder = new UnicodeEncoding();
 				String intext = encoder.GetString(message, 0, bytesRead);
-				AddText(InTextBox, intext);
+				String messagetype = intext.Substring(0, 3);
+				if(intext.Length > 3)
+					intext = intext.Substring(3);
+				switch (messagetype) {
+					case "STG": // STart Game
+						viruscontrol.StartGame(new VirusNameSpace.Virus());
+						ReadyButton.IsEnabled = false;
+						break;
+					case "MES": // MESsage
+						if (master) {
+							AddText(InTextBox, player.Name + ":\n  " + intext + "\n");
+							byte[] buffer = encoder.GetBytes("MES" + player.Name + ":\n  " + intext + "\n");
+							foreach (PlayerClient pc in playerList) {
+								TcpClient ns = pc.TcpClient;
+								ns.GetStream().Write(buffer, 0, buffer.Length);
+								ns.GetStream().Flush();
+							}
+						}
+						else {
+							AddText(InTextBox, intext);
+						}
+						break;
+					case "RDY": // ReaDY
+						player.Ready = true;
+						break;
+					case "NRD": // Not ReaDy
+						player.Ready = false;
+						break;
+					case "NME": // NaME
+						player.Name = intext;
+						break;
+				}
 				if (master) {
-					byte[] buffer = encoder.GetBytes(intext);
-
-					foreach (TcpClient ns in clientList) {
-						ns.GetStream().Write(buffer, 0, buffer.Length);
-						ns.GetStream().Flush();
+					ready = true;
+					foreach (PlayerClient pc in playerList) {
+						if (!pc.Ready)
+							ready = false;
+					}
+					if (ready) {
+						ReadyButton.IsEnabled = true;
+					}
+					else {
+						ReadyButton.IsEnabled = false;
 					}
 				}
 			}
 
 			tcpClient.Close();
-			clientList.Remove(tcpClient);
+			playerList.Remove(player);
 			Thread.CurrentThread.Abort();
 		}
 
@@ -130,10 +182,11 @@ namespace VirusNetwork {
 				MasterCheckbox.IsEnabled = true;
 				tcpListener.Stop();
 				listenThread.Abort();
-				foreach (TcpClient ns in clientList) {
+				foreach (PlayerClient pc in playerList) {
+					TcpClient ns = pc.TcpClient;
 					ns.Close();
 				}
-				clientList = new List<TcpClient>();
+				playerList = new List<PlayerClient>();
 				StartButton.Content = "Start Listening";
 			}
 			else if (((String)StartButton.Content)=="Connect") {   // Connecting
@@ -144,13 +197,14 @@ namespace VirusNetwork {
 						TcpClient client = new TcpClient();
 						IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse(IpBox.Text), 3000);
 						client.Connect(serverEndPoint);
-						clientList.Add(client);
+						playerList.Add(new PlayerClient(client, "master"));
 
 						Thread clientThread = new Thread(new ParameterizedThreadStart(HandleClientComm));
 						clientThread.Start(client);
 
 						StartButton.Content = "Disconnect";
 						MasterCheckbox.IsEnabled = false;
+						ReadyButton.IsEnabled = true;
 					}
 					catch (Exception exc) {
 						IpBox.Text = "Failed to connect";
@@ -164,16 +218,18 @@ namespace VirusNetwork {
 			else {   // Disconnecting
 				MasterCheckbox.IsEnabled = true;
 				StartButton.Content = "Connect";
-				foreach (TcpClient ns in clientList) {
+				foreach (PlayerClient pc in playerList) {
+					TcpClient ns = pc.TcpClient;
 					ns.Close();
 				}
-				clientList = new List<TcpClient>();
+				playerList = new List<PlayerClient>();
 			}
 		}
 
 		private void MasterCheckbox_Checked(object sender, RoutedEventArgs e) {
 			master = true;
 			StartButton.Content = "Start Listening";
+			ReadyButton.Content = "Start Game";
 			IpBox.IsEnabled = false;
 			IpBox.Text = GetOwnIP();
 		}
@@ -181,27 +237,31 @@ namespace VirusNetwork {
 		private void MasterCheckbox_UnChecked(object sender, RoutedEventArgs e) {
 			master = false;
 			StartButton.Content = "Connect";
+			ReadyButton.Content = "Ready";
 			IpBox.IsEnabled = true;
 			IpBox.Text = "";
 		}
 
-		private void SendButton_Click(object sender, RoutedEventArgs e) {
-			if (runOnce == true)
-			{
-				viruscontrol.StartGame(new VirusNameSpace.Virus());
-				runOnce = false;
-			}
+		private void SendMessage() {
 			UnicodeEncoding encoder = new UnicodeEncoding();
-			String message = PlayerNameBox.Text + ":\n  " + messageBox.Text + "\n";
-			byte[] buffer = encoder.GetBytes(message);
-			if(master)
+			String message = messageBox.Text;
+			if (master) {
+				message = PlayerNameBox.Text + ":\n  " + messageBox.Text + "\n";
 				AddText(InTextBox, message);
+			}
+				
 			messageBox.Text = "";
+			byte[] buffer = encoder.GetBytes("MES" + message);
 
-			foreach (TcpClient ns in clientList) {
+			foreach (PlayerClient pc in playerList) {
+				TcpClient ns = pc.TcpClient;
 				ns.GetStream().Write(buffer, 0, buffer.Length);
 				ns.GetStream().Flush();
 			}
+		}
+
+		private void SendButton_Click(object sender, RoutedEventArgs e) {
+			SendMessage();
 		}
 
 		public string GetOwnIP()
@@ -234,7 +294,8 @@ namespace VirusNetwork {
 					listenThread.Abort();
 				}
 			}
-			foreach (TcpClient ns in clientList) {
+			foreach (PlayerClient pc in playerList) {
+				TcpClient ns = pc.TcpClient;
 				ns.Close();
 			}
 		}
@@ -243,213 +304,95 @@ namespace VirusNetwork {
 		{
 			if (e.Key == Key.Enter && messageBox.Text != "")
 			{
-				UnicodeEncoding encoder = new UnicodeEncoding();
-				String message = PlayerNameBox.Text + ":\n  " + messageBox.Text + "\n";
-				byte[] buffer = encoder.GetBytes(message);
-				if (master)
-					AddText(InTextBox, message);
-				messageBox.Text = "";
-
-				foreach (TcpClient ns in clientList)
-				{
-					ns.GetStream().Write(buffer, 0, buffer.Length);
-					ns.GetStream().Flush();
-				}
+				SendMessage();
 			}
 		}
 
 		private void redColor_Checked(object sender, RoutedEventArgs e)
 		{
-			if (blueColor.IsChecked == false && greenColor.IsChecked == false && blackColor.IsChecked == false && goldColor.IsChecked == false)
-			{
-				UnicodeEncoding encoder = new UnicodeEncoding();
-				string message = PlayerNameBox.Text + " is red... \n";
-				byte[] buffer = encoder.GetBytes(message);
-				if (master)
-					AddText(InTextBox, message);
-				messageBox.Text = "";
-
-				foreach (TcpClient ns in clientList)
-				{
-					ns.GetStream().Write(buffer, 0, buffer.Length);
-					ns.GetStream().Flush();
-				}
-			}
-			else
-			{
-				redColor.IsChecked = false;
-			}
-		}
-
-		private void redColor_Unchecked(object sender, RoutedEventArgs e)
-		{
-			UnicodeEncoding encoder = new UnicodeEncoding();
-			string message = PlayerNameBox.Text + " is no longer red... \n";
-			byte[] buffer = encoder.GetBytes(message);
-			if (master)
-				AddText(InTextBox, message);
-			messageBox.Text = "";
-
-			foreach (TcpClient ns in clientList)
-			{
-				ns.GetStream().Write(buffer, 0, buffer.Length);
-				ns.GetStream().Flush();
-			}
+			SendColorMessage("Red");
 		}
 
 		private void blueColor_Checked(object sender, RoutedEventArgs e)
 		{
-			if (redColor.IsChecked == false && greenColor.IsChecked == false && blackColor.IsChecked == false && goldColor.IsChecked == false)
-			{
-				UnicodeEncoding encoder = new UnicodeEncoding();
-				string message = PlayerNameBox.Text + " is blue... \n";
-				byte[] buffer = encoder.GetBytes(message);
-				if (master)
-					AddText(InTextBox, message);
-				messageBox.Text = "";
-
-				foreach (TcpClient ns in clientList)
-				{
-					ns.GetStream().Write(buffer, 0, buffer.Length);
-					ns.GetStream().Flush();
-				}
-			}
-			else
-			{
-				blueColor.IsChecked = false;
-			}
-		}
-
-		private void blueColor_Unchecked(object sender, RoutedEventArgs e)
-		{
-			UnicodeEncoding encoder = new UnicodeEncoding();
-			string message = PlayerNameBox.Text + " is no longer blue... \n";
-			byte[] buffer = encoder.GetBytes(message);
-			if (master)
-				AddText(InTextBox, message);
-			messageBox.Text = "";
-
-			foreach (TcpClient ns in clientList)
-			{
-				ns.GetStream().Write(buffer, 0, buffer.Length);
-				ns.GetStream().Flush();
-			}
+			SendColorMessage("Blue");
 		}
 
 		private void greenColor_Checked(object sender, RoutedEventArgs e)
 		{
-			if (blueColor.IsChecked == false && redColor.IsChecked == false && blackColor.IsChecked == false && goldColor.IsChecked == false)
-			{
-				UnicodeEncoding encoder = new UnicodeEncoding();
-				string message = PlayerNameBox.Text + " is green... \n";
-				byte[] buffer = encoder.GetBytes(message);
-				if (master)
-					AddText(InTextBox, message);
-				messageBox.Text = "";
-
-				foreach (TcpClient ns in clientList)
-				{
-					ns.GetStream().Write(buffer, 0, buffer.Length);
-					ns.GetStream().Flush();
-				}
-			}
-			else
-			{
-				greenColor.IsChecked = false;
-			}
-		}
-
-		private void greenColor_Unchecked(object sender, RoutedEventArgs e)
-		{
-			UnicodeEncoding encoder = new UnicodeEncoding();
-			string message = PlayerNameBox.Text + " is no longer green... \n";
-			byte[] buffer = encoder.GetBytes(message);
-			if (master)
-				AddText(InTextBox, message);
-			messageBox.Text = "";
-
-			foreach (TcpClient ns in clientList)
-			{
-				ns.GetStream().Write(buffer, 0, buffer.Length);
-				ns.GetStream().Flush();
-			}
+			SendColorMessage("Green");
 		}
 
 		private void blackColor_Checked(object sender, RoutedEventArgs e)
 		{
-			if (blueColor.IsChecked == false && greenColor.IsChecked == false && redColor.IsChecked == false && goldColor.IsChecked == false)
-			{
-				UnicodeEncoding encoder = new UnicodeEncoding();
-				string message = PlayerNameBox.Text + " is black... \n";
-				byte[] buffer = encoder.GetBytes(message);
-				if (master)
-					AddText(InTextBox, message);
-				messageBox.Text = "";
-
-				foreach (TcpClient ns in clientList)
-				{
-					ns.GetStream().Write(buffer, 0, buffer.Length);
-					ns.GetStream().Flush();
-				}
-			}
-			else
-			{
-				blackColor.IsChecked = false;
-			}
-		}
-
-		private void blackColor_Unchecked(object sender, RoutedEventArgs e)
-		{
-			UnicodeEncoding encoder = new UnicodeEncoding();
-			string message = PlayerNameBox.Text + " is no longer black... \n";
-			byte[] buffer = encoder.GetBytes(message);
-			if (master)
-				AddText(InTextBox, message);
-			messageBox.Text = "";
-
-			foreach (TcpClient ns in clientList)
-			{
-				ns.GetStream().Write(buffer, 0, buffer.Length);
-				ns.GetStream().Flush();
-			}
+			SendColorMessage("Black");
 		}
 
 		private void goldColor_Checked(object sender, RoutedEventArgs e)
 		{
-			if (blueColor.IsChecked == false && greenColor.IsChecked == false && blackColor.IsChecked == false && redColor.IsChecked == false)
-			{
-				UnicodeEncoding encoder = new UnicodeEncoding();
-				string message = PlayerNameBox.Text + " is gold... \n";
-				byte[] buffer = encoder.GetBytes(message);
-				if (master)
-					AddText(InTextBox, message);
-				messageBox.Text = "";
+			SendColorMessage("Gold");
+		}
 
-				foreach (TcpClient ns in clientList)
-				{
+		private void SendColorMessage(String color) {
+			UnicodeEncoding encoder = new UnicodeEncoding();
+			String message = "NME" + color;
+			byte[] buffer = encoder.GetBytes(message);
+
+			foreach (PlayerClient pc in playerList) {
+				TcpClient ns = pc.TcpClient;
+				ns.GetStream().Write(buffer, 0, buffer.Length);
+				ns.GetStream().Flush();
+			}
+		}
+
+		private void ReadyButton_Click(object sender, RoutedEventArgs e) {
+			if (master) {
+				viruscontrol.StartGame(new VirusNameSpace.Virus());
+				UnicodeEncoding encoder = new UnicodeEncoding();
+				String message = "STG";
+				byte[] buffer = encoder.GetBytes(message);
+
+
+				foreach (PlayerClient pc in playerList) {
+					TcpClient ns = pc.TcpClient;
 					ns.GetStream().Write(buffer, 0, buffer.Length);
 					ns.GetStream().Flush();
 				}
 			}
-			else
-			{
-				goldColor.IsChecked = false;
+			else {
+				ready = !ready;
+				if (ready) {
+					ReadyLabel.Content = "Ready";
+					ReadyButton.Content = "Not ready";
+				}
+				else {
+					ReadyLabel.Content = "Not ready";
+					ReadyButton.Content = "Ready";
+				}
+
+				UnicodeEncoding encoder = new UnicodeEncoding();
+				String message = ready ? "RDY" : "NRD";
+				byte[] buffer = encoder.GetBytes(message);
+
+				foreach (PlayerClient pc in playerList) {
+					TcpClient ns = pc.TcpClient;
+					ns.GetStream().Write(buffer, 0, buffer.Length);
+					ns.GetStream().Flush();
+				}
 			}
 		}
 
-		private void goldColor_Unchecked(object sender, RoutedEventArgs e)
-		{
-			UnicodeEncoding encoder = new UnicodeEncoding();
-			string message = PlayerNameBox.Text + " is no longer gold... \n";
-			byte[] buffer = encoder.GetBytes(message);
-			if (master)
-				AddText(InTextBox, message);
-			messageBox.Text = "";
+		private void PlayerNameBox_LostFocus(object sender, RoutedEventArgs e) {
+			if (!master) {
+				UnicodeEncoding encoder = new UnicodeEncoding();
+				String message = "NME" + PlayerNameBox.Text;
+				byte[] buffer = encoder.GetBytes(message);
 
-			foreach (TcpClient ns in clientList)
-			{
-				ns.GetStream().Write(buffer, 0, buffer.Length);
-				ns.GetStream().Flush();
+				foreach (PlayerClient pc in playerList) {
+					TcpClient ns = pc.TcpClient;
+					ns.GetStream().Write(buffer, 0, buffer.Length);
+					ns.GetStream().Flush();
+				}
 			}
 		}
 	}
