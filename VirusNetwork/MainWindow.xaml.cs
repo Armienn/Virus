@@ -123,7 +123,52 @@ namespace VirusNetwork {
 						player.Ready = false;
 						break;
 					case "NME": // NaME
-						player.Name = intext;
+						if (master) {
+							string temp = player.Name + " changed name to:  " + intext + "\n";
+							player.Name = intext;
+							AddText(InTextBox, temp);
+							byte[] buffer = encoder.GetBytes("MES" + temp);
+							foreach (PlayerClient pc in playerList) {
+								TcpClient ns = pc.TcpClient;
+								ns.GetStream().Write(buffer, 0, buffer.Length);
+								ns.GetStream().Flush();
+							}
+						}
+						else {
+							AddText(InTextBox, "ERROR: Got name message while not master");
+						}
+						break;
+					case "CLR": // CoLoR
+						if (master) {
+							string temp = player.Name + " changed color to:  " + intext + "\n";
+							switch (intext) {
+								case "Red":
+									player.Color = Colors.Red;
+									break;
+								case "Blue":
+									player.Color = Colors.Blue;
+									break;
+								case "Black":
+									player.Color = Colors.Black;
+									break;
+								case "Green":
+									player.Color = Colors.Green;
+									break;
+								case "Gold":
+									player.Color = Colors.Gold;
+									break;
+							}
+							AddText(InTextBox, temp);
+							byte[] buffer = encoder.GetBytes("MES" + temp);
+							foreach (PlayerClient pc in playerList) {
+								TcpClient ns = pc.TcpClient;
+								ns.GetStream().Write(buffer, 0, buffer.Length);
+								ns.GetStream().Flush();
+							}
+						}
+						else {
+							AddText(InTextBox, "ERROR: Got color message while not master");
+						}
 						break;
 				}
 				if (master) {
@@ -336,7 +381,7 @@ namespace VirusNetwork {
 
 		private void SendColorMessage(String color) {
 			UnicodeEncoding encoder = new UnicodeEncoding();
-			String message = "NME" + color;
+			String message = "CLR" + color;
 			byte[] buffer = encoder.GetBytes(message);
 
 			foreach (PlayerClient pc in playerList) {
