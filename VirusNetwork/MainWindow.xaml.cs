@@ -429,7 +429,7 @@ namespace VirusNetwork {
 		}
 
 		private void PlayerNameBox_LostFocus(object sender, RoutedEventArgs e) {
-			if (!master) {
+			if (!master && PlayerNameBox.Text!=PlayerNameBox.Text) {
 				UnicodeEncoding encoder = new UnicodeEncoding();
 				String message = "NME" + PlayerNameBox.Text;
 				byte[] buffer = encoder.GetBytes(message);
