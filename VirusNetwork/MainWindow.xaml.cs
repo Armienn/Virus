@@ -23,14 +23,14 @@ namespace VirusNetwork {
 	class PlayerClient {
 		public readonly TcpClient TcpClient;
 		public readonly String ID;
-		public Color Color;
+		public string Color;
 		public String Name;
 		public bool Ready;
 
 		public PlayerClient(TcpClient cl, String id) {
 			this.TcpClient = cl;
 			this.ID = id;
-			this.Color = Colors.Red;
+			this.Color = "Red";
 			this.Name = "PlayerX";
 			this.Ready = false;
 		}
@@ -174,23 +174,7 @@ namespace VirusNetwork {
 					case "CLR": // CoLoR
 						if (master) {
 							string temp = player.Name + " changed color to:  " + intext + "\n";
-							switch (intext) {
-								case "Red":
-									player.Color = Colors.Red;
-									break;
-								case "Blue":
-									player.Color = Colors.Blue;
-									break;
-								case "Black":
-									player.Color = Colors.Black;
-									break;
-								case "Green":
-									player.Color = Colors.Green;
-									break;
-								case "Gold":
-									player.Color = Colors.Gold;
-									break;
-							}
+							player.Color = intext;
 							AddText(InTextBox, temp);
 							byte[] buffer = encoder.GetBytes("MES" + temp);
 							foreach (PlayerClient pc in playerList) {
@@ -467,15 +451,31 @@ namespace VirusNetwork {
 				for (int i = 0; i < players.Length - 1; i++) {
 					name = playerList[i].Name;
 					id = playerList[i].ID;
-					Color colr = playerList[i].Color;
-					players[i] = new VirusPlayer(name, id, System.Drawing.Color.FromArgb(colr.R, colr.G, colr.B));
+					switch (playerList[i].Color) {
+						case "Red":
+							col = System.Drawing.Color.Red;
+							break;
+						case "Blue":
+							col = System.Drawing.Color.Blue;
+							break;
+						case "Black":
+							col = System.Drawing.Color.Black;
+							break;
+						case "Green":
+							col = System.Drawing.Color.Green;
+							break;
+						case "Gold":
+							col = System.Drawing.Color.Gold;
+							break;
+					}
+					players[i] = new VirusPlayer(name, id, col);
 				}
 
 				for (int i = 0; i < players.Length; i++) {
 					message += " " + i + " ";
 					message += players[i].Name + " ";
 					message += players[i].IP + " ";
-					message += players[i].PlayerColor + " ";
+					message += players[i].PlayerColor.Name + " ";
 				}
 				message += "-1";
 
