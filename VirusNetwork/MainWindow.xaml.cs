@@ -197,10 +197,11 @@ namespace VirusNetwork {
 						TcpClient client = new TcpClient();
 						IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse(IpBox.Text), 3000);
 						client.Connect(serverEndPoint);
-						playerList.Add(new PlayerClient(client, "master"));
+						PlayerClient pclient = new PlayerClient(client, "master");
+						playerList.Add(pclient);
 
 						Thread clientThread = new Thread(new ParameterizedThreadStart(HandleClientComm));
-						clientThread.Start(client);
+						clientThread.Start(pclient);
 
 						StartButton.Content = "Disconnect";
 						MasterCheckbox.IsEnabled = false;
