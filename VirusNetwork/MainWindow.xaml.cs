@@ -46,6 +46,8 @@ namespace VirusNetwork {
 		VirusInterfaceMod viruscontrol;
 		Random rand = new Random();
 
+		string playerName = "playerY";
+
 		public MainWindow() {
 			InitializeComponent();
 			messageBox.KeyDown += new KeyEventHandler(messageBox_keyDown);
@@ -442,7 +444,8 @@ namespace VirusNetwork {
 		}
 
 		private void PlayerNameBox_LostFocus(object sender, RoutedEventArgs e) {
-			if (!master && PlayerNameBox.Text!=PlayerNameBox.Text) {
+			if (!master && playerName!=PlayerNameBox.Text) {
+				playerName = PlayerNameBox.Text;
 				UnicodeEncoding encoder = new UnicodeEncoding();
 				String message = "NME" + PlayerNameBox.Text;
 				byte[] buffer = encoder.GetBytes(message);
@@ -453,8 +456,9 @@ namespace VirusNetwork {
 					ns.GetStream().Flush();
 				}
 			}
-			else {
-				string temp = "Host changed name to:  " + PlayerNameBox.Text + "\n";
+			else if (master && playerName!=PlayerNameBox.Text) {
+				string temp = playerName + " changed name to:  " + PlayerNameBox.Text + "\n";
+				playerName = PlayerNameBox.Text;
 				AddText(InTextBox, temp);
 				UnicodeEncoding encoder = new UnicodeEncoding();
 				byte[] buffer = encoder.GetBytes("MES" + temp);
