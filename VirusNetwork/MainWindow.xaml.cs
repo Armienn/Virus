@@ -16,6 +16,8 @@ using System.Threading;
 using System.Net.Sockets;
 using System.Net;
 using System.ComponentModel;
+using System.IO;
+using Nea;
 
 namespace VirusNetwork {
 	class PlayerClient {
@@ -101,7 +103,35 @@ namespace VirusNetwork {
 					intext = intext.Substring(3);
 				switch (messagetype) {
 					case "STG": // STart Game
-						this.Dispatcher.Invoke(() => { viruscontrol.StartGame(new VirusNameSpace.Virus()); });
+						NeaReader r = new NeaReader(intext);
+						List<VirusPlayer> players = new List<VirusPlayer>();
+						int n = r.ReadInt();
+						while (n != -1) {
+							string name = r.ReadWord();
+							string ip = r.ReadWord();
+							string color = r.ReadWord();
+							System.Drawing.Color col = System.Drawing.Color.Gold;
+							switch (color) {
+								case "Red":
+									col = System.Drawing.Color.Red;
+									break;
+								case "Blue":
+									col = System.Drawing.Color.Blue;
+									break;
+								case "Black":
+									col = System.Drawing.Color.Black;
+									break;
+								case "Green":
+									col = System.Drawing.Color.Green;
+									break;
+								case "Gold":
+									col = System.Drawing.Color.Gold;
+									break;
+							}
+							VirusPlayer pl = new VirusPlayer(name, ip, col);
+							players.Add(pl);
+						}
+						this.Dispatcher.Invoke(() => { viruscontrol.StartGame(new VirusNameSpace.Virus(), players.ToArray()); });
 						this.Dispatcher.Invoke(() => { ReadyButton.IsEnabled = false; });
 						break;
 					case "MES": // MESsage
@@ -408,17 +438,51 @@ namespace VirusNetwork {
 
 		private void ReadyButton_Click(object sender, RoutedEventArgs e) {
 			if (master) {
-				viruscontrol.StartGame(new VirusNameSpace.Virus());
 				UnicodeEncoding encoder = new UnicodeEncoding();
 				String message = "STG";
+				VirusPlayer[] players = new VirusPlayer[playerList.Count + 1];
+				for (int i = 0; i < players.Length - 1; i++) {
+					players[i].Name = playerList[i].Name;
+					players[i].IP = playerList[i].ID;
+					Color col = playerList[i].Color;
+					players[i].PlayerColor = System.Drawing.Color.FromArgb(col.R, col.G, col.B);
+				}
+				int last = players.Length - 1;
+				players[last].Name = playerName;
+				players[last].IP = "master";
+				System.Drawing.Color colmast = System.Drawing.Color.Aqua;
+				if (blackColor.IsChecked == true) {
+					colmast = System.Drawing.Color.Black;
+				}
+				if (blueColor.IsChecked == true) {
+					colmast = System.Drawing.Color.Blue;
+				}
+				if (redColor.IsChecked == true) {
+					colmast = System.Drawing.Color.Red;
+				}
+				if (goldColor.IsChecked == true) {
+					colmast = System.Drawing.Color.Gold;
+				}
+				if (greenColor.IsChecked == true) {
+					colmast = System.Drawing.Color.Green;
+				}
+				players[last].PlayerColor = colmast;
+
+				for (int i = 0; i < players.Length; i++) {
+					message += " " + i + " ";
+					message += players[i].Name + " ";
+					message += players[i].IP + " ";
+					message += players[i].PlayerColor + " ";
+				}
+				message += "-1";
+
 				byte[] buffer = encoder.GetBytes(message);
-
-
 				foreach (PlayerClient pc in playerList) {
 					TcpClient ns = pc.TcpClient;
 					ns.GetStream().Write(buffer, 0, buffer.Length);
 					ns.GetStream().Flush();
 				}
+				viruscontrol.StartGame(new VirusNameSpace.Virus(), players);
 			}
 			else {
 				ready = !ready;
