@@ -441,32 +441,34 @@ namespace VirusNetwork {
 				UnicodeEncoding encoder = new UnicodeEncoding();
 				String message = "STG";
 				VirusPlayer[] players = new VirusPlayer[playerList.Count + 1];
-				for (int i = 0; i < players.Length - 1; i++) {
-					players[i].Name = playerList[i].Name;
-					players[i].IP = playerList[i].ID;
-					Color col = playerList[i].Color;
-					players[i].PlayerColor = System.Drawing.Color.FromArgb(col.R, col.G, col.B);
-				}
+
 				int last = players.Length - 1;
-				players[last].Name = playerName;
-				players[last].IP = "master";
-				System.Drawing.Color colmast = System.Drawing.Color.Aqua;
+				string name = playerName;
+				string id = "master";
+				System.Drawing.Color col = System.Drawing.Color.Aqua;
 				if (blackColor.IsChecked == true) {
-					colmast = System.Drawing.Color.Black;
+					col = System.Drawing.Color.Black;
 				}
 				if (blueColor.IsChecked == true) {
-					colmast = System.Drawing.Color.Blue;
+					col = System.Drawing.Color.Blue;
 				}
 				if (redColor.IsChecked == true) {
-					colmast = System.Drawing.Color.Red;
+					col = System.Drawing.Color.Red;
 				}
 				if (goldColor.IsChecked == true) {
-					colmast = System.Drawing.Color.Gold;
+					col = System.Drawing.Color.Gold;
 				}
 				if (greenColor.IsChecked == true) {
-					colmast = System.Drawing.Color.Green;
+					col = System.Drawing.Color.Green;
 				}
-				players[last].PlayerColor = colmast;
+				players[last] = new VirusPlayer(name, id, col);
+
+				for (int i = 0; i < players.Length - 1; i++) {
+					name = playerList[i].Name;
+					id = playerList[i].ID;
+					Color colr = playerList[i].Color;
+					players[i] = new VirusPlayer(name, id, System.Drawing.Color.FromArgb(colr.R, colr.G, colr.B));
+				}
 
 				for (int i = 0; i < players.Length; i++) {
 					message += " " + i + " ";
