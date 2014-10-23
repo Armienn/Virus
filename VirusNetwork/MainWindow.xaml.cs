@@ -135,7 +135,7 @@ namespace VirusNetwork {
 							}
 						}
 						else {
-							AddText(InTextBox, "ERROR: Got name message while not master");
+							AddText(InTextBox, "ERROR: Got name message while not master\n");
 						}
 						break;
 					case "CLR": // CoLoR
@@ -167,7 +167,7 @@ namespace VirusNetwork {
 							}
 						}
 						else {
-							AddText(InTextBox, "ERROR: Got color message while not master");
+							AddText(InTextBox, "ERROR: Got color message while not master\n");
 						}
 						break;
 				}
@@ -380,14 +380,27 @@ namespace VirusNetwork {
 		}
 
 		private void SendColorMessage(String color) {
-			UnicodeEncoding encoder = new UnicodeEncoding();
-			String message = "CLR" + color;
-			byte[] buffer = encoder.GetBytes(message);
+			if (!master) {
+				UnicodeEncoding encoder = new UnicodeEncoding();
+				String message = "CLR" + color;
+				byte[] buffer = encoder.GetBytes(message);
 
-			foreach (PlayerClient pc in playerList) {
-				TcpClient ns = pc.TcpClient;
-				ns.GetStream().Write(buffer, 0, buffer.Length);
-				ns.GetStream().Flush();
+				foreach (PlayerClient pc in playerList) {
+					TcpClient ns = pc.TcpClient;
+					ns.GetStream().Write(buffer, 0, buffer.Length);
+					ns.GetStream().Flush();
+				}
+			}
+			else {
+				string temp = PlayerNameBox.Text + " changed color to:  " + color + "\n";
+				AddText(InTextBox, temp);
+				UnicodeEncoding encoder = new UnicodeEncoding();
+				byte[] buffer = encoder.GetBytes("MES" + temp);
+				foreach (PlayerClient pc in playerList) {
+					TcpClient ns = pc.TcpClient;
+					ns.GetStream().Write(buffer, 0, buffer.Length);
+					ns.GetStream().Flush();
+				}
 			}
 		}
 
@@ -434,6 +447,17 @@ namespace VirusNetwork {
 				String message = "NME" + PlayerNameBox.Text;
 				byte[] buffer = encoder.GetBytes(message);
 
+				foreach (PlayerClient pc in playerList) {
+					TcpClient ns = pc.TcpClient;
+					ns.GetStream().Write(buffer, 0, buffer.Length);
+					ns.GetStream().Flush();
+				}
+			}
+			else {
+				string temp = "Host changed name to:  " + PlayerNameBox.Text + "\n";
+				AddText(InTextBox, temp);
+				UnicodeEncoding encoder = new UnicodeEncoding();
+				byte[] buffer = encoder.GetBytes("MES" + temp);
 				foreach (PlayerClient pc in playerList) {
 					TcpClient ns = pc.TcpClient;
 					ns.GetStream().Write(buffer, 0, buffer.Length);
