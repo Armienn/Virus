@@ -99,8 +99,8 @@ namespace VirusNetwork {
 					intext = intext.Substring(3);
 				switch (messagetype) {
 					case "STG": // STart Game
-						viruscontrol.StartGame(new VirusNameSpace.Virus());
-						ReadyButton.IsEnabled = false;
+						this.Dispatcher.Invoke(() => { viruscontrol.StartGame(new VirusNameSpace.Virus()); });
+						this.Dispatcher.Invoke(() => { ReadyButton.IsEnabled = false; });
 						break;
 					case "MES": // MESsage
 						if (master) {
@@ -133,10 +133,10 @@ namespace VirusNetwork {
 							ready = false;
 					}
 					if (ready) {
-						ReadyButton.IsEnabled = true;
+						this.Dispatcher.Invoke(() => { ReadyButton.IsEnabled = true; });
 					}
 					else {
-						ReadyButton.IsEnabled = false;
+						this.Dispatcher.Invoke(() => { ReadyButton.IsEnabled = false; });
 					}
 				}
 			}
