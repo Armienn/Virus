@@ -130,6 +130,7 @@ namespace VirusNetwork {
 							}
 							VirusPlayer pl = new VirusPlayer(name, ip, col);
 							players.Add(pl);
+							n = r.ReadInt();
 						}
 						this.Dispatcher.Invoke(() => { viruscontrol.StartGame(new VirusNameSpace.Virus(), players.ToArray()); });
 						this.Dispatcher.Invoke(() => { ReadyButton.IsEnabled = false; });
