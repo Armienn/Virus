@@ -16,9 +16,9 @@ namespace VirusNetwork
 		public string Name;
 		public string ID;
 		public Color PlayerColor;
-		public VirusPlayer(string name, string ip, Color color) {
+		public VirusPlayer(string name, string id, Color color) {
 			Name = name;
-			IP = ip;
+			ID = id;
 			PlayerColor = color;
 		}
 	}
