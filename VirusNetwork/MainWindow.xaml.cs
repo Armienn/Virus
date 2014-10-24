@@ -48,11 +48,13 @@ namespace VirusNetwork {
 		VirusInterfaceMod viruscontrol;
 		Random rand = new Random();
 
+		string playerID = "127.0.0.1";
 		string playerName = "playerY";
 
 		public MainWindow() {
 			InitializeComponent();
 			messageBox.KeyDown += new KeyEventHandler(messageBox_keyDown);
+			playerID = GetOwnIP();
 		}
 
 		private void ListenForClients() {
@@ -60,10 +62,11 @@ namespace VirusNetwork {
 
 			while (true) {
 				//blocks until a client has connected to the server
-				PlayerClient client = new PlayerClient(this.tcpListener.AcceptTcpClient(), rand.Next().ToString());
+				TcpClient cl = this.tcpListener.AcceptTcpClient();
+				PlayerClient client = new PlayerClient(cl, ((IPEndPoint)cl.Client.RemoteEndPoint).Address.ToString());
 				playerList.Add(client);
 
-				//create a thread to handle communication 
+				//create a thread to handle communication
 				//with connected client
 				Thread clientThread = new Thread(new ParameterizedThreadStart(HandleClientComm));
 				clientThread.Start(client);
@@ -132,7 +135,8 @@ namespace VirusNetwork {
 							players.Add(pl);
 							n = r.ReadInt();
 						}
-						this.Dispatcher.Invoke(() => { viruscontrol.StartGame(new VirusNameSpace.Virus(), players.ToArray()); });
+						this.Dispatcher.Invoke(() => {
+							viruscontrol.StartGame(new VirusNameSpace.Virus(), PerformedMoveCallback, playerID, players.ToArray()); });
 						this.Dispatcher.Invoke(() => { ReadyButton.IsEnabled = false; });
 						break;
 					case "MES": // MESsage
@@ -295,6 +299,7 @@ namespace VirusNetwork {
 			ReadyButton.Content = "Start Game";
 			IpBox.IsEnabled = false;
 			IpBox.Text = GetOwnIP();
+			playerID = "host";
 		}
 
 		private void MasterCheckbox_UnChecked(object sender, RoutedEventArgs e) {
@@ -303,6 +308,7 @@ namespace VirusNetwork {
 			ReadyButton.Content = "Ready";
 			IpBox.IsEnabled = true;
 			IpBox.Text = "";
+			playerID = GetOwnIP();
 		}
 
 		private void SendMessage() {
@@ -474,7 +480,7 @@ namespace VirusNetwork {
 				for (int i = 0; i < players.Length; i++) {
 					message += " " + i + " ";
 					message += players[i].Name + " ";
-					message += players[i].IP + " ";
+					message += players[i].ID + " ";
 					message += players[i].PlayerColor.Name + " ";
 				}
 				message += "-1";
@@ -485,7 +491,7 @@ namespace VirusNetwork {
 					ns.GetStream().Write(buffer, 0, buffer.Length);
 					ns.GetStream().Flush();
 				}
-				viruscontrol.StartGame(new VirusNameSpace.Virus(), players);
+				viruscontrol.StartGame(new VirusNameSpace.Virus(), PerformedMoveCallback, "host", players);
 			}
 			else {
 				ready = !ready;
@@ -508,6 +514,10 @@ namespace VirusNetwork {
 					ns.GetStream().Flush();
 				}
 			}
+		}
+
+		public void PerformedMoveCallback(int x, int y, int dx, int dy) {
+			
 		}
 
 		private void PlayerNameBox_LostFocus(object sender, RoutedEventArgs e) {

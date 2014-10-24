@@ -14,7 +14,7 @@ namespace VirusNetwork
 {
 	public class VirusPlayer {
 		public string Name;
-		public string IP;
+		public string ID;
 		public Color PlayerColor;
 		public VirusPlayer(string name, string ip, Color color) {
 			Name = name;
@@ -36,13 +36,19 @@ namespace VirusNetwork
 		List<VirusPlayer> players = new List<VirusPlayer>();
 		//Color[] colors;
 		Agent[] agents;
+		PerformedMoveCallback PerformedMove;
+		string PlayerID;
+
+		public delegate void PerformedMoveCallback(int x, int y, int dx, int dy);
 
 		public VirusInterfaceMod() {
 			InitializeComponent();
 		}
 
-		public void StartGame(Virus virus, params VirusPlayer[] players) {
+		public void StartGame(Virus virus, PerformedMoveCallback callback, string id, params VirusPlayer[] players) {
 			Random rand = new Random();
+			PerformedMove = callback;
+			PlayerID = id;
 			this.virus = virus;
 			this.immediateAI = false;
 			this.MouseClick += MouseClickHandler1;
@@ -214,7 +220,9 @@ namespace VirusNetwork
 				}
 			}
 			else if (!immediateRunning) {
-				PlayerMove(args);
+				int tileX = args.X / tileSize;
+				int tileY = virus.Size - (args.Y / tileSize) - 1;
+				PlayerMove(tileX, tileY);
 			}
 
 			if (gameWon) {
@@ -233,9 +241,7 @@ namespace VirusNetwork
 			}
 		}
 
-		private void PlayerMove(MouseEventArgs args) {
-			int tileX = args.X / tileSize;
-			int tileY = virus.Size - (args.Y / tileSize) - 1;
+		private void PlayerMove(int tileX, int tileY) {
 			byte piece = 0;
 			Rectangle areaToUpdate;
 
@@ -243,18 +249,24 @@ namespace VirusNetwork
 				return;
 
 			if (readyToMove) {
-				try {
-					virus.Move(x, y, tileX, tileY);
-					piece = virus.Winner;
-					int smallestX = x < tileX ? x : (tileX - 1);
-					int smallestY = y < tileY ? y : (tileY - 1);
-					int greatestX = x > tileX ? x : (tileX + 1);
-					int greatestY = y > tileY ? y : (tileY + 1);
-					Point startpoint = new Point(tileSize * smallestX, tileSize * (virus.Size - greatestY - 1));
-					Size size = new Size((greatestX - smallestX + 1) * tileSize, (greatestY - smallestY + 1) * tileSize);
-					areaToUpdate = new Rectangle(startpoint, size);
+				if (players[virus.CurrentPlayer].ID == PlayerID) {
+					try {
+						virus.Move(x, y, tileX, tileY);
+						piece = virus.Winner;
+						int smallestX = x < tileX ? x : (tileX - 1);
+						int smallestY = y < tileY ? y : (tileY - 1);
+						int greatestX = x > tileX ? x : (tileX + 1);
+						int greatestY = y > tileY ? y : (tileY + 1);
+						Point startpoint = new Point(tileSize * smallestX, tileSize * (virus.Size - greatestY - 1));
+						Size size = new Size((greatestX - smallestX + 1) * tileSize, (greatestY - smallestY + 1) * tileSize);
+						areaToUpdate = new Rectangle(startpoint, size);
+						PerformedMove(x, y, tileX, tileY);
+					}
+					catch {
+						areaToUpdate = new Rectangle(x * tileSize, (virus.Size - y - 1) * tileSize, tileSize, tileSize);
+					}
 				}
-				catch {
+				else {
 					areaToUpdate = new Rectangle(x * tileSize, (virus.Size - y - 1) * tileSize, tileSize, tileSize);
 				}
 				readyToMove = false;
