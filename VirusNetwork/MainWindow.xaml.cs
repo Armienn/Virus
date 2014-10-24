@@ -207,9 +207,11 @@ namespace VirusNetwork {
 						if (master) {
 							byte[] buffer = encoder.GetBytes(entiremessage);
 							foreach (PlayerClient pc in playerList) {
-								TcpClient ns = pc.TcpClient;
-								ns.GetStream().Write(buffer, 0, buffer.Length);
-								ns.GetStream().Flush();
+								if (pc.ID != id) {
+									TcpClient ns = pc.TcpClient;
+									ns.GetStream().Write(buffer, 0, buffer.Length);
+									ns.GetStream().Flush();
+								}
 							}
 						}
 						break;
@@ -285,7 +287,7 @@ namespace VirusNetwork {
 						TcpClient client = new TcpClient();
 						IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse(IpBox.Text), 3000);
 						client.Connect(serverEndPoint);
-						PlayerClient pclient = new PlayerClient(client, "master");
+						PlayerClient pclient = new PlayerClient(client, "host");
 						playerList.Add(pclient);
 
 						Thread clientThread = new Thread(new ParameterizedThreadStart(HandleClientComm));
@@ -457,7 +459,7 @@ namespace VirusNetwork {
 
 				int last = players.Length - 1;
 				string name = playerName;
-				string id = "master";
+				string id = "host";
 				System.Drawing.Color col = System.Drawing.Color.Aqua;
 				if (blackColor.IsChecked == true) {
 					col = System.Drawing.Color.Black;
