@@ -284,6 +284,30 @@ namespace VirusNetwork
 			CheckForWinner(piece);
 		}
 
+		public void NetworkMove(int x, int y, int dx, int dy) {
+			if (gameWon)
+				return;
+
+			int tileX = dx;
+			int tileY = dy;
+			byte piece = 0;
+			Rectangle areaToUpdate;
+
+			virus.Move(x, y, tileX, tileY);
+			piece = virus.Winner;
+			int smallestX = x < tileX ? x : (tileX - 1);
+			int smallestY = y < tileY ? y : (tileY - 1);
+			int greatestX = x > tileX ? x : (tileX + 1);
+			int greatestY = y > tileY ? y : (tileY + 1);
+			Point startpoint = new Point(tileSize * smallestX, tileSize * (virus.Size - greatestY - 1));
+			Size size = new Size((greatestX - smallestX + 1) * tileSize, (greatestY - smallestY + 1) * tileSize);
+			areaToUpdate = new Rectangle(startpoint, size);
+			this.Invalidate(areaToUpdate); //tile area
+			Update();
+
+			CheckForWinner(piece);
+		}
+
 		private void AIMove() {
 			VirusNameSpace.Move a = agents[virus.CurrentPlayer].Move(virus);
 

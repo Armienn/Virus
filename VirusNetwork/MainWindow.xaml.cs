@@ -100,13 +100,15 @@ namespace VirusNetwork {
 
 				//message has successfully been received
 				UnicodeEncoding encoder = new UnicodeEncoding();
-				String intext = encoder.GetString(message, 0, bytesRead);
+				NeaReader r;
+				String entiremessage = encoder.GetString(message, 0, bytesRead);
+				String intext = entiremessage;
 				String messagetype = intext.Substring(0, 3);
 				if(intext.Length > 3)
 					intext = intext.Substring(3);
 				switch (messagetype) {
 					case "STG": // STart Game
-						NeaReader r = new NeaReader(intext);
+						r = new NeaReader(intext);
 						List<VirusPlayer> players = new List<VirusPlayer>();
 						int n = r.ReadInt();
 						while (n != -1) {
@@ -189,6 +191,26 @@ namespace VirusNetwork {
 						}
 						else {
 							AddText(InTextBox, "ERROR: Got color message while not master\n");
+						}
+						break;
+					case "GMS": // Game MeSsage
+						r = new NeaReader(intext);
+						int x, y, dx, dy = 0;
+						string id = r.ReadWord();
+						x = r.ReadInt();
+						y = r.ReadInt();
+						dx = r.ReadInt();
+						dy = r.ReadInt();
+
+						viruscontrol.NetworkMove(x, y, dx, dy);
+
+						if (master) {
+							byte[] buffer = encoder.GetBytes(entiremessage);
+							foreach (PlayerClient pc in playerList) {
+								TcpClient ns = pc.TcpClient;
+								ns.GetStream().Write(buffer, 0, buffer.Length);
+								ns.GetStream().Flush();
+							}
 						}
 						break;
 				}
@@ -517,7 +539,15 @@ namespace VirusNetwork {
 		}
 
 		public void PerformedMoveCallback(int x, int y, int dx, int dy) {
-			
+			string temp = " " + playerID + " " + x + " " + " " + y + " " + dx + " " + dy;
+
+			UnicodeEncoding encoder = new UnicodeEncoding();
+			byte[] buffer = encoder.GetBytes("GMS" + temp);
+			foreach (PlayerClient pc in playerList) {
+				TcpClient ns = pc.TcpClient;
+				ns.GetStream().Write(buffer, 0, buffer.Length);
+				ns.GetStream().Flush();
+			}
 		}
 
 		private void PlayerNameBox_LostFocus(object sender, RoutedEventArgs e) {
