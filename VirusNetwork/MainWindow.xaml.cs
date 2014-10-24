@@ -202,7 +202,7 @@ namespace VirusNetwork {
 						dx = r.ReadInt();
 						dy = r.ReadInt();
 
-						viruscontrol.NetworkMove(x, y, dx, dy);
+						this.Dispatcher.Invoke(() => { viruscontrol.NetworkMove(x, y, dx, dy); });
 
 						if (master) {
 							byte[] buffer = encoder.GetBytes(entiremessage);
