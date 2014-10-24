@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using VirusNameSpace;
 using System.IO;
+using VirusNetwork;
 
 namespace VirusNetwork
 {
@@ -38,6 +39,7 @@ namespace VirusNetwork
 		Agent[] agents;
 		PerformedMoveCallback PerformedMove;
 		string PlayerID;
+		MainWindow mainWin;
 
 		public delegate void PerformedMoveCallback(int x, int y, int dx, int dy);
 
@@ -45,10 +47,11 @@ namespace VirusNetwork
 			InitializeComponent();
 		}
 
-		public void StartGame(Virus virus, PerformedMoveCallback callback, string id, params VirusPlayer[] players) {
+		public void StartGame(Virus virus, VirusNetwork.MainWindow mw, PerformedMoveCallback callback, string id, params VirusPlayer[] players) {
 			Random rand = new Random();
 			PerformedMove = callback;
 			PlayerID = id;
+			mainWin = mw;
 			this.virus = virus;
 			this.immediateAI = false;
 			this.MouseClick += MouseClickHandler1;
@@ -134,7 +137,10 @@ namespace VirusNetwork
 			if (virus != null) {
 				Graphics g = e.Graphics;
 				Pen pen = new Pen(Color.Black);
-				int boardlength = virus.Size;
+				double boardHeight = mainWin.gameHeight;
+				double boardWidth = mainWin.gameWidth;
+				//int boardlength = virus.Size;
+				int boardlength = (int)boardWidth;
 				int smallestSide = this.Size.Height < this.Size.Width ? this.Size.Height : this.Size.Width;
 				tileSize = smallestSide/virus.Size;
 

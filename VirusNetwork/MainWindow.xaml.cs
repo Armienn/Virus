@@ -47,6 +47,8 @@ namespace VirusNetwork {
 		List<PlayerClient> playerList = new List<PlayerClient>();
 		VirusInterfaceMod viruscontrol;
 		Random rand = new Random();
+		public double gameWidth = 0;
+		public double gameHeight = 0;
 
 		string playerID = "127.0.0.1";
 		string playerName = "playerY";
@@ -55,6 +57,8 @@ namespace VirusNetwork {
 			InitializeComponent();
 			messageBox.KeyDown += new KeyEventHandler(messageBox_keyDown);
 			playerID = GetOwnIP();
+			gameWidth = VirusGrid.Width;
+			gameHeight = VirusGrid.Height;
 		}
 
 		private void ListenForClients() {
@@ -136,7 +140,7 @@ namespace VirusNetwork {
 							n = r.ReadInt();
 						}
 						this.Dispatcher.Invoke(() => {
-							viruscontrol.StartGame(new VirusNameSpace.Virus(), PerformedMoveCallback, playerID, players.ToArray()); });
+							viruscontrol.StartGame(new VirusNameSpace.Virus(),this , PerformedMoveCallback, playerID, players.ToArray()); });
 						this.Dispatcher.Invoke(() => { ReadyButton.IsEnabled = false; });
 						break;
 					case "MES": // MESsage
@@ -491,7 +495,7 @@ namespace VirusNetwork {
 					ns.GetStream().Write(buffer, 0, buffer.Length);
 					ns.GetStream().Flush();
 				}
-				viruscontrol.StartGame(new VirusNameSpace.Virus(), PerformedMoveCallback, "host", players);
+				viruscontrol.StartGame(new VirusNameSpace.Virus(), this, PerformedMoveCallback, "host", players);
 			}
 			else {
 				ready = !ready;
