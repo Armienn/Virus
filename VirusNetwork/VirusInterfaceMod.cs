@@ -141,8 +141,11 @@ namespace VirusNetwork
 				double boardWidth = mainWin.gameWidth;
 				//int boardlength = virus.Size;
 				int boardlength = (int)boardWidth;
-				int smallestSide = this.Size.Height < this.Size.Width ? this.Size.Height : this.Size.Width;
-				tileSize = smallestSide/virus.Size;
+				//int smallestSide = this.Size.Height < this.Size.Width ? this.Size.Height : this.Size.Width;
+				//tileSize = smallestSide/virus.Size;
+
+				int smallestSide = (int)boardHeight < (int)boardWidth ? (int)boardHeight : (int)boardWidth;
+				tileSize = smallestSide / (int)boardWidth;
 
 				int xStart = e.ClipRectangle.Left / tileSize;
 				int yStart = e.ClipRectangle.Top / tileSize;
