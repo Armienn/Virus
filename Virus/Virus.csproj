@@ -39,17 +39,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Agent.cs" />
-    <Compile Include="QAgent.cs" />
-    <Compile Include="MinimaxAgent.cs" />
-    <Compile Include="MiniMaxMixAgent.cs" />
-    <Compile Include="MixedAgent.cs" />
+    <Compile Include="Agents\Agent.cs" />
+    <Compile Include="Agents\QAgents\Advanced\QAgentAdvanced.cs" />
+    <Compile Include="Agents\QAgents\Advanced\QAgentAdvanced.Parameters.cs" />
+    <Compile Include="Agents\QAgents\Original\QAgent.cs" />
+    <Compile Include="Agents\SearchAgents\MinimaxAgent.cs" />
+    <Compile Include="Agents\SearchAgents\MiniMaxMixAgent.cs" />
+    <Compile Include="Agents\SearchAgents\MixedAgent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="QAgentSemiObsolete.cs" />
-    <Compile Include="QAgentObsolete.cs" />
+    <Compile Include="Agents\QAgents\Advanced\QAgentAdvanced.Learning.cs" />
+    <Compile Include="Agents\QAgents\Advanced\QAgentAdvanced.Utility.cs" />
+    <Compile Include="Agents\QAgents\Original\QAgentSemiObsolete.cs" />
+    <Compile Include="Agents\QAgents\Original\QAgentObsolete.cs" />
     <Compile Include="Virus.cs" />
     <Compile Include="VirusBoard.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
