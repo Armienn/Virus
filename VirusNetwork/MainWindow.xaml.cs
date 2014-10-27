@@ -296,6 +296,18 @@ namespace VirusNetwork {
 						StartButton.Content = "Disconnect";
 						MasterCheckbox.IsEnabled = false;
 						ReadyButton.IsEnabled = true;
+						string col = "Red";
+						if (blackColor.IsChecked == true)
+							col = "Black";
+						if (blueColor.IsChecked == true)
+							col = "Blue";
+						if (redColor.IsChecked == true)
+							col = "Red";
+						if (goldColor.IsChecked == true)
+							col = "Gold";
+						if (greenColor.IsChecked == true)
+							col = "Green";
+						SendConnectMessage(playerName, col);
 					}
 					catch (Exception exc) {
 						IpBox.Text = "Failed to connect";
