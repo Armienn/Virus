@@ -30,23 +30,10 @@ namespace VirusNameSpace.Agents
 		public override void EndGame(Virus percept) {
 			if (learn) {
 				double reward = 0;
-				byte winner = percept.Winner;
-				if (winner == playerNumber)
-					reward = 1;
-				else if (winner != playerNumber && winner != 0)
-					reward = -1;
-				else
-					reward = 0;
-				if (!N.ContainsKey(prevState.CustomHash()))
-					N.Add(prevState.CustomHash(), new Dictionary<UInt32, int>());
-				if (!N[prevState.CustomHash()].ContainsKey(prevAction.CustomHash()))
-					N[prevState.CustomHash()].Add(prevAction.CustomHash(), 0);
+				if (percept.Winner == playerNumber) reward = 1;
+				else if (percept.Winner != playerNumber && percept.Winner != 0) reward = -1;
 
-				N[prevState.CustomHash()][prevAction.CustomHash()]++;
-				Q[prevState.CustomHash()][prevAction.CustomHash()] =
-					Q[prevState.CustomHash()][prevAction.CustomHash()]
-					+ LearningRate(N[prevState.CustomHash()][prevAction.CustomHash()])
-					* (reward - Q[prevState.CustomHash()][prevAction.CustomHash()]);
+				Learn(prevState, default(VirusBoard), prevAction, reward);
 			}
 
 			prevState = default(VirusBoard);
@@ -56,92 +43,14 @@ namespace VirusNameSpace.Agents
 
 		public override Move Move(Virus percept) {
 			VirusBoard newState = percept.GetBoardCopy();
-			if (!Q.ContainsKey(newState.CustomHash()))
-				Q.Add(newState.CustomHash(), new Dictionary<UInt32, double>());
 
-			if (learn && !prevState.Equals(default(VirusBoard))) {
-
-				if (!N.ContainsKey(prevState.CustomHash()))
-					N.Add(prevState.CustomHash(), new Dictionary<UInt32, int>());
-				if (!N[prevState.CustomHash()].ContainsKey(prevAction.CustomHash()))
-					N[prevState.CustomHash()].Add(prevAction.CustomHash(), 0);
-
-				N[prevState.CustomHash()][prevAction.CustomHash()]++;
-				Q[prevState.CustomHash()][prevAction.CustomHash()] =
-					Q[prevState.CustomHash()][prevAction.CustomHash()]
-					+ LearningRate(N[prevState.CustomHash()][prevAction.CustomHash()])
-					* (prevReward + discount * GetMaxQ(newState) - Q[prevState.CustomHash()][prevAction.CustomHash()]);
-			}
+			if (learn && !prevState.Equals(default(VirusBoard)))
+				Learn(prevState, newState, prevAction);
 
 			prevState = newState;
 			prevAction = GetMaxExplorationFunctionA(newState);
 			prevReward = 0;
-			if (learn && !Q[prevState.CustomHash()].ContainsKey(prevAction.CustomHash()))
-				Q[prevState.CustomHash()].Add(prevAction.CustomHash(), initvalue);
 			return prevAction;
-		}
-
-		private double GetMaxQ(VirusBoard state) {
-			double max = -10;
-			Move[] actions = state.GetPossibleMoves(playerNumber);
-			foreach (Move a in actions) {
-				double value = 0;
-				if (!Q[state.CustomHash()].ContainsKey(a.CustomHash())) {
-					value = initvalue;
-				}
-				else {
-					value = Q[state.CustomHash()][a.CustomHash()];
-				}
-				if (value > max)
-					max = value;
-			}
-			return max;
-		}
-
-		private Move GetMaxExplorationFunctionA(VirusBoard state) {
-			double max = double.NegativeInfinity;
-			Move action = default(Move);
-			Move[] actions = state.GetPossibleMoves(playerNumber);
-
-			bool berandom = random.NextDouble() < RandomRate;
-			foreach (Move a in actions) {
-				double value = 0;
-
-				if (Q[state.CustomHash()].ContainsKey(a.CustomHash())) {
-					if (Q[state.CustomHash()][a.CustomHash()] >= 1) {
-						value = 1;
-						max = value;
-						action = a;
-						break;
-					}
-					else if (Q[state.CustomHash()][a.CustomHash()] <= -1) {
-						value = -1;
-					}
-					else {
-						if (berandom)
-							value = random.NextDouble();
-						else
-							value = Q[state.CustomHash()][a.CustomHash()] + ((explore && !(RandomRate > 0)) ? ExplorationRate(N[state.CustomHash()][a.CustomHash()]) : 0);
-					}
-				}
-				else {
-					value = 1;
-				}
-				if (value > max) {
-					max = value;
-					action = a;
-				}
-			}
-			return action;
-		}
-
-		private double ExplorationRate(int frequency) {
-			return explorationModifier / Math.Pow((double)frequency + explorationStart, explorationPower);
-		}
-
-		private double LearningRate(int frequency) {
-			double result = learningRateModifier / Math.Pow((double)frequency + learningRateStart, learningRatePower);
-			return result < MinLearning ? MinLearning : result;
 		}
 	}
 }
