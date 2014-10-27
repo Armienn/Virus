@@ -483,6 +483,18 @@ namespace VirusNetwork {
 			}
 		}
 
+		private void SendConnectMessage(String name, String color) {
+			UnicodeEncoding encoder = new UnicodeEncoding();
+			String message = "CON" + name + " " + color;
+			byte[] buffer = encoder.GetBytes(message);
+
+			foreach (PlayerClient pc in playerList) {
+				TcpClient ns = pc.TcpClient;
+				ns.GetStream().Write(buffer, 0, buffer.Length);
+				ns.GetStream().Flush();
+			}
+		}
+
 		private void ReadyButton_Click(object sender, RoutedEventArgs e) {
 			if (master) {
 				UnicodeEncoding encoder = new UnicodeEncoding();
