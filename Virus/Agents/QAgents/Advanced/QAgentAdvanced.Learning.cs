@@ -79,6 +79,8 @@ namespace VirusNameSpace.Agents {
 			double max = double.NegativeInfinity;
 			Move action = default(Move);
 			Move[] actions = state.GetPossibleMoves(playerNumber);
+			if (!Q.ContainsKey(state.CustomHash()))
+				return actions.Length > 0 ? actions[0] : action;
 
 			bool berandom = random.NextDouble() < RandomRate;
 			foreach (Move a in actions) {
