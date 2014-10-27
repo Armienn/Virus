@@ -138,7 +138,7 @@ namespace VirusNetwork {
 							n = r.ReadInt();
 						}
 						this.Dispatcher.Invoke(() => {
-							viruscontrol.StartGame(new VirusNameSpace.Virus(), PerformedMoveCallback, playerID, players.ToArray()); });
+							viruscontrol.StartGame(new VirusNameSpace.Virus(players.Count, 10), PerformedMoveCallback, playerID, players.ToArray()); });
 						this.Dispatcher.Invoke(() => { ReadyButton.IsEnabled = false; });
 						break;
 					case "MES": // MESsage
@@ -213,6 +213,26 @@ namespace VirusNetwork {
 									ns.GetStream().Flush();
 								}
 							}
+						}
+						break;
+					case "CON": // CONnect
+						if (master) {
+							r = new NeaReader(intext);
+							string na = r.ReadWord();
+							string co = r.ReadWord();
+							string temp = na + " connected with color: " + co + "\n";
+							player.Name = na;
+							player.Color = co;
+							AddText(InTextBox, temp);
+							byte[] buffer = encoder.GetBytes("MES" + temp);
+							foreach (PlayerClient pc in playerList) {
+								TcpClient ns = pc.TcpClient;
+								ns.GetStream().Write(buffer, 0, buffer.Length);
+								ns.GetStream().Flush();
+							}
+						}
+						else {
+							AddText(InTextBox, "ERROR: Got connection message while not master\n");
 						}
 						break;
 				}
@@ -527,7 +547,7 @@ namespace VirusNetwork {
 					ns.GetStream().Write(buffer, 0, buffer.Length);
 					ns.GetStream().Flush();
 				}
-				viruscontrol.StartGame(new VirusNameSpace.Virus(), PerformedMoveCallback, "host", players);
+				viruscontrol.StartGame(new VirusNameSpace.Virus(players.Length, 10), PerformedMoveCallback, "host", players);
 			}
 			else {
 				ready = !ready;
