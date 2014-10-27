@@ -106,8 +106,10 @@ namespace VirusNetwork {
 				UnicodeEncoding encoder = new UnicodeEncoding();
 				String intext = encoder.GetString(message, 0, bytesRead);
 				String messagetype = intext.Substring(0, 3);
-				if(intext.Length > 3)
+				if (intext.Length > 3)
 					intext = intext.Substring(3);
+				else
+					intext = "";
 				switch (messagetype) {
 					case "STG": // STart Game
 						NeaReader r = new NeaReader(intext);
@@ -140,7 +142,8 @@ namespace VirusNetwork {
 							n = r.ReadInt();
 						}
 						this.Dispatcher.Invoke(() => {
-							viruscontrol.StartGame(new VirusNameSpace.Virus(),this , PerformedMoveCallback, playerID, players.ToArray()); });
+							viruscontrol.StartGame(new VirusNameSpace.Virus(players.Count + 1, 10), this, PerformedMoveCallback, playerID, players.ToArray());
+						});
 						this.Dispatcher.Invoke(() => { ReadyButton.IsEnabled = false; });
 						break;
 					case "MES": // MESsage
@@ -193,6 +196,26 @@ namespace VirusNetwork {
 						}
 						else {
 							AddText(InTextBox, "ERROR: Got color message while not master\n");
+						}
+						break;
+					case "CON": // CONnect
+						if (master) {
+							r = new NeaReader(intext);
+							string na = r.ReadWord();
+							string co = r.ReadWord();
+							string temp = na + " connected with color: " + co + "\n";
+							player.Name = na;
+							player.Color = co;
+							AddText(InTextBox, temp);
+							byte[] buffer = encoder.GetBytes("MES" + temp);
+							foreach (PlayerClient pc in playerList) {
+								TcpClient ns = pc.TcpClient;
+								ns.GetStream().Write(buffer, 0, buffer.Length);
+								ns.GetStream().Flush();
+							}
+						}
+						else {
+							AddText(InTextBox, "ERROR: Got connection message while not master\n");
 						}
 						break;
 				}
@@ -276,6 +299,18 @@ namespace VirusNetwork {
 						StartButton.Content = "Disconnect";
 						MasterCheckbox.IsEnabled = false;
 						ReadyButton.IsEnabled = true;
+						string col = "Red";
+						if (blackColor.IsChecked == true)
+							col = "Black";
+						if (blueColor.IsChecked == true)
+							col = "Blue";
+						if (redColor.IsChecked == true)
+							col = "Red";
+						if (goldColor.IsChecked == true)
+							col = "Gold";
+						if (greenColor.IsChecked == true)
+							col = "Green";
+						SendConnectMessage(playerName, col);
 					}
 					catch (Exception exc) {
 						IpBox.Text = "Failed to connect";
@@ -431,6 +466,18 @@ namespace VirusNetwork {
 			}
 		}
 
+		private void SendConnectMessage(String name, String color) {
+			UnicodeEncoding encoder = new UnicodeEncoding();
+			String message = "CON" + name + " " + color;
+			byte[] buffer = encoder.GetBytes(message);
+
+			foreach (PlayerClient pc in playerList) {
+				TcpClient ns = pc.TcpClient;
+				ns.GetStream().Write(buffer, 0, buffer.Length);
+				ns.GetStream().Flush();
+			}
+		}
+
 		private void ReadyButton_Click(object sender, RoutedEventArgs e) {
 			if (master) {
 				UnicodeEncoding encoder = new UnicodeEncoding();
@@ -495,7 +542,7 @@ namespace VirusNetwork {
 					ns.GetStream().Write(buffer, 0, buffer.Length);
 					ns.GetStream().Flush();
 				}
-				viruscontrol.StartGame(new VirusNameSpace.Virus(), this, PerformedMoveCallback, "host", players);
+				viruscontrol.StartGame(new VirusNameSpace.Virus(players.Length + 1, 10), this, PerformedMoveCallback, "host", players);
 			}
 			else {
 				ready = !ready;
