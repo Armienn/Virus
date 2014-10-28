@@ -51,14 +51,14 @@ namespace VirusNetwork
 			Random rand = new Random();
 			PerformedMove = callback;
 			PlayerID = id;
-			this.mainWin = mw;
+			mainWin = mw;
 			this.virus = virus;
 			this.immediateAI = false;
 			this.MouseClick += MouseClickHandler1;
 			tileSize = 20;
 			this.Size = new Size(
-				(int)this.mainWin.ActualHeight * tileSize + 17,
-				(int)this.mainWin.ActualWidth * tileSize + 55);
+				virus.Size * tileSize + 17,
+				virus.Size * tileSize + 55);
 			int smallestSide = this.Size.Height < this.Size.Width ? this.Size.Height : this.Size.Width;
 			tileSize = smallestSide / virus.Size;
 			this.players.Add(new VirusPlayer("Player 0", "", Color.White));
