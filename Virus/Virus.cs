@@ -27,7 +27,7 @@ namespace VirusNameSpace
 			}
 		}
 
-		public Virus(int players = 2, int x = 15) {
+		public Virus(int players = 2, int x = 5) {
 			if (x < 3)
 				throw new ArgumentException("Too small a board");
 			if (players < 2)

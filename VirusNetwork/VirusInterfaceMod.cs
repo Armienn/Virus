@@ -52,7 +52,7 @@ namespace VirusNetwork
 			this.virus = virus;
 			this.immediateAI = false;
 			this.MouseClick += MouseClickHandler1;
-			tileSize = 20;
+			tileSize = 30;
 			this.Size = new Size(
 				virus.Size * tileSize + 17,
 				virus.Size * tileSize + 55);
