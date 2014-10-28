@@ -73,27 +73,5 @@ namespace VirusNetwork {
 
 		}
 		#endregion
-
-		public static MessageType ParseMessageType(string message){
-			MessageType result = MessageType.Unknown;
-			string type = message.Substring(0, 3);
-			switch(type){
-				case "INT":
-					result = MessageType.Initialise;
-					break;
-				case "TXT":
-					result = MessageType.Text;
-					break;
-			}
-			return result;
-		}
-	}
-
-	enum MessageType {
-		Initialise,
-		Text,
-		Ready,
-		StartGame,
-		Unknown
 	}
 }

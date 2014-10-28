@@ -95,6 +95,7 @@
       <DependentUpon>VirusInterfaceMod.cs</DependentUpon>
     </Compile>
     <Compile Include="VirusLobby.cs" />
+    <Compile Include="VirusLobby.Messages.cs" />
     <Compile Include="VirusLobby.Tcp.cs" />
     <Compile Include="VirusPlayer.cs" />
     <Page Include="MainWindow.xaml">

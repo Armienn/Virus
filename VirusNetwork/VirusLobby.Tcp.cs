@@ -52,18 +52,31 @@ namespace VirusNetwork {
 				}
 
 				String message = encoder.GetString(incoming, 0, bytesRead);
+				MessageType type = VirusLobby.ParseMessageType(message);
 
+				// -- The player should start by initialising
 				if (!player.Initialised) {
-					MessageType type = VirusLobby.ParseMessageType(message);
 					if (type != MessageType.Initialise) {
 						player.Connected = false;
 						break;
 					}
-
+					bool success = TryParseInitialiseMessage(message, out player.Name, out player.Color);
+					if (!success) {
+						player.Connected = false;
+						break;
+					}
+					player.Initialised = true;
+					Players.Add(player);
+					continue;
 				}
-				
+
+				// -- Player is already initialised, so the message needs other handling
+				HandleMessage(message, type);
 			}
 		}
 
+		private void HandleMessage(string message, MessageType type) {
+			
+		}
 	}
 }
