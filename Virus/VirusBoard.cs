@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
+using Nea;
 
 namespace VirusNameSpace
 {
@@ -277,6 +278,47 @@ namespace VirusNameSpace
 			}
 			return h;
 		}
+
+		public string Save()
+		{
+			string save;
+			string players;
+			string winner;
+			string gameBoard = "";
+			string size;
+
+			players = this.players.ToString();
+			winner = this.winner.ToString();
+			size = this.Size.ToString();
+
+			for(int i=0; i < this.Size; i++){
+				for(int j=0; j < this.Size; j++){
+					gameBoard += this.board[i, j].ToString() + " ";
+				}
+			}
+
+			save = players + ";" + winner + ";" + size + ";" + gameBoard;
+			return save;
+		}
+
+		public void Load(string save)
+		{
+			NeaReader reader = new NeaReader(save);
+			players = byte.Parse(reader.ReadUntil(";"));
+			winner = byte.Parse(reader.ReadUntil(";"));
+			int size = int.Parse(reader.ReadUntil(";"));
+
+			board = new byte[size, size];
+
+			for (int i = 0; i < size; i++)
+			{
+				for (int j = 0; j < size; j++)
+				{
+					board[i, j] = byte.Parse(reader.ReadWord());
+				}
+			}
+
+		}
 	}
 
 	public struct Move : IEquatable<Move>
@@ -319,6 +361,33 @@ namespace VirusNameSpace
 
 		public UInt32 CustomHash() {
 			return (UInt32)GetHashCode();
+		}
+
+		public string Save()
+		{
+			string save;
+
+			string sx;
+			string sy;
+			string ex;
+			string ey;
+
+			sx = this.sx.ToString();
+			sy = this.sy.ToString();
+			ex = this.ex.ToString();
+			ey = this.ey.ToString();
+
+			save = sx + " " + sy + " " + ex + " " + ey;
+			return save;
+		}
+
+		public void Load(string save)
+		{
+			NeaReader reader = new NeaReader(save);
+			sx = reader.ReadInt();
+			sy = reader.ReadInt();
+			ex = reader.ReadInt();
+			ey = reader.ReadInt();
 		}
 	}
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using Nea;
 
 namespace VirusNameSpace.Agents {
 	public partial class MemoryQAgent {
@@ -59,6 +60,54 @@ namespace VirusNameSpace.Agents {
 					N.Add(key, new Dictionary<uint, int>());
 				UInt32 key2 = reader.ReadUInt32();
 				N[key].Add(key2, reader.ReadInt32());
+			}
+			reader.Close();
+		}
+
+		public void SaveLongTermMemory(String file)
+		{
+			StreamWriter writer = new StreamWriter(new FileStream(file + ".MQ", FileMode.Create));
+			string startState;
+			string endState;
+			string action;
+			string reward;
+			string data;
+
+			foreach (VirusMemory memory in LongTermMemory)
+			{
+				startState = memory.StartState.Save();
+				endState = memory.EndState.Save();
+				action = memory.Action.Save();
+				reward = memory.Reward.ToString();
+
+				data = startState + ":" + endState + ":" + action + ":" + reward + "/n";
+				writer.Write(data);
+			}
+			writer.Close();
+		}
+
+		public void LoadlongTermMermory(String file)
+		{
+			NeaReader reader = new NeaReader(new NeaStreamReader(file + ".MQ"));
+
+			while (reader.Peek() != -1)
+			{
+				VirusMemory memory = new VirusMemory();
+				VirusBoard startState = new VirusBoard();
+				VirusBoard endState = new VirusBoard();
+				Move action = new Move();
+				double reward;
+				string data;
+
+				data = reader.ReadLine();
+				NeaReader r = new NeaReader(data);
+				startState.Load(r.ReadUntil(":"));
+				endState.Load(r.ReadUntil(":"));
+				action.Load(r.ReadUntil(":"));
+				reward = r.ReadDouble();
+
+				memory = new VirusMemory(startState, action, endState, reward);
+				LongTermMemory.Add(memory);
 			}
 			reader.Close();
 		}
