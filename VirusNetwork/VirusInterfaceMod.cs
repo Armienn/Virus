@@ -12,17 +12,6 @@ using System.IO;
 
 namespace VirusNetwork
 {
-	public class VirusPlayer {
-		public string Name;
-		public string ID;
-		public Color PlayerColor;
-		public VirusPlayer(string name, string id, Color color) {
-			Name = name;
-			ID = id;
-			PlayerColor = color;
-		}
-	}
-
 	public partial class VirusInterfaceMod : UserControl
 	{
 		Virus virus;

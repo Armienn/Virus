@@ -20,21 +20,6 @@ using System.IO;
 using Nea;
 
 namespace VirusNetwork {
-	class PlayerClient {
-		public readonly TcpClient TcpClient;
-		public readonly String ID;
-		public string Color;
-		public String Name;
-		public bool Ready;
-
-		public PlayerClient(TcpClient cl, String id) {
-			this.TcpClient = cl;
-			this.ID = id;
-			this.Color = "Red";
-			this.Name = "PlayerX";
-			this.Ready = false;
-		}
-	}
 
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
@@ -42,9 +27,9 @@ namespace VirusNetwork {
 	public partial class MainWindow : Window {
 		private bool master = false;
 		private bool ready = false;
-		private TcpListener tcpListener;
 		private Thread listenThread;
-		List<PlayerClient> playerList = new List<PlayerClient>();
+		//List<VirusPlayer> playerList = new List<VirusPlayer>();
+		VirusLobby lobby;
 		VirusInterfaceMod viruscontrol;
 		Random rand = new Random();
 
@@ -54,27 +39,12 @@ namespace VirusNetwork {
 		public MainWindow() {
 			InitializeComponent();
 			messageBox.KeyDown += new KeyEventHandler(messageBox_keyDown);
-			playerID = GetOwnIP();
-		}
-
-		private void ListenForClients() {
-			this.tcpListener.Start();
-
-			while (true) {
-				//blocks until a client has connected to the server
-				TcpClient cl = this.tcpListener.AcceptTcpClient();
-				PlayerClient client = new PlayerClient(cl, ((IPEndPoint)cl.Client.RemoteEndPoint).Address.ToString());
-				playerList.Add(client);
-
-				//create a thread to handle communication
-				//with connected client
-				Thread clientThread = new Thread(new ParameterizedThreadStart(HandleClientComm));
-				clientThread.Start(client);
-			}
+			VirusPlayer player = new VirusPlayer("Player1", rand.Next().ToString(), System.Drawing.Color.Red);
+			lobby = new VirusLobby(player);
 		}
 
 		private void HandleClientComm(object client) {
-			PlayerClient player = (PlayerClient)client;
+			VirusPlayer player = (VirusPlayer)client;
 			TcpClient tcpClient = player.TcpClient;
 			NetworkStream clientStream = tcpClient.GetStream();
 
@@ -113,7 +83,7 @@ namespace VirusNetwork {
 						int n = r.ReadInt();
 						while (n != -1) {
 							string name = r.ReadWord();
-							string ip = r.ReadWord();
+							string id = r.ReadWord();
 							string color = r.ReadWord();
 							System.Drawing.Color col = System.Drawing.Color.Gold;
 							switch (color) {
@@ -133,7 +103,7 @@ namespace VirusNetwork {
 									col = System.Drawing.Color.Gold;
 									break;
 							}
-							VirusPlayer pl = new VirusPlayer(name, ip, col);
+							VirusPlayer pl = new VirusPlayer(name, id, col);
 							players.Add(pl);
 							n = r.ReadInt();
 						}
@@ -145,7 +115,7 @@ namespace VirusNetwork {
 						if (master) {
 							AddText(InTextBox, player.Name + ":\n  " + intext + "\n");
 							byte[] buffer = encoder.GetBytes("MES" + player.Name + ":\n  " + intext + "\n");
-							foreach (PlayerClient pc in playerList) {
+							foreach (VirusPlayer pc in playerList) {
 								TcpClient ns = pc.TcpClient;
 								ns.GetStream().Write(buffer, 0, buffer.Length);
 								ns.GetStream().Flush();
@@ -167,7 +137,7 @@ namespace VirusNetwork {
 							player.Name = intext;
 							AddText(InTextBox, temp);
 							byte[] buffer = encoder.GetBytes("MES" + temp);
-							foreach (PlayerClient pc in playerList) {
+							foreach (VirusPlayer pc in playerList) {
 								TcpClient ns = pc.TcpClient;
 								ns.GetStream().Write(buffer, 0, buffer.Length);
 								ns.GetStream().Flush();
@@ -183,7 +153,7 @@ namespace VirusNetwork {
 							player.Color = intext;
 							AddText(InTextBox, temp);
 							byte[] buffer = encoder.GetBytes("MES" + temp);
-							foreach (PlayerClient pc in playerList) {
+							foreach (VirusPlayer pc in playerList) {
 								TcpClient ns = pc.TcpClient;
 								ns.GetStream().Write(buffer, 0, buffer.Length);
 								ns.GetStream().Flush();
@@ -206,7 +176,7 @@ namespace VirusNetwork {
 
 						if (master) {
 							byte[] buffer = encoder.GetBytes(entiremessage);
-							foreach (PlayerClient pc in playerList) {
+							foreach (VirusPlayer pc in playerList) {
 								if (pc.ID != id) {
 									TcpClient ns = pc.TcpClient;
 									ns.GetStream().Write(buffer, 0, buffer.Length);
@@ -225,7 +195,7 @@ namespace VirusNetwork {
 							player.Color = co;
 							AddText(InTextBox, temp);
 							byte[] buffer = encoder.GetBytes("MES" + temp);
-							foreach (PlayerClient pc in playerList) {
+							foreach (VirusPlayer pc in playerList) {
 								TcpClient ns = pc.TcpClient;
 								ns.GetStream().Write(buffer, 0, buffer.Length);
 								ns.GetStream().Flush();
@@ -238,7 +208,7 @@ namespace VirusNetwork {
 				}
 				if (master) {
 					ready = true;
-					foreach (PlayerClient pc in playerList) {
+					foreach (VirusPlayer pc in playerList) {
 						if (!pc.Ready)
 							ready = false;
 					}
@@ -292,11 +262,11 @@ namespace VirusNetwork {
 				MasterCheckbox.IsEnabled = true;
 				tcpListener.Stop();
 				listenThread.Abort();
-				foreach (PlayerClient pc in playerList) {
+				foreach (VirusPlayer pc in playerList) {
 					TcpClient ns = pc.TcpClient;
 					ns.Close();
 				}
-				playerList = new List<PlayerClient>();
+				playerList = new List<VirusPlayer>();
 				StartButton.Content = "Start Listening";
 			}
 			else if (((String)StartButton.Content)=="Connect") {   // Connecting
@@ -307,7 +277,7 @@ namespace VirusNetwork {
 						TcpClient client = new TcpClient();
 						IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse(IpBox.Text), 3000);
 						client.Connect(serverEndPoint);
-						PlayerClient pclient = new PlayerClient(client, "host");
+						VirusPlayer pclient = new VirusPlayer(client, "host");
 						playerList.Add(pclient);
 
 						Thread clientThread = new Thread(new ParameterizedThreadStart(HandleClientComm));
@@ -341,11 +311,11 @@ namespace VirusNetwork {
 			else {   // Disconnecting
 				MasterCheckbox.IsEnabled = true;
 				StartButton.Content = "Connect";
-				foreach (PlayerClient pc in playerList) {
+				foreach (VirusPlayer pc in playerList) {
 					TcpClient ns = pc.TcpClient;
 					ns.Close();
 				}
-				playerList = new List<PlayerClient>();
+				playerList = new List<VirusPlayer>();
 			}
 		}
 
@@ -378,7 +348,7 @@ namespace VirusNetwork {
 			messageBox.Text = "";
 			byte[] buffer = encoder.GetBytes("MES" + message);
 
-			foreach (PlayerClient pc in playerList) {
+			foreach (VirusPlayer pc in playerList) {
 				TcpClient ns = pc.TcpClient;
 				ns.GetStream().Write(buffer, 0, buffer.Length);
 				ns.GetStream().Flush();
@@ -419,7 +389,7 @@ namespace VirusNetwork {
 					listenThread.Abort();
 				}
 			}
-			foreach (PlayerClient pc in playerList) {
+			foreach (VirusPlayer pc in playerList) {
 				TcpClient ns = pc.TcpClient;
 				ns.Close();
 			}
@@ -464,7 +434,7 @@ namespace VirusNetwork {
 				String message = "CLR" + color;
 				byte[] buffer = encoder.GetBytes(message);
 
-				foreach (PlayerClient pc in playerList) {
+				foreach (VirusPlayer pc in playerList) {
 					TcpClient ns = pc.TcpClient;
 					ns.GetStream().Write(buffer, 0, buffer.Length);
 					ns.GetStream().Flush();
@@ -475,7 +445,7 @@ namespace VirusNetwork {
 				AddText(InTextBox, temp);
 				UnicodeEncoding encoder = new UnicodeEncoding();
 				byte[] buffer = encoder.GetBytes("MES" + temp);
-				foreach (PlayerClient pc in playerList) {
+				foreach (VirusPlayer pc in playerList) {
 					TcpClient ns = pc.TcpClient;
 					ns.GetStream().Write(buffer, 0, buffer.Length);
 					ns.GetStream().Flush();
@@ -488,7 +458,7 @@ namespace VirusNetwork {
 			String message = "CON" + name + " " + color;
 			byte[] buffer = encoder.GetBytes(message);
 
-			foreach (PlayerClient pc in playerList) {
+			foreach (VirusPlayer pc in playerList) {
 				TcpClient ns = pc.TcpClient;
 				ns.GetStream().Write(buffer, 0, buffer.Length);
 				ns.GetStream().Flush();
@@ -554,7 +524,7 @@ namespace VirusNetwork {
 				message += "-1";
 
 				byte[] buffer = encoder.GetBytes(message);
-				foreach (PlayerClient pc in playerList) {
+				foreach (VirusPlayer pc in playerList) {
 					TcpClient ns = pc.TcpClient;
 					ns.GetStream().Write(buffer, 0, buffer.Length);
 					ns.GetStream().Flush();
@@ -576,7 +546,7 @@ namespace VirusNetwork {
 				String message = ready ? "RDY" : "NRD";
 				byte[] buffer = encoder.GetBytes(message);
 
-				foreach (PlayerClient pc in playerList) {
+				foreach (VirusPlayer pc in playerList) {
 					TcpClient ns = pc.TcpClient;
 					ns.GetStream().Write(buffer, 0, buffer.Length);
 					ns.GetStream().Flush();
@@ -589,7 +559,7 @@ namespace VirusNetwork {
 
 			UnicodeEncoding encoder = new UnicodeEncoding();
 			byte[] buffer = encoder.GetBytes("GMS" + temp);
-			foreach (PlayerClient pc in playerList) {
+			foreach (VirusPlayer pc in playerList) {
 				TcpClient ns = pc.TcpClient;
 				ns.GetStream().Write(buffer, 0, buffer.Length);
 				ns.GetStream().Flush();
@@ -603,7 +573,7 @@ namespace VirusNetwork {
 				String message = "NME" + PlayerNameBox.Text;
 				byte[] buffer = encoder.GetBytes(message);
 
-				foreach (PlayerClient pc in playerList) {
+				foreach (VirusPlayer pc in playerList) {
 					TcpClient ns = pc.TcpClient;
 					ns.GetStream().Write(buffer, 0, buffer.Length);
 					ns.GetStream().Flush();
@@ -615,7 +585,7 @@ namespace VirusNetwork {
 				AddText(InTextBox, temp);
 				UnicodeEncoding encoder = new UnicodeEncoding();
 				byte[] buffer = encoder.GetBytes("MES" + temp);
-				foreach (PlayerClient pc in playerList) {
+				foreach (VirusPlayer pc in playerList) {
 					TcpClient ns = pc.TcpClient;
 					ns.GetStream().Write(buffer, 0, buffer.Length);
 					ns.GetStream().Flush();

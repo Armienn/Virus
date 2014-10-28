@@ -94,6 +94,9 @@
     <Compile Include="VirusInterfaceMod.Designer.cs">
       <DependentUpon>VirusInterfaceMod.cs</DependentUpon>
     </Compile>
+    <Compile Include="VirusLobby.cs" />
+    <Compile Include="VirusLobby.Tcp.cs" />
+    <Compile Include="VirusPlayer.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
