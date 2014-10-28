@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VirusNameSpace;
+using VirusNameSpace.Agents;
 using System.IO;
 
 namespace VirusConsole
@@ -78,6 +79,23 @@ namespace VirusConsole
 							qagentm.TurnOffLearning();
 							RunQ(temp3, qagentm, command, temp1, temp4);
 						}
+						break;
+
+					case "train MemoryQ":
+						Console.WriteLine("Q is player..?");
+						temp3 = byte.Parse(Console.ReadLine());
+						MemoryQAgent mqagent = new MemoryQAgent(temp3);
+						if (load)
+							mqagent.Load("TrainingData");
+						Console.WriteLine("How many iterations?");
+						temp1 = int.Parse(Console.ReadLine());
+						Console.WriteLine("Save how often?");
+						temp2 = int.Parse(Console.ReadLine());
+						Console.WriteLine("Board size?");
+						temp4 = int.Parse(Console.ReadLine());
+						Console.WriteLine("Which opponent?");
+						command = Console.ReadLine();
+						TrainMemoryQ(temp4, temp3, mqagent, command, "log", "TrainingData", temp1, temp2);
 						break;
 
 					case "train mad Q":
@@ -574,6 +592,67 @@ namespace VirusConsole
 			p1.EndGame(virus);
 			p2.EndGame(virus);
 			return winner;
+		}
+
+		static void TrainMemoryQ(int size, byte qnumber, MemoryQAgent agent, String opponent, String logname, String savename, int iterations, int saveinterval = 360) {
+			Virus virus = new Virus(2, size);
+			int wins = 0, wins2 = 0;
+			byte oppnumber = qnumber == 1 ? (byte)2 : (byte)1;
+			Agent opp = new BruteForceAgent(oppnumber);
+			StreamWriter writer = new StreamWriter(logname);
+			for (int i = 1; i <= iterations; i++) {
+				switch (opponent) {
+					case "brute":
+						break;
+					case "minimax4":
+						opp = new MinimaxAgent(4, oppnumber);
+						break;
+					case "minimax3":
+						opp = new MinimaxAgent(3, oppnumber);
+						break;
+					case "minimax2":
+						opp = new MinimaxAgent(2, oppnumber);
+						break;
+					default:
+						opp = new BruteForceAgent(oppnumber);
+						break;
+				}
+
+				int winner = RunGame(virus, qnumber == 1 ? (Agent)agent : opp, qnumber == 2 ? (Agent)agent : opp);
+				wins += winner == 1 ? 1 : 0;
+				wins2 += winner == 1 ? 1 : 0;
+
+				agent.ProcessShortTermMemory();
+
+				if (i % 100 == 0) {
+					if (agent.RandomRate == 0) {
+						writer.WriteLine(wins2);
+					}
+					wins2 = 0;
+				}
+				if (i % saveinterval == 0) {
+					agent.Save(savename);
+					Console.WriteLine("Iteration: " + i);
+					Console.WriteLine("Wins: " + wins);
+					wins = 0;
+					if (agent.RandomRate > 0) {
+						agent.TurnOffExploration();
+						//agent.TurnOffLearning();
+						for (int j = 1; j <= 1000; j++) {
+							virus = new Virus(2, size);
+							winner = RunGame(virus, qnumber == 1 ? (Agent)agent : opp, qnumber == 2 ? (Agent)agent : opp);
+							wins += winner == 1 ? 1 : 0;
+						}
+						writer.WriteLine(wins);
+						wins = 0;
+						agent.TurnOnExploration();
+						agent.ForgetShortTerm();
+						//agent.TurnOnLearning();
+					}
+				}
+				virus = new Virus(2, size);
+			}
+			writer.Close();
 		}
 	}
 }

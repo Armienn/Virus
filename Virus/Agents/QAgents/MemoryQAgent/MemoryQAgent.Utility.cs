@@ -15,6 +15,10 @@ namespace VirusNameSpace.Agents {
 			explore = false;
 		}
 
+		public void ForgetShortTerm() {
+			ShortTermMemory.Clear();
+		}
+
 		public void Save(String file) {
 			BinaryWriter writer = new BinaryWriter(new FileStream(file + ".Q", FileMode.Create));
 			foreach (KeyValuePair<UInt64, Dictionary<UInt32, double>> kvp in Q) {
