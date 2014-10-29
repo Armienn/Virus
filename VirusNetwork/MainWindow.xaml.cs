@@ -52,6 +52,8 @@ namespace VirusNetwork {
 		string playerID = "127.0.0.1";
 		string playerName = "playerY";
 
+		int boardsize = 5;
+
 		public MainWindow() {
 			InitializeComponent();
 			messageBox.KeyDown += new KeyEventHandler(messageBox_keyDown);
@@ -139,7 +141,7 @@ namespace VirusNetwork {
 							n = r.ReadInt();
 						}
 						this.Dispatcher.Invoke(() => {
-							viruscontrol.StartGame(new VirusNameSpace.Virus(players.Count, 10), PerformedMoveCallback, updatePieces, playerID, players.ToArray()); });
+							viruscontrol.StartGame(new VirusNameSpace.Virus(players.Count, boardsize), PerformedMoveCallback, updatePieces, playerID, players.ToArray()); });
 						this.Dispatcher.Invoke(() => { ReadyButton.IsEnabled = false; });
 						break;
 					case "MES": // MESsage
@@ -560,7 +562,7 @@ namespace VirusNetwork {
 					ns.GetStream().Write(buffer, 0, buffer.Length);
 					ns.GetStream().Flush();
 				}
-				viruscontrol.StartGame(new VirusNameSpace.Virus(players.Length, 10), PerformedMoveCallback, updatePieces, "host", players);
+				viruscontrol.StartGame(new VirusNameSpace.Virus(players.Length, boardsize), PerformedMoveCallback, updatePieces, "host", players);
 			}
 			else {
 				ready = !ready;

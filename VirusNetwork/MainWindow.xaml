@@ -23,7 +23,7 @@
 		<RadioButton x:Name="blackColor" Content="" HorizontalAlignment="Left" Margin="73,10,0,0" VerticalAlignment="Top" Background="Black" BorderBrush="Black" Foreground="Black" GroupName="Colours" Checked="blackColor_Checked"/>
 		<RadioButton x:Name="blueColor" Content="" HorizontalAlignment="Left" Margin="94,10,0,0" VerticalAlignment="Top" Background="Blue" BorderBrush="Blue" Foreground="Blue" GroupName="Colours" Checked="blueColor_Checked"/>
 		<Grid HorizontalAlignment="Left" Height="65" Margin="10,400,10,10" VerticalAlignment="Top" Width="497">
-			<Canvas HorizontalAlignment="Left" VerticalAlignment="Bottom" Name="winnings">
+			<Canvas HorizontalAlignment="Left" VerticalAlignment="Bottom" Name="winnings" Width="497" Height="65">
 			</Canvas>
 		</Grid>
 	</Grid>
