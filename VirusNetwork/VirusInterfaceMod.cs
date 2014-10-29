@@ -37,17 +37,20 @@ namespace VirusNetwork
 		//Color[] colors;
 		Agent[] agents;
 		PerformedMoveCallback PerformedMove;
+		UpdatePiecesCallback UpdatePieces;
 		string PlayerID;
 
 		public delegate void PerformedMoveCallback(int x, int y, int dx, int dy);
+		public delegate void UpdatePiecesCallback(int pieces);
 
 		public VirusInterfaceMod() {
 			InitializeComponent();
 		}
 
-		public void StartGame(Virus virus, PerformedMoveCallback callback, string id, params VirusPlayer[] players) {
+		public void StartGame(Virus virus, PerformedMoveCallback callback, UpdatePiecesCallback piecesCallback, string id, params VirusPlayer[] players) {
 			Random rand = new Random();
 			PerformedMove = callback;
+			UpdatePieces = piecesCallback;
 			PlayerID = id;
 			this.virus = virus;
 			this.immediateAI = false;
@@ -390,6 +393,10 @@ namespace VirusNetwork
 				String s = "Free: " + pieces[0] + "\n";
 				for (int i = 1; i <= virus.Players; i++) {
 					s += players[i].Name + ": " + pieces[i] + "\n";
+					if (players[i].ID == PlayerID)
+					{
+						UpdatePieces(pieces[i]);
+					}
 				}
 				MessageBox.Show(w + " is the winner\n" + s);
 			}

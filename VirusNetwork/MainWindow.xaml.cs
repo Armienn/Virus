@@ -47,6 +47,7 @@ namespace VirusNetwork {
 		List<PlayerClient> playerList = new List<PlayerClient>();
 		VirusInterfaceMod viruscontrol;
 		Random rand = new Random();
+		List<int> PieceList = new List<int>();
 
 		string playerID = "127.0.0.1";
 		string playerName = "playerY";
@@ -138,7 +139,7 @@ namespace VirusNetwork {
 							n = r.ReadInt();
 						}
 						this.Dispatcher.Invoke(() => {
-							viruscontrol.StartGame(new VirusNameSpace.Virus(players.Count, 10), PerformedMoveCallback, playerID, players.ToArray()); });
+							viruscontrol.StartGame(new VirusNameSpace.Virus(players.Count, 10), PerformedMoveCallback, updatePieces, playerID, players.ToArray()); });
 						this.Dispatcher.Invoke(() => { ReadyButton.IsEnabled = false; });
 						break;
 					case "MES": // MESsage
@@ -559,7 +560,7 @@ namespace VirusNetwork {
 					ns.GetStream().Write(buffer, 0, buffer.Length);
 					ns.GetStream().Flush();
 				}
-				viruscontrol.StartGame(new VirusNameSpace.Virus(players.Length, 10), PerformedMoveCallback, "host", players);
+				viruscontrol.StartGame(new VirusNameSpace.Virus(players.Length, 10), PerformedMoveCallback, updatePieces, "host", players);
 			}
 			else {
 				ready = !ready;
@@ -623,16 +624,28 @@ namespace VirusNetwork {
 			}
 		}
 
-		public void DrawLines(double[] lineList, Polyline line, double max, Canvas canvas)
+		public void DrawLines(int[] lineList, Polyline line, Canvas canvas)
 		{
 			double height = canvas.Height;
 			double width = canvas.Width;
-			double scaleGraph = height / max;
+			double scaleGraph = height / lineList.Max();
 
 			for (int i = 0; i < lineList.Length; i++)
 			{
-				line.Points.Add(new Point(width * ((double)i / (double)lineList.Length), (lineList[i] * scaleGraph)));
+				line.Points.Add(new Point(width * (i / lineList.Length), (lineList[i] * scaleGraph)));
 			}
+		}
+
+		public void updatePieces(int pieces)
+		{
+			winnings.Children.Clear();
+			PieceList.Add(pieces);
+			Polyline line = new Polyline();
+			line.StrokeThickness = 2;
+			line.Stroke = Brushes.Blue;
+			winnings.Children.Add(line);
+
+			DrawLines(PieceList.ToArray(), line, winnings);
 		}
 	}
 }
