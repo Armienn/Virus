@@ -215,7 +215,9 @@ namespace VirusNetwork
 			if (players[virus.CurrentPlayer].Name.StartsWith("AI")) {
 				if (!immediateAI) {
 					if ((args.X > this.Width - 60) && (args.Y > virus.Size * tileSize)) {
-						AIMove();
+						if (players[virus.CurrentPlayer].ID == PlayerID) {
+							AINetworkMove();
+						}
 					}
 				}
 			}
@@ -322,6 +324,35 @@ namespace VirusNetwork
 			Rectangle areaToUpdate;
 
 			virus.Move(x, y, tileX, tileY);
+			piece = virus.Winner;
+			int smallestX = x < tileX ? x : (tileX - 1);
+			int smallestY = y < tileY ? y : (tileY - 1);
+			int greatestX = x > tileX ? x : (tileX + 1);
+			int greatestY = y > tileY ? y : (tileY + 1);
+			Point startpoint = new Point(tileSize * smallestX, tileSize * (virus.Size - greatestY - 1));
+			Size size = new Size((greatestX - smallestX + 1) * tileSize, (greatestY - smallestY + 1) * tileSize);
+			areaToUpdate = new Rectangle(startpoint, size);
+			this.Invalidate(areaToUpdate); //tile area
+			Update();
+
+			CheckForWinner(piece);
+		}
+
+		private void AINetworkMove() {
+			VirusNameSpace.Move a = agents[virus.CurrentPlayer].Move(virus);
+
+			if (gameWon)
+				return;
+
+			int x = a.sx;
+			int y = a.sy;
+			int tileX = a.ex;
+			int tileY = a.ey;
+			byte piece = 0;
+			Rectangle areaToUpdate;
+
+			virus.Move(x, y, tileX, tileY);
+			PerformedMove(x, y, tileX, tileY);
 			piece = virus.Winner;
 			int smallestX = x < tileX ? x : (tileX - 1);
 			int smallestY = y < tileY ? y : (tileY - 1);
