@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using VirusNameSpace;
+using VirusNameSpace.Agents;
 using System.IO;
 
 namespace VirusNetwork
@@ -78,6 +79,15 @@ namespace VirusNetwork
 							((QAgent)agents[i]).Load("TrainingData");
 							((QAgent)agents[i]).TurnOffExploration();
 							((QAgent)agents[i]).TurnOffLearning();
+						}
+						this.players[i].Name = "AI " + n;
+						n++;
+						break;
+					case "MQAI":
+						agents[i] = new MemoryQAgent(i);
+						if (File.Exists("TrainingData.Q") && File.Exists("TrainingData.N")) {
+							((MemoryQAgent)agents[i]).Load("TrainingData");
+							((MemoryQAgent)agents[i]).TurnOffExploration();
 						}
 						this.players[i].Name = "AI " + n;
 						n++;
@@ -178,7 +188,7 @@ namespace VirusNetwork
 					pen.Brush,
 					new Rectangle(0, boardlength * tileSize, 200, 20)
 					);
-				if ((!immediateAI) && (players[virus.CurrentPlayer].Name.StartsWith("AI"))) {
+				if ((!immediateAI) && (players[virus.CurrentPlayer].Name.StartsWith("AI")) && players[virus.CurrentPlayer].ID == PlayerID) {
 					g.FillRectangle(
 						new Pen(Color.LightGray).Brush,
 						new Rectangle(this.Width - 60, boardlength * tileSize + 2, 43, 13)
@@ -368,6 +378,9 @@ namespace VirusNetwork
 			Update();
 
 			CheckForWinner(piece);
+			if(agents[virus.CurrentPlayer] is MemoryQAgent){
+				((MemoryQAgent)agents[virus.CurrentPlayer]).ForgetShortTerm();
+			}
 		}
 
 		private void CheckForWinner(byte winner) {
