@@ -622,5 +622,17 @@ namespace VirusNetwork {
 				}
 			}
 		}
+
+		public void DrawLines(double[] lineList, Polyline line, double max, Canvas canvas)
+		{
+			double height = canvas.Height;
+			double width = canvas.Width;
+			double scaleGraph = height / max;
+
+			for (int i = 0; i < lineList.Length; i++)
+			{
+				line.Points.Add(new Point(width * ((double)i / (double)lineList.Length), (lineList[i] * scaleGraph)));
+			}
+		}
 	}
 }
