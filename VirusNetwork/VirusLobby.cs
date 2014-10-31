@@ -129,7 +129,7 @@ namespace VirusNetwork {
 			client.Connect(serverEndPoint);
 			VirusPlayer pclient = new VirusPlayer(client);
 			MasterPlayer = pclient;
-			SendInitialiseMessage(pclient);
+			SendInitialiseMessage(Player);
 
 			Thread clientThread = new Thread(new ParameterizedThreadStart(AwaitCommunicationClient));
 			clientThread.Start(pclient);
