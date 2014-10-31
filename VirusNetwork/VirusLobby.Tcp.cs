@@ -71,6 +71,9 @@ namespace VirusNetwork {
 					Players.Add(player);
 					Connected = true;
 					OnPlayerConnected(player);
+					foreach (VirusPlayer p in Players) {
+						SendInitialiseMessage(p);
+					}
 					continue;
 				}
 

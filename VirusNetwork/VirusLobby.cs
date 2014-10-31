@@ -127,6 +127,7 @@ namespace VirusNetwork {
 			IPEndPoint serverEndPoint = new IPEndPoint(ip, Port);
 			client.Connect(serverEndPoint);
 			VirusPlayer pclient = new VirusPlayer(client);
+			SendInitialiseMessage(pclient);
 
 			Thread clientThread = new Thread(new ParameterizedThreadStart(AwaitCommunicationClient));
 			clientThread.Start(pclient);
