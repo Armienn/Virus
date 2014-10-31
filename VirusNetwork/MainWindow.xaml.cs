@@ -179,7 +179,10 @@ namespace VirusNetwork {
 		}
 
 		private void SendButton_Click(object sender, RoutedEventArgs e) {
-			lobby.SendTextMessage(messageBox.Text);
+			if (messageBox.Text != "") {
+				lobby.SendTextMessage(messageBox.Text);
+				messageBox.Text = "";
+			}
 		}
 
 		public string GetOwnIP() {
@@ -209,6 +212,7 @@ namespace VirusNetwork {
 		private void messageBox_keyDown(object sender, KeyEventArgs e) {
 			if (e.Key == Key.Enter && messageBox.Text != "") {
 				lobby.SendTextMessage(messageBox.Text);
+				messageBox.Text = "";
 			}
 		}
 

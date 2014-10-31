@@ -70,6 +70,7 @@ namespace VirusNetwork {
 					player.Initialised = true;
 					Players.Add(player);
 					Connected = true;
+					OnPlayerConnected(player);
 					continue;
 				}
 
@@ -222,6 +223,7 @@ namespace VirusNetwork {
 					Players.Add(player);
 					MasterPlayer = player;
 					Connected = true;
+					OnPlayerConnected(player);
 					continue;
 				}
 
