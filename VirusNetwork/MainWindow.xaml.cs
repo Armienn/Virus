@@ -25,10 +25,6 @@ namespace VirusNetwork {
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
 	public partial class MainWindow : Window {
-		//private bool master = false;
-		//private bool ready = false;
-		//private Thread listenThread;
-		//List<VirusPlayer> playerList = new List<VirusPlayer>();
 		VirusLobby lobby;
 		VirusInterfaceMod viruscontrol;
 		Random rand = new Random();

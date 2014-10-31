@@ -106,8 +106,8 @@ namespace VirusNetwork {
 				throw new ApplicationException("Client tried to listen for clients");
 			this.tcpListener = new TcpListener(IPAddress.Any, Port);
 			this.listenThread = new Thread(new ThreadStart(ListenForClients));
-			this.listenThread.Start();
 			ListeningStarted = true;
+			this.listenThread.Start();
 		}
 
 		public void StopListening(){
@@ -117,6 +117,7 @@ namespace VirusNetwork {
 			listenThread.Join(20);
 			if(listenThread.IsAlive)
 				listenThread.Abort();
+			this.tcpListener.Stop();
 		}
 
 		public void StartConnection(IPAddress ip) {

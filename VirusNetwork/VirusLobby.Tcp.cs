@@ -27,6 +27,7 @@ namespace VirusNetwork {
 				Thread clientThread = new Thread(new ParameterizedThreadStart(AwaitCommunicationMaster));
 				clientThread.Start(client);
 			}
+			this.tcpListener.Stop();
 		}
 
 		private void AwaitCommunicationMaster(object client) {
