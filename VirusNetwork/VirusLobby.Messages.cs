@@ -108,7 +108,7 @@ namespace VirusNetwork {
 		}
 
 		private void SendTextMessage(VirusPlayer player, string text) {
-			byte[] buffer = encoder.GetBytes(CodeText + player.ID + " " + text);
+			byte[] buffer = encoder.GetBytes(CodeText + player.ID + " [" + text + "]");
 			SendMessage(buffer);
 		}
 
@@ -161,7 +161,7 @@ namespace VirusNetwork {
 			try {
 				id = reader.ReadWord();
 				name = reader.ReadSection('[', ']');
-				color = Color.FromName(reader.ReadToEnd());
+				color = Color.FromName(reader.ReadWord());
 			}
 			catch { return false; }
 			return true;
@@ -178,7 +178,7 @@ namespace VirusNetwork {
 
 			try {
 				id = reader.ReadWord();
-				text = reader.ReadToEnd();
+				text = reader.ReadSection('[', ']');
 			}
 			catch { return false; }
 			return true;
@@ -195,7 +195,7 @@ namespace VirusNetwork {
 
 			try {
 				id = reader.ReadWord();
-				color = Color.FromName(reader.ReadToEnd());
+				color = Color.FromName(reader.ReadWord());
 			}
 			catch { return false; }
 			return true;
