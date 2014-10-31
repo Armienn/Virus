@@ -25,205 +25,81 @@ namespace VirusNetwork {
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
 	public partial class MainWindow : Window {
-		private bool master = false;
-		private bool ready = false;
-		private Thread listenThread;
+		//private bool master = false;
+		//private bool ready = false;
+		//private Thread listenThread;
 		//List<VirusPlayer> playerList = new List<VirusPlayer>();
 		VirusLobby lobby;
 		VirusInterfaceMod viruscontrol;
 		Random rand = new Random();
 
-		string playerID = "127.0.0.1";
-		string playerName = "playerY";
+		VirusPlayer player;
 
 		public MainWindow() {
 			InitializeComponent();
 			messageBox.KeyDown += new KeyEventHandler(messageBox_keyDown);
-			VirusPlayer player = new VirusPlayer("Player1", rand.Next().ToString(), System.Drawing.Color.Red);
+			player = new VirusPlayer("Player1", rand.Next().ToString(), System.Drawing.Color.Red);
 			lobby = new VirusLobby(player);
+			lobby.OnBadMessageRecieved += new VirusLobby.TextFunction(BadMessage);
+			lobby.OnColorChanged += new VirusLobby.PlayerUpdateColorFunction(ColorUpdated);
+			lobby.OnEveryoneReadyChanged += new VirusLobby.BoolFunction(EveryoneReadyUpdated);
+			lobby.OnGameMove += new VirusLobby.GameMoveFunction(GameMove);
+			lobby.OnNameChanged += new VirusLobby.PlayerUpdateTextFunction(NameUpdated);
+			lobby.OnPlayerConnected += new VirusLobby.PlayerUpdateFunction(PlayerConnected);
+			lobby.OnStartGame += new VirusLobby.StartFunction(StartGame);
+			lobby.OnTextMessageRecieved += new VirusLobby.TextMessageFunction(TextMessageRecieved);
 		}
 
-		private void HandleClientComm(object client) {
-			VirusPlayer player = (VirusPlayer)client;
-			TcpClient tcpClient = player.TcpClient;
-			NetworkStream clientStream = tcpClient.GetStream();
+		void BadMessage(string text) {
+			AddText(InTextBox, text + "\n");
+		}
 
-			byte[] message = new byte[4096];
-			int bytesRead;
+		private void StartGame(VirusPlayer[] players) {
+			Dispatcher.Invoke(() => { 
+				viruscontrol.StartGame(new VirusNameSpace.Virus(lobby.PlayerCount, 10), PerformedMoveCallback, player.ID, players);
+			});
+		}
 
-			while (true) {
-				bytesRead = 0;
+		private void TextMessageRecieved(VirusPlayer player, string text) {
+			Dispatcher.Invoke(() => {
+				InTextBox.Text += player.Name + ":\n" + text + "\n";
+			});
+		}
 
-				try {
-					//blocks until a client sends a message
-					bytesRead = clientStream.Read(message, 0, 4096);
+		private void NameUpdated(VirusPlayer player, string name) {
+			string original = player.Name;
+			Dispatcher.Invoke(() => {
+				InTextBox.Text += "Player " + original + " changed name to " + name + "\n";
+			});
+		}
+
+		private void ColorUpdated(VirusPlayer player, System.Drawing.Color color) {
+			Dispatcher.Invoke(() => {
+				InTextBox.Text += "Player " + player.Name + " changed color to " + player.Color.Name + "\n";
+			});
+		}
+
+		private void EveryoneReadyUpdated(bool ready) {
+			if (lobby.Master) {
+				if (ready) {
+					ReadyButton.IsEnabled = true;
 				}
-				catch {
-					//a socket error has occured
-					break;
-				}
-
-				if (bytesRead == 0) {
-					//the client has disconnected from the server
-					break;
-				}
-
-				//message has successfully been received
-				UnicodeEncoding encoder = new UnicodeEncoding();
-				NeaReader r;
-				String entiremessage = encoder.GetString(message, 0, bytesRead);
-				String intext = entiremessage;
-				String messagetype = intext.Substring(0, 3);
-				if(intext.Length > 3)
-					intext = intext.Substring(3);
-				switch (messagetype) {
-					case "STG": // STart Game
-						r = new NeaReader(intext);
-						List<VirusPlayer> players = new List<VirusPlayer>();
-						int n = r.ReadInt();
-						while (n != -1) {
-							string name = r.ReadWord();
-							string id = r.ReadWord();
-							string color = r.ReadWord();
-							System.Drawing.Color col = System.Drawing.Color.Gold;
-							switch (color) {
-								case "Red":
-									col = System.Drawing.Color.Red;
-									break;
-								case "Blue":
-									col = System.Drawing.Color.Blue;
-									break;
-								case "Black":
-									col = System.Drawing.Color.Black;
-									break;
-								case "Green":
-									col = System.Drawing.Color.Green;
-									break;
-								case "Gold":
-									col = System.Drawing.Color.Gold;
-									break;
-							}
-							VirusPlayer pl = new VirusPlayer(name, id, col);
-							players.Add(pl);
-							n = r.ReadInt();
-						}
-						this.Dispatcher.Invoke(() => {
-							viruscontrol.StartGame(new VirusNameSpace.Virus(players.Count, 10), PerformedMoveCallback, playerID, players.ToArray()); });
-						this.Dispatcher.Invoke(() => { ReadyButton.IsEnabled = false; });
-						break;
-					case "MES": // MESsage
-						if (master) {
-							AddText(InTextBox, player.Name + ":\n  " + intext + "\n");
-							byte[] buffer = encoder.GetBytes("MES" + player.Name + ":\n  " + intext + "\n");
-							foreach (VirusPlayer pc in playerList) {
-								TcpClient ns = pc.TcpClient;
-								ns.GetStream().Write(buffer, 0, buffer.Length);
-								ns.GetStream().Flush();
-							}
-						}
-						else {
-							AddText(InTextBox, intext);
-						}
-						break;
-					case "RDY": // ReaDY
-						player.Ready = true;
-						break;
-					case "NRD": // Not ReaDy
-						player.Ready = false;
-						break;
-					case "NME": // NaME
-						if (master) {
-							string temp = player.Name + " changed name to:  " + intext + "\n";
-							player.Name = intext;
-							AddText(InTextBox, temp);
-							byte[] buffer = encoder.GetBytes("MES" + temp);
-							foreach (VirusPlayer pc in playerList) {
-								TcpClient ns = pc.TcpClient;
-								ns.GetStream().Write(buffer, 0, buffer.Length);
-								ns.GetStream().Flush();
-							}
-						}
-						else {
-							AddText(InTextBox, "ERROR: Got name message while not master\n");
-						}
-						break;
-					case "CLR": // CoLoR
-						if (master) {
-							string temp = player.Name + " changed color to:  " + intext + "\n";
-							player.Color = intext;
-							AddText(InTextBox, temp);
-							byte[] buffer = encoder.GetBytes("MES" + temp);
-							foreach (VirusPlayer pc in playerList) {
-								TcpClient ns = pc.TcpClient;
-								ns.GetStream().Write(buffer, 0, buffer.Length);
-								ns.GetStream().Flush();
-							}
-						}
-						else {
-							AddText(InTextBox, "ERROR: Got color message while not master\n");
-						}
-						break;
-					case "GMS": // Game MeSsage
-						r = new NeaReader(intext);
-						int x, y, dx, dy = 0;
-						string id = r.ReadWord();
-						x = r.ReadInt();
-						y = r.ReadInt();
-						dx = r.ReadInt();
-						dy = r.ReadInt();
-
-						this.Dispatcher.Invoke(() => { viruscontrol.NetworkMove(x, y, dx, dy); });
-
-						if (master) {
-							byte[] buffer = encoder.GetBytes(entiremessage);
-							foreach (VirusPlayer pc in playerList) {
-								if (pc.ID != id) {
-									TcpClient ns = pc.TcpClient;
-									ns.GetStream().Write(buffer, 0, buffer.Length);
-									ns.GetStream().Flush();
-								}
-							}
-						}
-						break;
-					case "CON": // CONnect
-						if (master) {
-							r = new NeaReader(intext);
-							string na = r.ReadWord();
-							string co = r.ReadWord();
-							string temp = na + " connected with color: " + co + "\n";
-							player.Name = na;
-							player.Color = co;
-							AddText(InTextBox, temp);
-							byte[] buffer = encoder.GetBytes("MES" + temp);
-							foreach (VirusPlayer pc in playerList) {
-								TcpClient ns = pc.TcpClient;
-								ns.GetStream().Write(buffer, 0, buffer.Length);
-								ns.GetStream().Flush();
-							}
-						}
-						else {
-							AddText(InTextBox, "ERROR: Got connection message while not master\n");
-						}
-						break;
-				}
-				if (master) {
-					ready = true;
-					foreach (VirusPlayer pc in playerList) {
-						if (!pc.Ready)
-							ready = false;
-					}
-					if (ready) {
-						this.Dispatcher.Invoke(() => { ReadyButton.IsEnabled = true; });
-					}
-					else {
-						this.Dispatcher.Invoke(() => { ReadyButton.IsEnabled = false; });
-					}
+				else {
+					ReadyButton.IsEnabled = false;
 				}
 			}
+		}
 
-			tcpClient.Close();
-			playerList.Remove(player);
-			Thread.CurrentThread.Abort();
+		private void PlayerConnected(VirusPlayer player) {
+			Dispatcher.Invoke(() => {
+				InTextBox.Text += "Player " + player.Name + " connected with color " + player.Color.Name + "\n";
+			});
+		}
+
+		private void GameMove(VirusPlayer player, int x, int y, int dx, int dy) {
+			Dispatcher.Invoke(() => {
+				viruscontrol.NetworkMove(x, y, dx, dy);
+			});
 		}
 
 		delegate void SetTextCallback(TextBlock control, string text);
@@ -251,122 +127,66 @@ namespace VirusNetwork {
 		}
 
 		private void StartButton_Click(object sender, RoutedEventArgs e) {
-			if (master && ((String)StartButton.Content) == "Start Listening") {   // Listening
+			if (lobby.Master && ((String)StartButton.Content) == "Start Listening") {   // Listening
 				MasterCheckbox.IsEnabled = false;
-				this.tcpListener = new TcpListener(IPAddress.Any, 3000);
-				this.listenThread = new Thread(new ThreadStart(ListenForClients));
-				this.listenThread.Start();
+				lobby.StartListening();
 				StartButton.Content = "Stop Listening";
 			}
-			else if (master) {   // Disconnecting
+			else if (lobby.Master) {   // Disconnecting
 				MasterCheckbox.IsEnabled = true;
-				tcpListener.Stop();
-				listenThread.Abort();
-				foreach (VirusPlayer pc in playerList) {
-					TcpClient ns = pc.TcpClient;
-					ns.Close();
-				}
-				playerList = new List<VirusPlayer>();
+				lobby.Disconnect();
+				ReadyButton.IsEnabled = false;
 				StartButton.Content = "Start Listening";
 			}
-			else if (((String)StartButton.Content)=="Connect") {   // Connecting
-				
+			else if (((String)StartButton.Content) == "Connect") {   // Connecting
+
 				IPAddress ip;
 				if (IPAddress.TryParse(IpBox.Text, out ip)) {
 					try {
-						TcpClient client = new TcpClient();
-						IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse(IpBox.Text), 3000);
-						client.Connect(serverEndPoint);
-						VirusPlayer pclient = new VirusPlayer(client, "host");
-						playerList.Add(pclient);
-
-						Thread clientThread = new Thread(new ParameterizedThreadStart(HandleClientComm));
-						clientThread.Start(pclient);
-
+						lobby.StartConnection(ip);
 						StartButton.Content = "Disconnect";
 						MasterCheckbox.IsEnabled = false;
 						ReadyButton.IsEnabled = true;
-						string col = "Red";
-						if (blackColor.IsChecked == true)
-							col = "Black";
-						if (blueColor.IsChecked == true)
-							col = "Blue";
-						if (redColor.IsChecked == true)
-							col = "Red";
-						if (goldColor.IsChecked == true)
-							col = "Gold";
-						if (greenColor.IsChecked == true)
-							col = "Green";
-						SendConnectMessage(playerName, col);
 					}
-					catch (Exception exc) {
-						IpBox.Text = "Failed to connect";
-					}
+					catch { IpBox.Text = "Failed to connect"; }
 				}
-				else {
+				else
 					IpBox.Text = "Not valid IP";
-				}
-				
+
 			}
 			else {   // Disconnecting
 				MasterCheckbox.IsEnabled = true;
 				StartButton.Content = "Connect";
-				foreach (VirusPlayer pc in playerList) {
-					TcpClient ns = pc.TcpClient;
-					ns.Close();
-				}
-				playerList = new List<VirusPlayer>();
+				lobby.Disconnect();
+				ReadyButton.IsEnabled = false;
 			}
 		}
 
 		private void MasterCheckbox_Checked(object sender, RoutedEventArgs e) {
-			master = true;
 			StartButton.Content = "Start Listening";
 			ReadyButton.Content = "Start Game";
 			IpBox.IsEnabled = false;
 			IpBox.Text = GetOwnIP();
-			playerID = "host";
+			lobby.Master = true;
 		}
 
 		private void MasterCheckbox_UnChecked(object sender, RoutedEventArgs e) {
-			master = false;
 			StartButton.Content = "Connect";
 			ReadyButton.Content = "Ready";
 			IpBox.IsEnabled = true;
 			IpBox.Text = "";
-			playerID = GetOwnIP();
-		}
-
-		private void SendMessage() {
-			UnicodeEncoding encoder = new UnicodeEncoding();
-			String message = messageBox.Text;
-			if (master) {
-				message = PlayerNameBox.Text + ":\n  " + messageBox.Text + "\n";
-				AddText(InTextBox, message);
-			}
-				
-			messageBox.Text = "";
-			byte[] buffer = encoder.GetBytes("MES" + message);
-
-			foreach (VirusPlayer pc in playerList) {
-				TcpClient ns = pc.TcpClient;
-				ns.GetStream().Write(buffer, 0, buffer.Length);
-				ns.GetStream().Flush();
-			}
+			lobby.Master = false;
 		}
 
 		private void SendButton_Click(object sender, RoutedEventArgs e) {
-			SendMessage();
+			lobby.SendTextMessage(messageBox.Text);
 		}
 
-		public string GetOwnIP()
-		{
+		public string GetOwnIP() {
 			string localIP = "?";
 			IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
-			foreach (IPAddress ip in host.AddressList)
-			{
-				if (ip.AddressFamily == AddressFamily.InterNetwork)
-				{
+			foreach (IPAddress ip in host.AddressList) {
+				if (ip.AddressFamily == AddressFamily.InterNetwork) {
 					localIP = ip.ToString();
 				}
 			}
@@ -383,156 +203,43 @@ namespace VirusNetwork {
 		}
 
 		void MainWindow_Closing(object sender, CancelEventArgs e) {
-			if (master) {
-				if (tcpListener != null) {
-					tcpListener.Stop();
-					listenThread.Abort();
-				}
-			}
-			foreach (VirusPlayer pc in playerList) {
-				TcpClient ns = pc.TcpClient;
-				ns.Close();
+			lobby.Disconnect();
+		}
+
+		private void messageBox_keyDown(object sender, KeyEventArgs e) {
+			if (e.Key == Key.Enter && messageBox.Text != "") {
+				lobby.SendTextMessage(messageBox.Text);
 			}
 		}
 
-		private void messageBox_keyDown(object sender, KeyEventArgs e)
-		{
-			if (e.Key == Key.Enter && messageBox.Text != "")
-			{
-				SendMessage();
-			}
+		private void redColor_Checked(object sender, RoutedEventArgs e) {
+			lobby.UpdatePlayer(System.Drawing.Color.FromName("Red"));
 		}
 
-		private void redColor_Checked(object sender, RoutedEventArgs e)
-		{
-			SendColorMessage("Red");
+		private void blueColor_Checked(object sender, RoutedEventArgs e) {
+			lobby.UpdatePlayer(System.Drawing.Color.FromName("Blue"));
 		}
 
-		private void blueColor_Checked(object sender, RoutedEventArgs e)
-		{
-			SendColorMessage("Blue");
+		private void greenColor_Checked(object sender, RoutedEventArgs e) {
+			lobby.UpdatePlayer(System.Drawing.Color.FromName("Green"));
 		}
 
-		private void greenColor_Checked(object sender, RoutedEventArgs e)
-		{
-			SendColorMessage("Green");
+		private void blackColor_Checked(object sender, RoutedEventArgs e) {
+			lobby.UpdatePlayer(System.Drawing.Color.FromName("Black"));
 		}
 
-		private void blackColor_Checked(object sender, RoutedEventArgs e)
-		{
-			SendColorMessage("Black");
-		}
-
-		private void goldColor_Checked(object sender, RoutedEventArgs e)
-		{
-			SendColorMessage("Gold");
-		}
-
-		private void SendColorMessage(String color) {
-			if (!master) {
-				UnicodeEncoding encoder = new UnicodeEncoding();
-				String message = "CLR" + color;
-				byte[] buffer = encoder.GetBytes(message);
-
-				foreach (VirusPlayer pc in playerList) {
-					TcpClient ns = pc.TcpClient;
-					ns.GetStream().Write(buffer, 0, buffer.Length);
-					ns.GetStream().Flush();
-				}
-			}
-			else {
-				string temp = PlayerNameBox.Text + " changed color to:  " + color + "\n";
-				AddText(InTextBox, temp);
-				UnicodeEncoding encoder = new UnicodeEncoding();
-				byte[] buffer = encoder.GetBytes("MES" + temp);
-				foreach (VirusPlayer pc in playerList) {
-					TcpClient ns = pc.TcpClient;
-					ns.GetStream().Write(buffer, 0, buffer.Length);
-					ns.GetStream().Flush();
-				}
-			}
-		}
-
-		private void SendConnectMessage(String name, String color) {
-			UnicodeEncoding encoder = new UnicodeEncoding();
-			String message = "CON" + name + " " + color;
-			byte[] buffer = encoder.GetBytes(message);
-
-			foreach (VirusPlayer pc in playerList) {
-				TcpClient ns = pc.TcpClient;
-				ns.GetStream().Write(buffer, 0, buffer.Length);
-				ns.GetStream().Flush();
-			}
+		private void goldColor_Checked(object sender, RoutedEventArgs e) {
+			lobby.UpdatePlayer(System.Drawing.Color.FromName("Gold"));
 		}
 
 		private void ReadyButton_Click(object sender, RoutedEventArgs e) {
-			if (master) {
-				UnicodeEncoding encoder = new UnicodeEncoding();
-				String message = "STG";
-				VirusPlayer[] players = new VirusPlayer[playerList.Count + 1];
-
-				int last = players.Length - 1;
-				string name = playerName;
-				string id = "host";
-				System.Drawing.Color col = System.Drawing.Color.Aqua;
-				if (blackColor.IsChecked == true) {
-					col = System.Drawing.Color.Black;
-				}
-				if (blueColor.IsChecked == true) {
-					col = System.Drawing.Color.Blue;
-				}
-				if (redColor.IsChecked == true) {
-					col = System.Drawing.Color.Red;
-				}
-				if (goldColor.IsChecked == true) {
-					col = System.Drawing.Color.Gold;
-				}
-				if (greenColor.IsChecked == true) {
-					col = System.Drawing.Color.Green;
-				}
-				players[last] = new VirusPlayer(name, id, col);
-
-				for (int i = 0; i < players.Length - 1; i++) {
-					name = playerList[i].Name;
-					id = playerList[i].ID;
-					switch (playerList[i].Color) {
-						case "Red":
-							col = System.Drawing.Color.Red;
-							break;
-						case "Blue":
-							col = System.Drawing.Color.Blue;
-							break;
-						case "Black":
-							col = System.Drawing.Color.Black;
-							break;
-						case "Green":
-							col = System.Drawing.Color.Green;
-							break;
-						case "Gold":
-							col = System.Drawing.Color.Gold;
-							break;
-					}
-					players[i] = new VirusPlayer(name, id, col);
-				}
-
-				for (int i = 0; i < players.Length; i++) {
-					message += " " + i + " ";
-					message += players[i].Name + " ";
-					message += players[i].ID + " ";
-					message += players[i].PlayerColor.Name + " ";
-				}
-				message += "-1";
-
-				byte[] buffer = encoder.GetBytes(message);
-				foreach (VirusPlayer pc in playerList) {
-					TcpClient ns = pc.TcpClient;
-					ns.GetStream().Write(buffer, 0, buffer.Length);
-					ns.GetStream().Flush();
-				}
-				viruscontrol.StartGame(new VirusNameSpace.Virus(players.Length, 10), PerformedMoveCallback, "host", players);
+			if (lobby.Master) {
+				ReadyButton.IsEnabled = false;
+				lobby.StartGame();
+				viruscontrol.StartGame(new VirusNameSpace.Virus(lobby.PlayerCount, 10), PerformedMoveCallback, player.ID, lobby.AllPlayers);
 			}
 			else {
-				ready = !ready;
+				bool ready = !player.Ready;
 				if (ready) {
 					ReadyLabel.Content = "Ready";
 					ReadyButton.Content = "Not ready";
@@ -542,55 +249,17 @@ namespace VirusNetwork {
 					ReadyButton.Content = "Ready";
 				}
 
-				UnicodeEncoding encoder = new UnicodeEncoding();
-				String message = ready ? "RDY" : "NRD";
-				byte[] buffer = encoder.GetBytes(message);
-
-				foreach (VirusPlayer pc in playerList) {
-					TcpClient ns = pc.TcpClient;
-					ns.GetStream().Write(buffer, 0, buffer.Length);
-					ns.GetStream().Flush();
-				}
+				lobby.UpdatePlayer(ready);
 			}
 		}
 
 		public void PerformedMoveCallback(int x, int y, int dx, int dy) {
-			string temp = " " + playerID + " " + x + " " + " " + y + " " + dx + " " + dy;
-
-			UnicodeEncoding encoder = new UnicodeEncoding();
-			byte[] buffer = encoder.GetBytes("GMS" + temp);
-			foreach (VirusPlayer pc in playerList) {
-				TcpClient ns = pc.TcpClient;
-				ns.GetStream().Write(buffer, 0, buffer.Length);
-				ns.GetStream().Flush();
-			}
+			lobby.SendGameMessage(x, y, dx, dy);
 		}
 
 		private void PlayerNameBox_LostFocus(object sender, RoutedEventArgs e) {
-			if (!master && playerName!=PlayerNameBox.Text) {
-				playerName = PlayerNameBox.Text;
-				UnicodeEncoding encoder = new UnicodeEncoding();
-				String message = "NME" + PlayerNameBox.Text;
-				byte[] buffer = encoder.GetBytes(message);
-
-				foreach (VirusPlayer pc in playerList) {
-					TcpClient ns = pc.TcpClient;
-					ns.GetStream().Write(buffer, 0, buffer.Length);
-					ns.GetStream().Flush();
-				}
-			}
-			else if (master && playerName!=PlayerNameBox.Text) {
-				string temp = playerName + " changed name to:  " + PlayerNameBox.Text + "\n";
-				playerName = PlayerNameBox.Text;
-				AddText(InTextBox, temp);
-				UnicodeEncoding encoder = new UnicodeEncoding();
-				byte[] buffer = encoder.GetBytes("MES" + temp);
-				foreach (VirusPlayer pc in playerList) {
-					TcpClient ns = pc.TcpClient;
-					ns.GetStream().Write(buffer, 0, buffer.Length);
-					ns.GetStream().Flush();
-				}
-			}
+			if (player.Name != PlayerNameBox.Text)
+				lobby.UpdatePlayer(PlayerNameBox.Text);
 		}
 	}
 }

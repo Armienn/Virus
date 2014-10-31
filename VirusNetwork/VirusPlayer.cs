@@ -7,7 +7,7 @@ using System.Drawing;
 using System.Net.Sockets;
 
 namespace VirusNetwork {
-	class VirusPlayer {
+	public class VirusPlayer {
 		public string Name;
 		public Color Color;
 		public String ID;
