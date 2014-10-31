@@ -78,7 +78,7 @@ namespace VirusNetwork {
 		}
 
 		public void SendMessage(byte[] message) {
-			if (Connected) {
+			//if (Connected) {
 				if (Master) {
 					foreach (VirusPlayer pc in Players) {
 						TcpClient ns = pc.TcpClient;
@@ -91,7 +91,7 @@ namespace VirusNetwork {
 					ns.GetStream().Write(message, 0, message.Length);
 					ns.GetStream().Flush();
 				}
-			}
+			//}
 		}
 
 		#region Send Messages
