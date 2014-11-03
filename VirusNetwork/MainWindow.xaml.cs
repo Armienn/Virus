@@ -52,7 +52,7 @@ namespace VirusNetwork {
 
 		private void StartGame(VirusPlayer[] players) {
 			Dispatcher.Invoke(() => { 
-				viruscontrol.StartGame(new VirusNameSpace.Virus(lobby.PlayerCount, 10), PerformedMoveCallback, player.ID, players);
+				viruscontrol.StartGame(new VirusNameSpace.Virus(lobby.PlayerCount, 10), PerformedMoveCallback, null, player.ID, players);
 			});
 		}
 
@@ -238,7 +238,7 @@ namespace VirusNetwork {
 			if (lobby.Master) {
 				ReadyButton.IsEnabled = false;
 				lobby.StartGame();
-				viruscontrol.StartGame(new VirusNameSpace.Virus(lobby.PlayerCount, 10), PerformedMoveCallback, player.ID, lobby.AllPlayers);
+				viruscontrol.StartGame(new VirusNameSpace.Virus(lobby.PlayerCount, 10), PerformedMoveCallback, null,  player.ID, lobby.AllPlayers);
 			}
 			else {
 				bool ready = !player.Ready;
@@ -263,5 +263,26 @@ namespace VirusNetwork {
 			if (player.Name != PlayerNameBox.Text)
 				lobby.UpdatePlayer(PlayerNameBox.Text);
 		}
+
+		public void DrawLines(int[] lineList, Polyline line, Canvas canvas) {
+			double height = canvas.Height;
+			double width = canvas.Width;
+			double scaleGraph = height / lineList.Max();
+
+			for (int i = 0; i < lineList.Length; i++) {
+				line.Points.Add(new Point(width * (i / lineList.Length), (lineList[i] * scaleGraph)));
+			}
+		}
+
+		/*public void updatePieces(int pieces) {
+			winnings.Children.Clear();
+			PieceList.Add(pieces);
+			Polyline line = new Polyline();
+			line.StrokeThickness = 2;
+			line.Stroke = Brushes.Blue;
+			winnings.Children.Add(line);
+
+			DrawLines(PieceList.ToArray(), line, winnings);
+		}*/
 	}
 }

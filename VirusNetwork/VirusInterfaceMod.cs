@@ -397,7 +397,8 @@ namespace VirusNetwork
 					s += players[i].Name + ": " + pieces[i] + "\n";
 					if (players[i].ID == PlayerID)
 					{
-						UpdatePieces(pieces[i]);
+						if(UpdatePieces != null)
+							UpdatePieces(pieces[i]);
 					}
 				}
 				MessageBox.Show(w + " is the winner\n" + s);
