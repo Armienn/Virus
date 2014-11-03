@@ -19,13 +19,16 @@ namespace VirusNetwork {
 			this.tcpListener.Start();
 
 			while (ListeningStarted) {
-				TcpClient cl = this.tcpListener.AcceptTcpClient(); //blocks until a client has connected to the server
-				VirusPlayer client = new VirusPlayer(cl);
-				//Players.Add(client);
+				try {
+					TcpClient cl = this.tcpListener.AcceptTcpClient(); //blocks until a client has connected to the server
+					VirusPlayer client = new VirusPlayer(cl);
+					//Players.Add(client);
 
-				//create a thread to handle communication with connected client
-				Thread clientThread = new Thread(new ParameterizedThreadStart(AwaitCommunicationMaster));
-				clientThread.Start(client);
+					//create a thread to handle communication with connected client
+					Thread clientThread = new Thread(new ParameterizedThreadStart(AwaitCommunicationMaster));
+					clientThread.Start(client);
+				}
+				catch { }
 			}
 			this.tcpListener.Stop();
 		}
@@ -71,10 +74,12 @@ namespace VirusNetwork {
 					player.Initialised = true;
 					Players.Add(player);
 					Connected = true;
-					OnPlayerConnected(player);
+					if (OnPlayerConnected != null)
+						OnPlayerConnected(player);
 					SendInitialiseMessage(Player);
 					foreach (VirusPlayer p in Players) {
-						SendInitialiseMessage(p);
+						if(p.ID != player.ID)
+							SendInitialiseMessage(p);
 					}
 					continue;
 				}
@@ -93,59 +98,75 @@ namespace VirusNetwork {
 			int x, y, dx, dy = 0;
 			switch (type) {
 				case MessageType.Initialise:
-					OnBadMessageRecieved("Got a second initialise message from player with id " + player.ID);
+					if (OnBadMessageRecieved != null)
+						OnBadMessageRecieved("Got a second initialise message from player with id " + player.ID);
 					break;
 				case MessageType.Text:
 					if (TryParseTextMessage(message, out id, out text)) {
-						if (player.ID != id)
-							OnBadMessageRecieved("Got text message with id " + id + " from player with id " + player.ID);
+						if (player.ID != id) {
+							if (OnBadMessageRecieved != null)
+								OnBadMessageRecieved("Got text message with id " + id + " from player with id " + player.ID);
+						}
 						else {
-							OnTextMessageRecieved(player, text);
+							if (OnTextMessageRecieved != null)
+								OnTextMessageRecieved(player, text);
 							SendTextMessage(player, text);
 						}
 					}
 					else {
-						OnBadMessageRecieved("Couldn't parse text message from player with id " + player.ID);
+						if (OnBadMessageRecieved != null)
+							OnBadMessageRecieved("Couldn't parse text message from player with id " + player.ID);
 					}
 					break;
 				case MessageType.Color:
 					if (TryParseColorMessage(message, out id, out color)) {
-						if (player.ID != id)
-							OnBadMessageRecieved("Got color message with id " + id + " from player with id " + player.ID);
+						if (player.ID != id) {
+							if (OnBadMessageRecieved != null)
+								OnBadMessageRecieved("Got color message with id " + id + " from player with id " + player.ID);
+						}
 						else {
-							OnColorChanged(player, color);
+							if (OnColorChanged != null)
+								OnColorChanged(player, color);
 							player.Color = color;
 							SendColorMessage(player);
 						}
 					}
 					else {
-						OnBadMessageRecieved("Couldn't parse color message from player with id " + player.ID);
+						if (OnBadMessageRecieved != null)
+							OnBadMessageRecieved("Couldn't parse color message from player with id " + player.ID);
 					}
 					break;
 				case MessageType.Name:
 					if (TryParseNameMessage(message, out id, out name)) {
-						if (player.ID != id)
-							OnBadMessageRecieved("Got name message with id " + id + " from player with id " + player.ID);
+						if (player.ID != id) {
+							if (OnBadMessageRecieved != null)
+								OnBadMessageRecieved("Got name message with id " + id + " from player with id " + player.ID);
+						}
 						else {
-							OnNameChanged(player, name);
+							if (OnNameChanged != null)
+								OnNameChanged(player, name);
 							player.Name = name;
 							SendNameMessage(player);
 						}
 					}
 					else {
-						OnBadMessageRecieved("Couldn't parse name message from player with id " + player.ID);
+						if (OnBadMessageRecieved != null)
+							OnBadMessageRecieved("Couldn't parse name message from player with id " + player.ID);
 					}
 					break;
 				case MessageType.Ready:
 					if (TryParseReadyMessage(message, out id, out ready)) {
-						if (player.ID != id)
-							OnBadMessageRecieved("Got ready message with id " + id + " from player with id " + player.ID);
+						if (player.ID != id) {
+							if (OnBadMessageRecieved != null)
+								OnBadMessageRecieved("Got ready message with id " + id + " from player with id " + player.ID);
+						}
 						else {
 							bool allreadyprev = false;
 							foreach (VirusPlayer p in Players)
 								if (!p.Ready)
 									allreadyprev = false;
-							OnReadyChanged(player, ready);
+							if (OnReadyChanged != null)
+								OnReadyChanged(player, ready);
 							player.Ready = ready;
 							SendReadyMessage(player);
 							bool allreadynow = true;
@@ -153,31 +174,39 @@ namespace VirusNetwork {
 								if (!p.Ready)
 									allreadynow = false;
 							if (allreadynow != allreadyprev)
-								OnEveryoneReadyChanged(allreadynow);
+								if (OnEveryoneReadyChanged != null)
+									OnEveryoneReadyChanged(allreadynow);
 						}
 					}
 					else {
-						OnBadMessageRecieved("Couldn't parse ready message from player with id " + player.ID);
+						if (OnBadMessageRecieved != null)
+							OnBadMessageRecieved("Couldn't parse ready message from player with id " + player.ID);
 					}
 					break;
 				case MessageType.StartGame:
-					OnBadMessageRecieved("Got start game message from player with id " + player.ID);
+					if (OnBadMessageRecieved != null)
+						OnBadMessageRecieved("Got start game message from player with id " + player.ID);
 					break;
 				case MessageType.GameMessage:
 					if (TryParseGameMessage(message, out id, out x, out y, out dx, out dy)) {
-						if (player.ID != id)
-							OnBadMessageRecieved("Got game message with id " + id + " from player with id " + player.ID);
+						if (player.ID != id) {
+							if (OnBadMessageRecieved != null)
+								OnBadMessageRecieved("Got game message with id " + id + " from player with id " + player.ID);
+						}
 						else {
-							OnGameMove(player, x, y, dx, dy);
+							if (OnGameMove != null)
+								OnGameMove(player, x, y, dx, dy);
 							SendGameMessage(player, x, y, dx, dy);
 						}
 					}
 					else {
-						OnBadMessageRecieved("Couldn't parse game message from player with id " + player.ID);
+						if (OnBadMessageRecieved != null)
+							OnBadMessageRecieved("Couldn't parse game message from player with id " + player.ID);
 					}
 					break;
 				default:
-					OnBadMessageRecieved("Couldn't recognise message from player with id " + player.ID);
+					if (OnBadMessageRecieved != null)
+						OnBadMessageRecieved("Couldn't recognise message from player with id " + player.ID);
 					break;
 			}
 		}
@@ -228,7 +257,8 @@ namespace VirusNetwork {
 					Players.Add(player);
 					MasterPlayer = player;
 					Connected = true;
-					OnPlayerConnected(player);
+					if (OnPlayerConnected != null)
+						OnPlayerConnected(player);
 					continue;
 				}
 
@@ -255,65 +285,83 @@ namespace VirusNetwork {
 							Players.Add(new VirusPlayer(name, id, color));
 						}
 						else {
-							OnBadMessageRecieved("Got a second initialise message for player id: " + origin.ID);
+							if (OnBadMessageRecieved != null)
+								OnBadMessageRecieved("Got a second initialise message for player id: " + origin.ID);
 						}
 					}
 					else {
-						OnBadMessageRecieved("Couldn't parse new initialise message from master");
+						if (OnBadMessageRecieved != null)
+							OnBadMessageRecieved("Couldn't parse new initialise message from master");
 					}
 					break;
 				case MessageType.Text:
 					if (TryParseTextMessage(message, out id, out text)) {
 						origin = GetPlayerFromID(id);
-						if (origin == null)
-							OnBadMessageRecieved("Got text message without origin");
+						if (origin == null) {
+							if (OnBadMessageRecieved != null)
+								OnBadMessageRecieved("Got text message without origin");
+						}
 						else
-							OnTextMessageRecieved(origin, text);
+							if (OnTextMessageRecieved != null)
+								OnTextMessageRecieved(origin, text);
 					}
 					else {
-						OnBadMessageRecieved("Couldn't parse text message from master");
+						if (OnBadMessageRecieved != null)
+							OnBadMessageRecieved("Couldn't parse text message from master");
 					}
 					break;
 				case MessageType.Color:
 					if (TryParseColorMessage(message, out id, out color)) {
 						origin = GetPlayerFromID(id);
-						if (origin == null)
-							OnBadMessageRecieved("Got color message without origin");
+						if (origin == null) {
+							if (OnBadMessageRecieved != null)
+								OnBadMessageRecieved("Got color message without origin");
+						}
 						else {
-							OnColorChanged(origin, color);
+							if (OnColorChanged != null)
+								OnColorChanged(origin, color);
 							origin.Color = color;
 						}
 					}
 					else {
-						OnBadMessageRecieved("Couldn't parse color message from master");
+						if (OnBadMessageRecieved != null)
+							OnBadMessageRecieved("Couldn't parse color message from master");
 					}
 					break;
 				case MessageType.Name:
 					if (TryParseNameMessage(message, out id, out name)) {
 						origin = GetPlayerFromID(id);
-						if (origin == null)
-							OnBadMessageRecieved("Got name message without origin");
+						if (origin == null) {
+							if (OnBadMessageRecieved != null)
+								OnBadMessageRecieved("Got name message without origin");
+						}
 						else {
-							OnNameChanged(origin, name);
+							if (OnNameChanged != null)
+								OnNameChanged(origin, name);
 							origin.Name = name;
 						}
 					}
 					else {
-						OnBadMessageRecieved("Couldn't parse name message from master");
+						if (OnBadMessageRecieved != null)
+							OnBadMessageRecieved("Couldn't parse name message from master");
 					}
 					break;
 				case MessageType.Ready:
 					if (TryParseReadyMessage(message, out id, out ready)) {
 						origin = GetPlayerFromID(id);
-						if (origin == null)
-							OnBadMessageRecieved("Got ready message without origin");
+						if (origin == null) {
+							if (OnBadMessageRecieved != null)
+								OnBadMessageRecieved("Got ready message without origin");
+						}
 						else {
-							OnReadyChanged(origin, ready);
+							if (OnReadyChanged != null)
+								OnReadyChanged(origin, ready);
 							origin.Ready = ready;
 						}
 					}
 					else {
-						OnBadMessageRecieved("Couldn't parse ready message from master");
+						if (OnBadMessageRecieved != null)
+							OnBadMessageRecieved("Couldn't parse ready message from master");
 					}
 					break;
 				case MessageType.StartGame:
@@ -330,29 +378,39 @@ namespace VirusNetwork {
 								}
 							}
 							GameStarted = true;
-							OnStartGame(list);
+							if (OnStartGame != null)
+								OnStartGame(list);
 						}
 						else
-							OnBadMessageRecieved("Start game message from master had different number of players than locally");
+							if (OnBadMessageRecieved != null)
+								OnBadMessageRecieved("Start game message from master had different number of players than locally");
 					}
 					else {
-						OnBadMessageRecieved("Couldn't parse start game message from master");
+						if (OnBadMessageRecieved != null)
+							OnBadMessageRecieved("Couldn't parse start game message from master");
 					}
 					break;
 				case MessageType.GameMessage:
 					if (TryParseGameMessage(message, out id, out x, out y, out dx, out dy)) {
+						if (id == Player.ID)
+							break;
 						origin = GetPlayerFromID(id);
-						if (origin == null)
-							OnBadMessageRecieved("Got game message without origin");
+						if (origin == null) {
+							if (OnBadMessageRecieved != null)
+								OnBadMessageRecieved("Got game message without origin");
+						}
 						else
-							OnGameMove(origin, x, y, dx, dy);
+							if (OnGameMove != null)
+								OnGameMove(origin, x, y, dx, dy);
 					}
 					else {
-						OnBadMessageRecieved("Couldn't parse game message from master");
+						if (OnBadMessageRecieved != null)
+							OnBadMessageRecieved("Couldn't parse game message from master");
 					}
 					break;
 				default:
-					OnBadMessageRecieved("Couldn't recognise message from master");
+					if (OnBadMessageRecieved != null)
+						OnBadMessageRecieved("Couldn't recognise message from master");
 					break;
 			}
 		}

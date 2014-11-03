@@ -114,10 +114,10 @@ namespace VirusNetwork {
 			if(!Master)
 				return;
 			ListeningStarted = false;
+			this.tcpListener.Stop();
 			listenThread.Join(20);
 			if(listenThread.IsAlive)
 				listenThread.Abort();
-			this.tcpListener.Stop();
 		}
 
 		public void StartConnection(IPAddress ip) {
@@ -153,21 +153,24 @@ namespace VirusNetwork {
 			if (Master)
 				OnColorChanged(Player, color);
 			Player.Color = color;
-			SendColorMessage(Player);
+			if(Connected)
+				SendColorMessage(Player);
 		}
 
 		public void UpdatePlayer(string name) {
 			if (Master)
 				OnNameChanged(Player, name);
 			Player.Name = name;
-			SendNameMessage(Player);
+			if (Connected)
+				SendNameMessage(Player);
 		}
 
 		public void UpdatePlayer(bool ready) {
 			if (Master)
 				OnReadyChanged(Player, ready);
 			Player.Ready = ready;
-			SendReadyMessage(Player);
+			if (Connected)
+				SendReadyMessage(Player);
 		}
 		#endregion
 

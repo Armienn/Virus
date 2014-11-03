@@ -123,7 +123,7 @@ namespace VirusNetwork {
 		}
 
 		private void SendReadyMessage(VirusPlayer player) {
-			byte[] buffer = encoder.GetBytes(CodeReady + player.ID + (player.Ready ? "1" : "0"));
+			byte[] buffer = encoder.GetBytes(CodeReady + player.ID + " " + (player.Ready ? "1" : "0"));
 			SendMessage(buffer);
 		}
 
@@ -140,7 +140,7 @@ namespace VirusNetwork {
 		public void SendGameMessage(int x, int y, int dx, int dy) { SendGameMessage(Player, x, y, dx, dy); }
 
 		private void SendGameMessage(VirusPlayer player, int x, int y, int dx, int dy) {
-			byte[] buffer = encoder.GetBytes(CodeGameMessage + x + " " + y + " " + dx + " " + dy);
+			byte[] buffer = encoder.GetBytes(CodeGameMessage + player.ID + " " + x + " " + y + " " + dx + " " + dy);
 			SendMessage(buffer);
 		}
 
@@ -187,7 +187,7 @@ namespace VirusNetwork {
 		public static bool TryParseColorMessage(string message, out string id, out Color color) {
 			id = "";
 			color = Color.Red;
-			bool success = InitialMessageCheck(message, MessageType.Text, out message);
+			bool success = InitialMessageCheck(message, MessageType.Color, out message);
 			if (!success)
 				return false;
 
@@ -204,7 +204,7 @@ namespace VirusNetwork {
 		public static bool TryParseNameMessage(string message, out string id, out string name) {
 			id = "";
 			name = "";
-			bool success = InitialMessageCheck(message, MessageType.Text, out message);
+			bool success = InitialMessageCheck(message, MessageType.Name, out message);
 			if (!success)
 				return false;
 
@@ -221,7 +221,7 @@ namespace VirusNetwork {
 		public static bool TryParseReadyMessage(string message, out string id, out bool ready) {
 			id = "";
 			ready = false;
-			bool success = InitialMessageCheck(message, MessageType.Text, out message);
+			bool success = InitialMessageCheck(message, MessageType.Ready, out message);
 			if (!success)
 				return false;
 
@@ -237,7 +237,7 @@ namespace VirusNetwork {
 
 		public static bool TryParseStartGameMessage(string message, out string[] sequence) {
 			sequence = new string[0];
-			bool success = InitialMessageCheck(message, MessageType.Text, out message);
+			bool success = InitialMessageCheck(message, MessageType.StartGame, out message);
 			if (!success)
 				return false;
 
@@ -258,7 +258,7 @@ namespace VirusNetwork {
 		public static bool TryParseGameMessage(string message, out string id, out int x, out int y, out int dx, out int dy) {
 			id = "";
 			x = y = dx = dy = 0;
-			bool success = InitialMessageCheck(message, MessageType.Text, out message);
+			bool success = InitialMessageCheck(message, MessageType.GameMessage, out message);
 			if (!success)
 				return false;
 

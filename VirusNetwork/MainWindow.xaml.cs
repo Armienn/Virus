@@ -71,19 +71,21 @@ namespace VirusNetwork {
 
 		private void ColorUpdated(VirusPlayer player, System.Drawing.Color color) {
 			Dispatcher.Invoke(() => {
-				InTextBox.Text += "Player " + player.Name + " changed color to " + player.Color.Name + "\n";
+				InTextBox.Text += "Player " + player.Name + " changed color to " + color.Name + "\n";
 			});
 		}
 
 		private void EveryoneReadyUpdated(bool ready) {
-			if (lobby.Master) {
-				if (ready) {
-					ReadyButton.IsEnabled = true;
+			Dispatcher.Invoke(() => {
+				if (lobby.Master) {
+					if (ready) {
+						ReadyButton.IsEnabled = true;
+					}
+					else {
+						ReadyButton.IsEnabled = false;
+					}
 				}
-				else {
-					ReadyButton.IsEnabled = false;
-				}
-			}
+			});
 		}
 
 		private void PlayerConnected(VirusPlayer player) {
