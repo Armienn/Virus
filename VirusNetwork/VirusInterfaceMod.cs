@@ -13,17 +13,6 @@ using System.IO;
 
 namespace VirusNetwork
 {
-	public class VirusPlayer {
-		public string Name;
-		public string ID;
-		public Color PlayerColor;
-		public VirusPlayer(string name, string id, Color color) {
-			Name = name;
-			ID = id;
-			PlayerColor = color;
-		}
-	}
-
 	public partial class VirusInterfaceMod : UserControl
 	{
 		Virus virus;
@@ -165,7 +154,7 @@ namespace VirusNetwork
 
 							g.DrawRectangle(pen, i * tileSize, j * tileSize, tileSize, tileSize);
 
-							pen.Color = players[virus[i, boardlength - j - 1]].PlayerColor;
+							pen.Color = players[virus[i, boardlength - j - 1]].Color;
 							g.FillRectangle(pen.Brush, i * tileSize + 1, j * tileSize + 1, tileSize - 1, tileSize - 1);
 
 							if (readyToMove && i == x && (boardlength - j - 1) == y) {
@@ -179,7 +168,7 @@ namespace VirusNetwork
 				}
 
 				g.FillRectangle(
-					new Pen(players[virus.CurrentPlayer].PlayerColor).Brush,
+					new Pen(players[virus.CurrentPlayer].Color).Brush,
 					new Rectangle(0, boardlength * tileSize + 1, this.Width, 20)
 					);
 				g.DrawString(
