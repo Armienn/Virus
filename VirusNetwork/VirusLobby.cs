@@ -80,6 +80,7 @@ namespace VirusNetwork {
 		public PlayerUpdateBoolFunction OnReadyChanged;
 		public BoolFunction OnEveryoneReadyChanged;
 		public PlayerUpdateFunction OnPlayerConnected;
+		public PlayerUpdateFunction OnPlayerDisconnected;
 		public GameMoveFunction OnGameMove;
 
 		#endregion

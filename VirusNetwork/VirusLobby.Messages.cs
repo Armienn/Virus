@@ -21,6 +21,7 @@ namespace VirusNetwork {
 		const string CodeReady = "RDY";
 		const string CodeStartGame = "STG";
 		const string CodeGameMessage = "GMS";
+		const string CodeDisconnect = "DIS";
 
 		enum MessageType {
 			Initialise,
@@ -30,6 +31,7 @@ namespace VirusNetwork {
 			Ready,
 			StartGame,
 			GameMessage,
+			Disconnect,
 			Unknown
 		}
 
@@ -60,6 +62,9 @@ namespace VirusNetwork {
 				case CodeGameMessage:
 					result = MessageType.GameMessage;
 					break;
+				case CodeDisconnect:
+					result = MessageType.Disconnect;
+					break;
 				default:
 					result = MessageType.Unknown;
 					break;
@@ -78,6 +83,10 @@ namespace VirusNetwork {
 		}
 
 		public void SendMessage(byte[] message) {
+			SendMessage(message, Players);
+		}
+
+		public void SendMessage(byte[] message, List<VirusPlayer> players) {
 			//if (Connected) {
 			byte[] sizeinfo = new byte[4];
 
@@ -87,7 +96,7 @@ namespace VirusNetwork {
 			sizeinfo[2] = (byte)(message.Length >> 16);
 			sizeinfo[3] = (byte)(message.Length >> 24);
 				if (Master) {
-					foreach (VirusPlayer pc in Players) {
+					foreach (VirusPlayer pc in players) {
 						TcpClient ns = pc.TcpClient;
 						ns.GetStream().Write(sizeinfo, 0, 4);
 						ns.GetStream().Write(message, 0, message.Length);
@@ -104,6 +113,11 @@ namespace VirusNetwork {
 		}
 
 		#region Send Messages
+
+		private void SendInitialiseMessage(VirusPlayer player, List<VirusPlayer> players) {
+			byte[] buffer = encoder.GetBytes(CodeInitialise + player.ID + " [" + player.Name + "] " + player.Color.Name);
+			SendMessage(buffer, players);
+		}
 
 		private void SendInitialiseMessage(VirusPlayer player) {
 			byte[] buffer = encoder.GetBytes(CodeInitialise + player.ID + " [" + player.Name + "] " + player.Color.Name);
@@ -150,6 +164,11 @@ namespace VirusNetwork {
 
 		private void SendGameMessage(VirusPlayer player, int x, int y, int dx, int dy) {
 			byte[] buffer = encoder.GetBytes(CodeGameMessage + player.ID + " " + x + " " + y + " " + dx + " " + dy);
+			SendMessage(buffer);
+		}
+
+		private void SendDisconnectMessage(VirusPlayer player) {
+			byte[] buffer = encoder.GetBytes(CodeDisconnect + player.ID);
 			SendMessage(buffer);
 		}
 
@@ -279,6 +298,21 @@ namespace VirusNetwork {
 				y = reader.ReadInt();
 				dx = reader.ReadInt();
 				dy = reader.ReadInt();
+			}
+			catch { return false; }
+			return true;
+		}
+
+		public static bool TryParseDisconnectMessage(string message, out string id) {
+			id = "";
+			bool success = InitialMessageCheck(message, MessageType.Disconnect, out message);
+			if (!success)
+				return false;
+
+			NeaReader reader = new NeaReader(message);
+
+			try {
+				id = reader.ReadWord();
 			}
 			catch { return false; }
 			return true;

@@ -28,19 +28,29 @@ namespace VirusNetwork
 		Agent[] agents;
 		PerformedMoveCallback PerformedMove;
 		UpdatePiecesCallback UpdatePieces;
+		EndCallback End;
 		string PlayerID;
 
 		public delegate void PerformedMoveCallback(int x, int y, int dx, int dy);
 		public delegate void UpdatePiecesCallback(int pieces);
+		public delegate void EndCallback();
 
 		public VirusInterfaceMod() {
 			InitializeComponent();
 		}
 
-		public void StartGame(Virus virus, PerformedMoveCallback callback, UpdatePiecesCallback piecesCallback, string id, params VirusPlayer[] players) {
+		public void StartGame(
+			Virus virus, 
+			PerformedMoveCallback callback, 
+			UpdatePiecesCallback piecesCallback,
+			EndCallback end,
+			string id, 
+			params VirusPlayer[] players) 
+		{
 			Random rand = new Random();
 			PerformedMove = callback;
 			UpdatePieces = piecesCallback;
+			End = end;
 			PlayerID = id;
 			this.virus = virus;
 			this.immediateAI = false;
@@ -402,6 +412,8 @@ namespace VirusNetwork
 					}
 				}
 				MessageBox.Show(w + " is the winner\n" + s);
+				if (End != null)
+					End();
 			}
 			else {
 				message = players[virus.CurrentPlayer].Name;

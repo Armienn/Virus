@@ -26,6 +26,7 @@ namespace VirusNetwork {
 	/// </summary>
 	public partial class MainWindow : Window {
 		VirusLobby lobby;
+		System.Windows.Forms.Integration.WindowsFormsHost host = null;
 		VirusInterfaceMod viruscontrol;
 		Random rand = new Random();
 
@@ -42,8 +43,28 @@ namespace VirusNetwork {
 			lobby.OnGameMove += new VirusLobby.GameMoveFunction(GameMove);
 			lobby.OnNameChanged += new VirusLobby.PlayerUpdateTextFunction(NameUpdated);
 			lobby.OnPlayerConnected += new VirusLobby.PlayerUpdateFunction(PlayerConnected);
+			lobby.OnPlayerDisconnected += new VirusLobby.PlayerUpdateFunction(PlayerDisconnected);
 			lobby.OnStartGame += new VirusLobby.StartFunction(StartGame);
 			lobby.OnTextMessageRecieved += new VirusLobby.TextMessageFunction(TextMessageRecieved);
+		}
+
+		private void Window_Loaded(object sender, RoutedEventArgs e) {
+			// Create the interop host control.
+			host = new System.Windows.Forms.Integration.WindowsFormsHost();
+			viruscontrol = new VirusInterfaceMod();
+			host.Child = viruscontrol;
+			this.VirusGrid.Children.Add(host);
+		}
+
+		public string GetOwnIP() {
+			string localIP = "?";
+			IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
+			foreach (IPAddress ip in host.AddressList) {
+				if (ip.AddressFamily == AddressFamily.InterNetwork) {
+					localIP = ip.ToString();
+				}
+			}
+			return localIP;
 		}
 
 		void BadMessage(string text) {
@@ -52,7 +73,13 @@ namespace VirusNetwork {
 
 		private void StartGame(VirusPlayer[] players) {
 			Dispatcher.Invoke(() => { 
-				viruscontrol.StartGame(new VirusNameSpace.Virus(lobby.PlayerCount, 10), PerformedMoveCallback, null, player.ID, players);
+				viruscontrol.StartGame(
+					new VirusNameSpace.Virus(lobby.PlayerCount, 10),
+					PerformedMoveCallback,
+					null,
+					EndGame,
+					player.ID,
+					players);
 			});
 		}
 
@@ -91,6 +118,13 @@ namespace VirusNetwork {
 		private void PlayerConnected(VirusPlayer player) {
 			Dispatcher.Invoke(() => {
 				InTextBox.Text += "Player " + player.Name + " connected with color " + player.Color.Name + "\n";
+			});
+		}
+
+		private void PlayerDisconnected(VirusPlayer player) {
+			Dispatcher.Invoke(() => {
+				InTextBox.Text += "Player " + player.Name + " disconnected\n";
+				EndGame();
 			});
 		}
 
@@ -133,6 +167,7 @@ namespace VirusNetwork {
 			else if (lobby.Master) {   // Disconnecting
 				MasterCheckbox.IsEnabled = true;
 				lobby.Disconnect();
+				EndGame();
 				ReadyButton.IsEnabled = false;
 				StartButton.Content = "Start Listening";
 			}
@@ -156,6 +191,7 @@ namespace VirusNetwork {
 				MasterCheckbox.IsEnabled = true;
 				StartButton.Content = "Connect";
 				lobby.Disconnect();
+				EndGame();
 				ReadyButton.IsEnabled = false;
 			}
 		}
@@ -182,27 +218,6 @@ namespace VirusNetwork {
 				messageBox.Text = "";
 			}
 		}
-
-		public string GetOwnIP() {
-			string localIP = "?";
-			IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
-			foreach (IPAddress ip in host.AddressList) {
-				if (ip.AddressFamily == AddressFamily.InterNetwork) {
-					localIP = ip.ToString();
-				}
-			}
-			return localIP;
-		}
-
-		private void Window_Loaded(object sender, RoutedEventArgs e) {
-			// Create the interop host control.
-			System.Windows.Forms.Integration.WindowsFormsHost host =
-					new System.Windows.Forms.Integration.WindowsFormsHost();
-			viruscontrol = new VirusInterfaceMod();
-			host.Child = viruscontrol;
-			this.VirusGrid.Children.Add(host);
-		}
-
 		void MainWindow_Closing(object sender, CancelEventArgs e) {
 			lobby.Disconnect();
 		}
@@ -238,7 +253,13 @@ namespace VirusNetwork {
 			if (lobby.Master) {
 				ReadyButton.IsEnabled = false;
 				lobby.StartGame();
-				viruscontrol.StartGame(new VirusNameSpace.Virus(lobby.PlayerCount, 10), PerformedMoveCallback, null,  player.ID, lobby.AllPlayers);
+				viruscontrol.StartGame(
+					new VirusNameSpace.Virus(lobby.PlayerCount, 10),
+					PerformedMoveCallback,
+					null,
+					EndGame,
+					player.ID,
+					lobby.AllPlayers);
 			}
 			else {
 				bool ready = !player.Ready;
@@ -262,6 +283,13 @@ namespace VirusNetwork {
 		private void PlayerNameBox_LostFocus(object sender, RoutedEventArgs e) {
 			if (player.Name != PlayerNameBox.Text)
 				lobby.UpdatePlayer(PlayerNameBox.Text);
+		}
+
+		private void EndGame() {
+			viruscontrol = new VirusInterfaceMod();
+			host.Child = viruscontrol;
+			//this.VirusGrid.Children.Clear();
+			//this.VirusGrid.Children.Add(host);
 		}
 
 		public void DrawLines(int[] lineList, Polyline line, Canvas canvas) {

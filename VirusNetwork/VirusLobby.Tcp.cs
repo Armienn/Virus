@@ -70,17 +70,29 @@ namespace VirusNetwork {
 					Connected = true;
 					if (OnPlayerConnected != null)
 						OnPlayerConnected(player);
-					SendInitialiseMessage(Player);
+					List<VirusPlayer> list = new List<VirusPlayer>();
+					List<VirusPlayer> list2 = new List<VirusPlayer>();
+					list.Add(player);
 					foreach (VirusPlayer p in Players) {
-						if(p.ID != player.ID)
-							SendInitialiseMessage(p);
+						if (p.ID != player.ID) {
+							SendInitialiseMessage(p, list); //send init message to new player about the existing players
+							list2.Add(p);
+						}
 					}
+					SendInitialiseMessage(Player, list); //send init message to new player about the host
+					SendInitialiseMessage(player, list2); //send init message to existing players about the new player
+
 					continue;
 				}
 
 				// -- Player is already initialised, so the message needs other handling
 				HandleMessageMaster(player, message, type);
 			}
+
+			if (OnPlayerDisconnected != null)
+				OnPlayerDisconnected(player);
+			Players.Remove(player);
+			SendDisconnectMessage(player);
 		}
 
 		private void HandleMessageMaster(VirusPlayer player, string message, MessageType type) {
@@ -91,10 +103,14 @@ namespace VirusNetwork {
 			bool ready;
 			int x, y, dx, dy = 0;
 			switch (type) {
+
+				// ###### ------ Initialise ------ ###### //
 				case MessageType.Initialise:
 					if (OnBadMessageRecieved != null)
 						OnBadMessageRecieved("Got a second initialise message from player with id " + player.ID);
 					break;
+
+				// ###### ------ Text ------ ###### //
 				case MessageType.Text:
 					if (TryParseTextMessage(message, out id, out text)) {
 						if (player.ID != id) {
@@ -112,6 +128,8 @@ namespace VirusNetwork {
 							OnBadMessageRecieved("Couldn't parse text message from player with id " + player.ID);
 					}
 					break;
+
+				// ###### ------ Color ------ ###### //
 				case MessageType.Color:
 					if (TryParseColorMessage(message, out id, out color)) {
 						if (player.ID != id) {
@@ -130,6 +148,8 @@ namespace VirusNetwork {
 							OnBadMessageRecieved("Couldn't parse color message from player with id " + player.ID);
 					}
 					break;
+
+				// ###### ------ Name ------ ###### //
 				case MessageType.Name:
 					if (TryParseNameMessage(message, out id, out name)) {
 						if (player.ID != id) {
@@ -148,6 +168,8 @@ namespace VirusNetwork {
 							OnBadMessageRecieved("Couldn't parse name message from player with id " + player.ID);
 					}
 					break;
+
+				// ###### ------ Ready ------ ###### //
 				case MessageType.Ready:
 					if (TryParseReadyMessage(message, out id, out ready)) {
 						if (player.ID != id) {
@@ -155,7 +177,7 @@ namespace VirusNetwork {
 								OnBadMessageRecieved("Got ready message with id " + id + " from player with id " + player.ID);
 						}
 						else {
-							bool allreadyprev = false;
+							bool allreadyprev = true;
 							foreach (VirusPlayer p in Players)
 								if (!p.Ready)
 									allreadyprev = false;
@@ -177,10 +199,14 @@ namespace VirusNetwork {
 							OnBadMessageRecieved("Couldn't parse ready message from player with id " + player.ID);
 					}
 					break;
+
+				// ###### ------ StartGame ------ ###### //
 				case MessageType.StartGame:
 					if (OnBadMessageRecieved != null)
 						OnBadMessageRecieved("Got start game message from player with id " + player.ID);
 					break;
+
+				// ###### ------ GameMessage ------ ###### //
 				case MessageType.GameMessage:
 					if (TryParseGameMessage(message, out id, out x, out y, out dx, out dy)) {
 						if (player.ID != id) {
@@ -198,6 +224,14 @@ namespace VirusNetwork {
 							OnBadMessageRecieved("Couldn't parse game message from player with id " + player.ID);
 					}
 					break;
+
+				// ###### ------ Disconnect ------ ###### //
+				case MessageType.Disconnect:
+					if (OnBadMessageRecieved != null)
+						OnBadMessageRecieved("Got disconnect message from player with id " + player.ID);
+					break;
+
+				// ###### ------ default ------ ###### //
 				default:
 					if (OnBadMessageRecieved != null)
 						OnBadMessageRecieved("Couldn't recognise message from player with id " + player.ID);
@@ -253,6 +287,9 @@ namespace VirusNetwork {
 				// -- Player is already initialised, so the message needs other handling
 				HandleMessageClient(message, type);
 			}
+			if (OnPlayerDisconnected != null)
+				OnPlayerDisconnected(player);
+			Players.Clear();
 		}
 
 		private void HandleMessageClient(string message, MessageType type) {
@@ -394,6 +431,24 @@ namespace VirusNetwork {
 					else {
 						if (OnBadMessageRecieved != null)
 							OnBadMessageRecieved("Couldn't parse game message from master");
+					}
+					break;
+				case MessageType.Disconnect:
+					if (TryParseDisconnectMessage(message, out id)) {
+						origin = GetPlayerFromID(id);
+						if (origin == null) {
+							if (OnBadMessageRecieved != null)
+								OnBadMessageRecieved("Got disconnect message without origin");
+						}
+						else {
+							if (OnPlayerDisconnected != null)
+								OnPlayerDisconnected(origin);
+							Players.Remove(origin);
+						}
+					}
+					else {
+						if (OnBadMessageRecieved != null)
+							OnBadMessageRecieved("Couldn't parse ready message from master");
 					}
 					break;
 				default:
