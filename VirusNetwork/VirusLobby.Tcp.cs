@@ -38,26 +38,20 @@ namespace VirusNetwork {
 			TcpClient tcpClient = player.TcpClient;
 			NetworkStream clientStream = tcpClient.GetStream();
 
-			byte[] incoming = new byte[4096];
-			int bytesRead;
-
 			while (player.Connected) {
-				bytesRead = 0;
+				String message = "";
 
 				try { //blocks until a client sends a message
-					bytesRead = clientStream.Read(incoming, 0, 4096);
+					message = ReadMessage(clientStream);
 				}
 				catch { //a socket error has occured
 					player.Connected = false;
 					break;
 				}
 
-				if (bytesRead == 0) { //the client has disconnected from the server
-					player.Connected = false;
-					break;
-				}
+				if (message == "")
+					continue;
 
-				String message = encoder.GetString(incoming, 0, bytesRead);
 				MessageType type = VirusLobby.ParseMessageType(message);
 
 				// -- The player should start by initialising
@@ -220,26 +214,20 @@ namespace VirusNetwork {
 			TcpClient tcpClient = player.TcpClient;
 			NetworkStream clientStream = tcpClient.GetStream();
 
-			byte[] incoming = new byte[4096];
-			int bytesRead;
-
 			while (player.Connected) {
-				bytesRead = 0;
+				String message = "";
 
 				try { //blocks until a client sends a message
-					bytesRead = clientStream.Read(incoming, 0, 4096);
+					message = ReadMessage(clientStream);
 				}
 				catch { //a socket error has occured
 					player.Connected = false;
 					break;
 				}
 
-				if (bytesRead == 0) { //the client has disconnected from the server
-					player.Connected = false;
-					break;
-				}
+				if (message == "")
+					continue;
 
-				String message = encoder.GetString(incoming, 0, bytesRead);
 				MessageType type = VirusLobby.ParseMessageType(message);
 
 				// -- The player should start by initialising
@@ -416,5 +404,57 @@ namespace VirusNetwork {
 		}
 
 		#endregion
+
+		static string ReadMessage(NetworkStream stream) {
+			byte[] sizeinfo = new byte[4];
+
+			//read the size of the message
+			int totalread = 0, currentread = 0;
+
+			currentread = totalread = stream.Read(sizeinfo, 0, 4);// socket.Receive(sizeinfo);
+
+			while (totalread < sizeinfo.Length && currentread > 0) {
+				currentread = stream.Read(sizeinfo,
+									totalread, //offset into the buffer
+									sizeinfo.Length - totalread //max amount to read
+									);
+
+				totalread += currentread;
+			}
+
+			int messagesize = 0;
+
+			//could optionally call BitConverter.ToInt32(sizeinfo, 0);
+			messagesize |= sizeinfo[0];
+			messagesize |= (((int)sizeinfo[1]) << 8);
+			messagesize |= (((int)sizeinfo[2]) << 16);
+			messagesize |= (((int)sizeinfo[3]) << 24);
+
+			//create a byte array of the correct size
+			//note:  there really should be a size restriction on
+			//              messagesize because a user could send
+			//              Int32.MaxValue and cause an OutOfMemoryException
+			//              on the receiving side.  maybe consider using a short instead
+			//              or just limit the size to some reasonable value
+			byte[] data = new byte[messagesize];
+
+			//read the first chunk of data
+			totalread = 0;
+			currentread = totalread = stream.Read(data,
+									 totalread, //offset into the buffer
+									data.Length - totalread //max amount to read
+									);
+
+			//if we didn't get the entire message, read some more until we do
+			while (totalread < messagesize && currentread > 0) {
+				currentread = stream.Read(data,
+								 totalread, //offset into the buffer
+								data.Length - totalread //max amount to read
+								);
+				totalread += currentread;
+			}
+
+			return encoder.GetString(data, 0, totalread);
+		}
 	}
 }

@@ -79,15 +79,24 @@ namespace VirusNetwork {
 
 		public void SendMessage(byte[] message) {
 			//if (Connected) {
+			byte[] sizeinfo = new byte[4];
+
+			//could optionally call BitConverter.GetBytes(data.length);
+			sizeinfo[0] = (byte)message.Length;
+			sizeinfo[1] = (byte)(message.Length >> 8);
+			sizeinfo[2] = (byte)(message.Length >> 16);
+			sizeinfo[3] = (byte)(message.Length >> 24);
 				if (Master) {
 					foreach (VirusPlayer pc in Players) {
 						TcpClient ns = pc.TcpClient;
+						ns.GetStream().Write(sizeinfo, 0, 4);
 						ns.GetStream().Write(message, 0, message.Length);
 						ns.GetStream().Flush();
 					}
 				}
 				else {
 					TcpClient ns = MasterPlayer.TcpClient;
+					ns.GetStream().Write(sizeinfo, 0, 4);
 					ns.GetStream().Write(message, 0, message.Length);
 					ns.GetStream().Flush();
 				}

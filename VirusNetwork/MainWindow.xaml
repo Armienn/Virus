@@ -12,7 +12,7 @@
 		<TextBox x:Name="messageBox" HorizontalAlignment="Left" Margin="10,0,0,140" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="246" MaxLength="1000" Height="22" KeyDown="messageBox_keyDown"/>
 		<Button x:Name="ReadyButton" Content="Ready" HorizontalAlignment="Left" Margin="10,0,0,80" VerticalAlignment="Bottom" Width="89" Click="ReadyButton_Click" IsEnabled="False"/>
 		<Label x:Name="ReadyLabel" Content="Not ready" HorizontalAlignment="Left" Margin="189,0,0,78" VerticalAlignment="Bottom" Width="67"/>
-		<TextBox x:Name="PlayerNameBox" HorizontalAlignment="Left" Height="23" Margin="10,38,0,0" TextWrapping="Wrap" Text="Player1" VerticalAlignment="Top" Width="246" MaxLines="1" MaxLength="12" LostFocus="PlayerNameBox_LostFocus"/>
+		<TextBox x:Name="PlayerNameBox" HorizontalAlignment="Left" Height="23" Margin="10,38,0,0" TextWrapping="Wrap" Text="Player1" VerticalAlignment="Top" Width="246" MaxLines="1" MaxLength="24" LostFocus="PlayerNameBox_LostFocus"/>
 		<ScrollViewer HorizontalAlignment="Left" Margin="13,126,0,170" VerticalAlignment="Stretch" Width="243">
 			<TextBlock x:Name="InTextBox" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Width="223"/>
 		</ScrollViewer>
