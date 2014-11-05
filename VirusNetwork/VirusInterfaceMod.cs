@@ -53,7 +53,7 @@ namespace VirusNetwork
 			End = end;
 			PlayerID = id;
 			this.virus = virus;
-			this.immediateAI = false;
+			this.immediateAI = true;
 			this.MouseClick += MouseClickHandler1;
 			tileSize = 30;
 			this.Size = new Size(
@@ -72,56 +72,56 @@ namespace VirusNetwork
 			for (byte i = 1; i < this.players.Count; i++) {
 				String p = this.players[i].Name;
 				switch (p) {
-					case "QAI":
+					case "AIQ":
 						agents[i] = new QAgent(i);
 						if (File.Exists("TrainingData.Q") && File.Exists("TrainingData.N")) {
 							((QAgent)agents[i]).Load("TrainingData");
 							((QAgent)agents[i]).TurnOffExploration();
 							((QAgent)agents[i]).TurnOffLearning();
 						}
-						this.players[i].Name = "AI " + n;
+						//this.players[i].Name = "AI " + n;
 						n++;
 						break;
-					case "MQAI":
+					case "AIMQ":
 						agents[i] = new MemoryQAgent(i);
 						if (File.Exists("TrainingData.Q") && File.Exists("TrainingData.N")) {
 							((MemoryQAgent)agents[i]).Load("TrainingData");
 							((MemoryQAgent)agents[i]).TurnOffExploration();
 						}
-						this.players[i].Name = "AI " + n;
+						//this.players[i].Name = "AI " + n;
 						n++;
 						break;
-					case "MinimaxAI":
+					case "AIMinimax":
 						agents[i] = new MinimaxAgent(4,i);
-						this.players[i].Name = "AI " + n;
+						//this.players[i].Name = "AI " + n;
 						n++;
 						break;
-					case "MiniMaxMixAI":
+					case "AIMiniMaxMix":
 						if (File.Exists("TrainingData.Q"))
 							agents[i] = new MiniMaxMixAgent("TrainingData", 2, i);
 						else
 							agents[i] = new BruteForceAgent(i);
-						this.players[i].Name = "AI " + n;
+						//this.players[i].Name = "AI " + n;
 						n++;
 						break;
-					case "MixedAI":
+					case "AIMixed":
 						agents[i] = new MixedAgent(0.5,false,i);
-						this.players[i].Name = "AI " + n;
+						//this.players[i].Name = "AI " + n;
 						n++;
 						break;
-					case "BruteAI":
+					case "AIBrute":
 						agents[i] = new BruteForceAgent(i);
-						this.players[i].Name = "AI " + n;
+						//this.players[i].Name = "AI " + n;
 						n++;
 						break;
-					case "RandomAI":
+					case "AIRandom":
 						agents[i] = new RandomAgent(i);
-						this.players[i].Name = "AI " + n;
+						//this.players[i].Name = "AI " + n;
 						n++;
 						break;
-					case "SimpleAI":
+					case "AISimple":
 						agents[i] = new SimpleAgent(i);
-						this.players[i].Name = "AI " + n;
+						//this.players[i].Name = "AI " + n;
 						n++;
 						break;
 				}
@@ -204,8 +204,8 @@ namespace VirusNetwork
 
 		private void ImmediateHandler() {
 			immediateRunning = true;
-			while (players[virus.CurrentPlayer].Name.StartsWith("AI")) {
-				AIMove();
+			while (players[virus.CurrentPlayer].Name.StartsWith("AI") && players[virus.CurrentPlayer].ID == PlayerID) {
+				AINetworkMove();
 
 				if (gameWon) {
 					foreach (Agent a in agents) {
@@ -214,7 +214,8 @@ namespace VirusNetwork
 						}
 					}
 					gameWon = false;
-					virus = new Virus(virus.Players, virus.Size);
+					//virus = new Virus(virus.Players, virus.Size);
+					immediateAI = false;
 					this.Refresh();
 				}
 				if (!immediateAI)
@@ -320,6 +321,9 @@ namespace VirusNetwork
 			Update();
 
 			CheckForWinner(piece);
+			if (immediateAI && !immediateRunning) {
+				ImmediateHandler();
+			}
 		}
 
 		private void AIMove() {
