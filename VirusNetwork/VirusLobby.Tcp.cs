@@ -145,7 +145,7 @@ namespace VirusNetwork {
 							player.Color = color;
 							if (OnColorChanged != null)
 								OnColorChanged(player, orig);
-							SendColorMessage(player);
+							SendColorMessage(player, color);
 						}
 					}
 					else {
@@ -166,7 +166,7 @@ namespace VirusNetwork {
 							player.Name = name;
 							if (OnNameChanged != null)
 								OnNameChanged(player, orig);
-							SendNameMessage(player);
+							SendNameMessage(player, name);
 						}
 					}
 					else {

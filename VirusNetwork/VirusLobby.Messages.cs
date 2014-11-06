@@ -135,13 +135,13 @@ namespace VirusNetwork {
 			SendMessage(buffer);
 		}
 
-		private void SendColorMessage(VirusPlayer player) {
-			byte[] buffer = encoder.GetBytes(CodeColor + player.ID + " " + player.Color.Name);
+		private void SendColorMessage(VirusPlayer player, Color color) {
+			byte[] buffer = encoder.GetBytes(CodeColor + player.ID + " " + color.Name);
 			SendMessage(buffer);
 		}
 
-		private void SendNameMessage(VirusPlayer player) {
-			byte[] buffer = encoder.GetBytes(CodeName + player.ID + " [" + player.Name + "]");
+		private void SendNameMessage(VirusPlayer player, string name) {
+			byte[] buffer = encoder.GetBytes(CodeName + player.ID + " [" + name + "]");
 			SendMessage(buffer);
 		}
 

@@ -152,29 +152,41 @@ namespace VirusNetwork {
 		#region Update Player
 		public void UpdatePlayer(Color color) {
 			Color orig = Player.Color;
-			Player.Color = color;
-			if (Master)
-				OnColorChanged(Player, orig);
-			if(Connected)
-				SendColorMessage(Player);
+			if (Connected) {
+				if (Master) {
+					Player.Color = color;
+					OnColorChanged(Player, orig);
+				}
+				SendColorMessage(Player, color);
+			}
+			else {
+				Player.Color = color;
+			}
 		}
 
 		public void UpdatePlayer(string name) {
 			string orig = Player.Name;
-			Player.Name = name;
-			if (Master)
-				OnNameChanged(Player, orig);
-			if (Connected)
-				SendNameMessage(Player);
+			if (Connected) {
+				if (Master) {
+					Player.Name = name;
+					OnNameChanged(Player, orig);
+				}
+				SendNameMessage(Player, name);
+			}
+			else {
+				Player.Name = name;
+			}
 		}
 
 		public void UpdatePlayer(bool ready) {
 			bool orig = Player.Ready;
-			Player.Ready = ready;
-			if (Master)
-				OnReadyChanged(Player, orig);
-			if (Connected)
+			if (Connected) {
+				Player.Ready = ready;
+				if (Master) {
+					OnReadyChanged(Player, orig);
+				}
 				SendReadyMessage(Player);
+			}
 		}
 		#endregion
 

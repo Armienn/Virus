@@ -57,7 +57,7 @@ namespace VirusNetwork {
 		}
 
 		public string GetOwnIP() {
-			string localIP = "?";
+			string localIP = "No IP";
 			IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
 			foreach (IPAddress ip in host.AddressList) {
 				if (ip.AddressFamily == AddressFamily.InterNetwork) {
@@ -68,7 +68,10 @@ namespace VirusNetwork {
 		}
 
 		void BadMessage(string text) {
-			AddText(InTextBox, text + "\n");
+			Dispatcher.Invoke(() => {
+				InTextBox.Text += text + "\n";
+				TextScrollViewer.ScrollToBottom();
+			});
 		}
 
 		private void StartGame(VirusPlayer[] players) {
@@ -86,18 +89,22 @@ namespace VirusNetwork {
 		private void TextMessageRecieved(VirusPlayer player, string text) {
 			Dispatcher.Invoke(() => {
 				InTextBox.Text += player.Name + ":\n" + text + "\n";
+				TextScrollViewer.ScrollToBottom();
 			});
 		}
 
 		private void NameUpdated(VirusPlayer player, string orig) {
 			Dispatcher.Invoke(() => {
 				InTextBox.Text += "Player " + orig + " changed name to " + player.Name + "\n";
+				viruscontrol.Refresh();
+				TextScrollViewer.ScrollToBottom();
 			});
 		}
 
 		private void ColorUpdated(VirusPlayer player, System.Drawing.Color orig) {
 			Dispatcher.Invoke(() => {
 				InTextBox.Text += "Player " + player.Name + " changed color to " + player.Color.Name + "\n";
+				TextScrollViewer.ScrollToBottom();
 				viruscontrol.Refresh();
 			});
 		}
@@ -118,12 +125,14 @@ namespace VirusNetwork {
 		private void PlayerConnected(VirusPlayer player) {
 			Dispatcher.Invoke(() => {
 				InTextBox.Text += "Player " + player.Name + " connected with color " + player.Color.Name + "\n";
+				TextScrollViewer.ScrollToBottom();
 			});
 		}
 
 		private void PlayerDisconnected(VirusPlayer player) {
 			Dispatcher.Invoke(() => {
 				InTextBox.Text += "Player " + player.Name + " disconnected\n";
+				TextScrollViewer.ScrollToBottom();
 				EndGame();
 			});
 		}
@@ -132,30 +141,6 @@ namespace VirusNetwork {
 			Dispatcher.Invoke(() => {
 				viruscontrol.NetworkMove(x, y, dx, dy);
 			});
-		}
-
-		delegate void SetTextCallback(TextBlock control, string text);
-
-		private void SetText(TextBlock control, string text) {
-			if (control.Dispatcher.CheckAccess()) {
-				control.Text = text;
-			}
-			else {
-				SetTextCallback d = new SetTextCallback(SetText);
-				control.Dispatcher.Invoke(d, new object[] { control, text });
-			}
-		}
-
-		delegate void AddTextCallback(TextBlock control, string text);
-
-		private void AddText(TextBlock control, string text) {
-			if (control.Dispatcher.CheckAccess()) {
-				control.Text += text;
-			}
-			else {
-				AddTextCallback d = new AddTextCallback(AddText);
-				control.Dispatcher.Invoke(d, new object[] { control, text });
-			}
 		}
 
 		private void StartButton_Click(object sender, RoutedEventArgs e) {
