@@ -8,23 +8,23 @@
 		<Label Content="IP" HorizontalAlignment="Left" Margin="10,90,0,0" VerticalAlignment="Top"/>
 		<TextBox x:Name="IpBox" HorizontalAlignment="Left" Height="23" Margin="94,92,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="162" UndoLimit="10" MaxLength="15"/>
 		<Button x:Name="StartButton" Content="Connect" HorizontalAlignment="Left" Margin="94,66,0,0" VerticalAlignment="Top" Width="162" Click="StartButton_Click"/>
-		<Button x:Name="SendButton" Content="Send" HorizontalAlignment="Left" Margin="10,0,0,110" VerticalAlignment="Bottom" Width="246" Click="SendButton_Click"/>
-		<TextBox x:Name="messageBox" HorizontalAlignment="Left" Margin="10,0,0,140" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="246" MaxLength="1000" Height="22" KeyDown="messageBox_keyDown"/>
-		<Button x:Name="ReadyButton" Content="Ready" HorizontalAlignment="Left" Margin="10,0,0,80" VerticalAlignment="Bottom" Width="89" Click="ReadyButton_Click" IsEnabled="False"/>
-		<Label x:Name="ReadyLabel" Content="Not ready" HorizontalAlignment="Left" Margin="189,0,0,78" VerticalAlignment="Bottom" Width="67"/>
+		<Button x:Name="SendButton" Content="Send" HorizontalAlignment="Left" Margin="10,0,0,40" VerticalAlignment="Bottom" Width="246" Click="SendButton_Click"/>
+		<TextBox x:Name="messageBox" HorizontalAlignment="Left" Margin="10,0,0,70" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="246" MaxLength="1000" Height="22" KeyDown="messageBox_keyDown"/>
+		<Button x:Name="ReadyButton" Content="Ready" HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Bottom" Width="89" Click="ReadyButton_Click" IsEnabled="False"/>
+		<Label x:Name="ReadyLabel" Content="Not ready" HorizontalAlignment="Left" Margin="189,0,0,8" VerticalAlignment="Bottom" Width="67"/>
 		<TextBox x:Name="PlayerNameBox" HorizontalAlignment="Left" Height="23" Margin="10,38,0,0" TextWrapping="Wrap" Text="Player1" VerticalAlignment="Top" Width="246" MaxLines="1" MaxLength="24" LostFocus="PlayerNameBox_LostFocus"/>
-		<ScrollViewer HorizontalAlignment="Left" Margin="13,126,0,170" VerticalAlignment="Stretch" Width="243">
+		<ScrollViewer HorizontalAlignment="Left" Margin="13,126,0,97" VerticalAlignment="Stretch" Width="243">
 			<TextBlock x:Name="InTextBox" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Width="223"/>
 		</ScrollViewer>
-		<Grid x:Name="VirusGrid" HorizontalAlignment="Stretch" Margin="261,10,10,80" VerticalAlignment="Stretch"/>
+		<Grid x:Name="VirusGrid" HorizontalAlignment="Stretch" Margin="261,10,10,10" VerticalAlignment="Stretch"/>
 		<RadioButton x:Name="greenColor" Content="" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Background="Lime" BorderBrush="Lime" Foreground="Lime" GroupName="Colours" Checked="greenColor_Checked"/>
 		<RadioButton x:Name="redColor" Content="" HorizontalAlignment="Left" Margin="31,10,0,0" VerticalAlignment="Top" Background="Red" BorderBrush="Red" Foreground="Red" GroupName="Colours" Checked="redColor_Checked"/>
 		<RadioButton x:Name="goldColor" Content="" HorizontalAlignment="Left" Margin="52,10,0,0" VerticalAlignment="Top" Background="Gold" BorderBrush="Gold" Foreground="Gold" GroupName="Colours" Checked="goldColor_Checked"/>
 		<RadioButton x:Name="blackColor" Content="" HorizontalAlignment="Left" Margin="73,10,0,0" VerticalAlignment="Top" Background="Black" BorderBrush="Black" Foreground="Black" GroupName="Colours" Checked="blackColor_Checked"/>
 		<RadioButton x:Name="blueColor" Content="" HorizontalAlignment="Left" Margin="94,10,0,0" VerticalAlignment="Top" Background="Blue" BorderBrush="Blue" Foreground="Blue" GroupName="Colours" Checked="blueColor_Checked"/>
-		<Grid HorizontalAlignment="Stretch" Margin="10,0,0,10" VerticalAlignment="Bottom">
+		<!--Grid HorizontalAlignment="Stretch" Margin="10,0,0,10" VerticalAlignment="Bottom">
 			<Canvas HorizontalAlignment="Left" VerticalAlignment="Bottom" Name="winnings" Width="782" Height="65">
 			</Canvas>
-		</Grid>
+		</Grid-->
 	</Grid>
 </Window>

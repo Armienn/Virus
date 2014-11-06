@@ -89,8 +89,12 @@ namespace VirusNetwork {
 				HandleMessageMaster(player, message, type);
 			}
 
-			if (OnPlayerDisconnected != null)
-				OnPlayerDisconnected(player);
+			if (OnPlayerDisconnected != null) {
+				try {
+					OnPlayerDisconnected(player);
+				}
+				catch { }
+			}
 			Players.Remove(player);
 			SendDisconnectMessage(player);
 		}
@@ -137,9 +141,10 @@ namespace VirusNetwork {
 								OnBadMessageRecieved("Got color message with id " + id + " from player with id " + player.ID);
 						}
 						else {
-							if (OnColorChanged != null)
-								OnColorChanged(player, color);
+							Color orig = player.Color;
 							player.Color = color;
+							if (OnColorChanged != null)
+								OnColorChanged(player, orig);
 							SendColorMessage(player);
 						}
 					}
@@ -157,9 +162,10 @@ namespace VirusNetwork {
 								OnBadMessageRecieved("Got name message with id " + id + " from player with id " + player.ID);
 						}
 						else {
-							if (OnNameChanged != null)
-								OnNameChanged(player, name);
+							string orig = Player.Name;
 							player.Name = name;
+							if (OnNameChanged != null)
+								OnNameChanged(player, orig);
 							SendNameMessage(player);
 						}
 					}
@@ -181,9 +187,10 @@ namespace VirusNetwork {
 							foreach (VirusPlayer p in Players)
 								if (!p.Ready)
 									allreadyprev = false;
-							if (OnReadyChanged != null)
-								OnReadyChanged(player, ready);
+							bool orig = player.Ready;
 							player.Ready = ready;
+							if (OnReadyChanged != null)
+								OnReadyChanged(player, orig);
 							SendReadyMessage(player);
 							bool allreadynow = true;
 							foreach (VirusPlayer p in Players)
@@ -287,8 +294,12 @@ namespace VirusNetwork {
 				// -- Player is already initialised, so the message needs other handling
 				HandleMessageClient(message, type);
 			}
-			if (OnPlayerDisconnected != null)
-				OnPlayerDisconnected(player);
+			if (OnPlayerDisconnected != null) {
+				try {
+					OnPlayerDisconnected(player);
+				}
+				catch { }
+			}
 			Players.Clear();
 		}
 
@@ -343,9 +354,10 @@ namespace VirusNetwork {
 								OnBadMessageRecieved("Got color message without origin");
 						}
 						else {
-							if (OnColorChanged != null)
-								OnColorChanged(origin, color);
+							Color orig = origin.Color;
 							origin.Color = color;
+							if (OnColorChanged != null)
+								OnColorChanged(origin, orig);
 						}
 					}
 					else {
@@ -361,9 +373,10 @@ namespace VirusNetwork {
 								OnBadMessageRecieved("Got name message without origin");
 						}
 						else {
-							if (OnNameChanged != null)
-								OnNameChanged(origin, name);
+							string orig = origin.Name;
 							origin.Name = name;
+							if (OnNameChanged != null)
+								OnNameChanged(origin, orig);
 						}
 					}
 					else {
@@ -379,9 +392,10 @@ namespace VirusNetwork {
 								OnBadMessageRecieved("Got ready message without origin");
 						}
 						else {
-							if (OnReadyChanged != null)
-								OnReadyChanged(origin, ready);
+							bool orig = origin.Ready;
 							origin.Ready = ready;
+							if (OnReadyChanged != null)
+								OnReadyChanged(origin, orig);
 						}
 					}
 					else {

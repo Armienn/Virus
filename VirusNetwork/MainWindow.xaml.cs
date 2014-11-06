@@ -89,16 +89,16 @@ namespace VirusNetwork {
 			});
 		}
 
-		private void NameUpdated(VirusPlayer player, string name) {
-			string original = player.Name;
+		private void NameUpdated(VirusPlayer player, string orig) {
 			Dispatcher.Invoke(() => {
-				InTextBox.Text += "Player " + original + " changed name to " + name + "\n";
+				InTextBox.Text += "Player " + orig + " changed name to " + player.Name + "\n";
 			});
 		}
 
-		private void ColorUpdated(VirusPlayer player, System.Drawing.Color color) {
+		private void ColorUpdated(VirusPlayer player, System.Drawing.Color orig) {
 			Dispatcher.Invoke(() => {
-				InTextBox.Text += "Player " + player.Name + " changed color to " + color.Name + "\n";
+				InTextBox.Text += "Player " + player.Name + " changed color to " + player.Color.Name + "\n";
+				viruscontrol.Refresh();
 			});
 		}
 

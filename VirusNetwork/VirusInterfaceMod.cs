@@ -55,7 +55,7 @@ namespace VirusNetwork
 			this.virus = virus;
 			this.immediateAI = true;
 			this.MouseClick += MouseClickHandler1;
-			tileSize = 30;
+			tileSize = 49;
 			this.Size = new Size(
 				virus.Size * tileSize + 17,
 				virus.Size * tileSize + 55);
@@ -147,7 +147,7 @@ namespace VirusNetwork
 				Graphics g = e.Graphics;
 				Pen pen = new Pen(Color.Black);
 				int boardlength = virus.Size;
-				int smallestSide = this.Size.Height < this.Size.Width ? this.Size.Height : this.Size.Width;
+				int smallestSide = this.Size.Height - 20 < this.Size.Width ? this.Size.Height - 20 : this.Size.Width;
 				tileSize = smallestSide/virus.Size;
 
 				int xStart = e.ClipRectangle.Left / tileSize;
