@@ -138,9 +138,14 @@ namespace VirusNetwork {
 		}
 
 		public void Disconnect() {
+			SendDisconnectMessage(Player);
 			StopListening();
 			foreach(VirusPlayer player in Players){
-				player.TcpClient.Close();
+				if (player.TcpClient != null) {
+					if(player.TcpClient.Connected)
+						player.TcpClient.GetStream().Close();
+					player.TcpClient.Close();
+				}
 			}
 			ConnectionStarted = false;
 			Connected = false;

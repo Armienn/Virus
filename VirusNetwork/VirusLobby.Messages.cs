@@ -96,18 +96,34 @@ namespace VirusNetwork {
 			sizeinfo[2] = (byte)(message.Length >> 16);
 			sizeinfo[3] = (byte)(message.Length >> 24);
 				if (Master) {
-					foreach (VirusPlayer pc in players) {
-						TcpClient ns = pc.TcpClient;
+					VirusPlayer[] pl = players.ToArray();
+					foreach (VirusPlayer pc in pl) {
+						try {
+							TcpClient ns = pc.TcpClient;
+							ns.GetStream().Write(sizeinfo, 0, 4);
+							ns.GetStream().Write(message, 0, message.Length);
+							ns.GetStream().Flush();
+						}
+						catch {
+							pc.Connected = false;
+							Players.Remove(pc);
+							SendDisconnectMessage(pc);
+						}
+					}
+				}
+				else {
+					try {
+						TcpClient ns = MasterPlayer.TcpClient;
 						ns.GetStream().Write(sizeinfo, 0, 4);
 						ns.GetStream().Write(message, 0, message.Length);
 						ns.GetStream().Flush();
 					}
-				}
-				else {
-					TcpClient ns = MasterPlayer.TcpClient;
-					ns.GetStream().Write(sizeinfo, 0, 4);
-					ns.GetStream().Write(message, 0, message.Length);
-					ns.GetStream().Flush();
+					catch {
+						MasterPlayer.Connected = false;
+						Connected = false;
+						ConnectionStarted = false;
+						Players.Clear();
+					}
 				}
 			//}
 		}

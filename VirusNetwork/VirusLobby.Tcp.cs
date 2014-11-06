@@ -81,6 +81,21 @@ namespace VirusNetwork {
 					}
 					SendInitialiseMessage(Player, list); //send init message to new player about the host
 					SendInitialiseMessage(player, list2); //send init message to existing players about the new player
+					
+					bool allreadyprev = true;
+					foreach (VirusPlayer p in Players)
+						if(p.ID != player.ID)
+							if (!p.Ready)
+								allreadyprev = false;
+
+					bool allreadynow = true;
+					foreach (VirusPlayer p in Players)
+						if (!p.Ready)
+							allreadynow = false;
+
+					if (allreadynow != allreadyprev)
+						if (OnEveryoneReadyChanged != null)
+							OnEveryoneReadyChanged(allreadynow);
 
 					continue;
 				}
@@ -88,7 +103,7 @@ namespace VirusNetwork {
 				// -- Player is already initialised, so the message needs other handling
 				HandleMessageMaster(player, message, type);
 			}
-
+			player.TcpClient.Close();
 			if (OnPlayerDisconnected != null) {
 				try {
 					OnPlayerDisconnected(player);
@@ -234,8 +249,10 @@ namespace VirusNetwork {
 
 				// ###### ------ Disconnect ------ ###### //
 				case MessageType.Disconnect:
-					if (OnBadMessageRecieved != null)
-						OnBadMessageRecieved("Got disconnect message from player with id " + player.ID);
+					player.TcpClient.Close();
+					player.Connected = false;
+					//if (OnBadMessageRecieved != null)
+					//	OnBadMessageRecieved("Got disconnect message from player with id " + player.ID);
 					break;
 
 				// ###### ------ default ------ ###### //
@@ -294,6 +311,7 @@ namespace VirusNetwork {
 				// -- Player is already initialised, so the message needs other handling
 				HandleMessageClient(message, type);
 			}
+			//player.TcpClient.Close();
 			if (OnPlayerDisconnected != null) {
 				try {
 					OnPlayerDisconnected(player);
@@ -301,6 +319,7 @@ namespace VirusNetwork {
 				catch { }
 			}
 			Players.Clear();
+			GameStarted = false;
 		}
 
 		private void HandleMessageClient(string message, MessageType type) {
@@ -454,10 +473,15 @@ namespace VirusNetwork {
 							if (OnBadMessageRecieved != null)
 								OnBadMessageRecieved("Got disconnect message without origin");
 						}
+						else if (origin.ID == MasterPlayer.ID) {
+							origin.TcpClient.Close();
+							origin.Connected = false;
+						}
 						else {
 							if (OnPlayerDisconnected != null)
 								OnPlayerDisconnected(origin);
 							Players.Remove(origin);
+							GameStarted = false;
 						}
 					}
 					else {

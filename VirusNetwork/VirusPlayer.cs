@@ -13,7 +13,15 @@ namespace VirusNetwork {
 		public String ID;
 		public readonly TcpClient TcpClient;
 		public bool Initialised;
-		public bool Connected;
+		public bool Connected {
+			get {
+				return con;
+			}
+			set {
+				con = value;
+			}
+		}
+		private bool con = false;
 		public bool Ready;
 
 		public VirusPlayer(TcpClient client) {

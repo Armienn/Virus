@@ -273,6 +273,15 @@ namespace VirusNetwork {
 		private void EndGame() {
 			viruscontrol = new VirusInterfaceMod();
 			host.Child = viruscontrol;
+			if (lobby.Master) {
+				
+			}
+			else {
+				lobby.UpdatePlayer(false);
+				ReadyButton.IsEnabled = true;
+				ReadyLabel.Content = "Ready";
+				ReadyButton.Content = "Not ready";
+			}
 			//this.VirusGrid.Children.Clear();
 			//this.VirusGrid.Children.Add(host);
 		}
