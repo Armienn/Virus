@@ -16,6 +16,8 @@ namespace VirusNameSpace.Agents {
 		double explorationPower = 0.5;
 		bool explore = true;
 
+		double longTermMemorySize = 50;
+
 		public double MinLearning {
 			get;
 			set;
@@ -28,7 +30,7 @@ namespace VirusNameSpace.Agents {
 
 		// Memory:
 		List<VirusMemory> ShortTermMemory = new List<VirusMemory>();
-		List<VirusMemory> LongTermMemory = new List<VirusMemory>();
+		Dictionary<Double,VirusMemory> LongTermMemory = new Dictionary<Double,VirusMemory>();
 
 		// Q-values:
 		Dictionary<UInt64, Dictionary<UInt32, double>> Q = new Dictionary<UInt64, Dictionary<UInt32, double>>();

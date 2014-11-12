@@ -9,7 +9,7 @@ namespace VirusNameSpace.Agents {
 
 		#region Learning
 
-		private void Learn(VirusMemory memory) {
+		private double Learn(VirusMemory memory) {
 			VirusBoard startstate = memory.StartState;
 			VirusBoard endstate = memory.EndState;
 			Move action = memory.Action;
@@ -28,10 +28,11 @@ namespace VirusNameSpace.Agents {
 
 			// -- Perform the update of Q-values --
 			N[startstate.CustomHash()][action.CustomHash()]++;
-			Q[startstate.CustomHash()][action.CustomHash()] =
-				Q[startstate.CustomHash()][action.CustomHash()]
-				+ LearningRate(N[startstate.CustomHash()][action.CustomHash()])
+			double change = LearningRate(N[startstate.CustomHash()][action.CustomHash()])
 				* (reward + discount * GetMaxQ(endstate) - Q[startstate.CustomHash()][action.CustomHash()]);
+			Q[startstate.CustomHash()][action.CustomHash()] =
+				Q[startstate.CustomHash()][action.CustomHash()] + change;
+			return Math.Abs(change);
 		}
 
 		public static double Reward(VirusBoard startstate, VirusBoard endstate) {

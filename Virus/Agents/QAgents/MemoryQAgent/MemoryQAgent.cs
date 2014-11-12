@@ -54,9 +54,26 @@ namespace VirusNameSpace.Agents
 
 		public void ProcessShortTermMemory() {
 			foreach (VirusMemory memory in ShortTermMemory) {
-				Learn(memory);
+				double change = Learn(memory);
+				AddToLongTermMemory(memory, change);
 			}
 			ShortTermMemory.Clear();
+		}
+
+		private void AddToLongTermMemory(VirusMemory memory, double significance) {
+			if (LongTermMemory.Count < longTermMemorySize)
+				LongTermMemory.Add(significance, memory);
+			else {
+				double min = double.MaxValue;
+				foreach (KeyValuePair<double, VirusMemory> pair in LongTermMemory) {
+					if (pair.Key < min)
+						min = pair.Key;
+				}
+				if (significance > min) {
+					LongTermMemory.Remove(min);
+					LongTermMemory.Add(significance, memory);
+				}
+			}
 		}
 	}
 }

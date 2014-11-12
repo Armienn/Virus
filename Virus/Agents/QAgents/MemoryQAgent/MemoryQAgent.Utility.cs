@@ -66,21 +66,25 @@ namespace VirusNameSpace.Agents {
 
 		public void SaveLongTermMemory(String file)
 		{
-			StreamWriter writer = new StreamWriter(new FileStream(file + ".MQ", FileMode.Create));
+			StreamWriter writer = new StreamWriter(new FileStream(file + ".SMQ", FileMode.Create));
+			VirusMemory memory;
+			string significance;
 			string startState;
 			string endState;
 			string action;
 			string reward;
 			string data;
 
-			foreach (VirusMemory memory in LongTermMemory)
+			foreach (KeyValuePair<double,VirusMemory> pair in LongTermMemory)
 			{
+				memory = pair.Value;
+				significance = pair.Key.ToString();
 				startState = memory.StartState.Save();
 				endState = memory.EndState.Save();
 				action = memory.Action.Save();
 				reward = memory.Reward.ToString();
 
-				data = startState + ":" + endState + ":" + action + ":" + reward + "/n";
+				data = significance + ":" + startState + ":" + endState + ":" + action + ":" + reward + "/n";
 				writer.Write(data);
 			}
 			writer.Close();
@@ -88,7 +92,7 @@ namespace VirusNameSpace.Agents {
 
 		public void LoadlongTermMermory(String file)
 		{
-			NeaReader reader = new NeaReader(new NeaStreamReader(file + ".MQ"));
+			NeaReader reader = new NeaReader(new NeaStreamReader(file + ".LMQ"));
 
 			while (reader.Peek() != -1)
 			{
@@ -97,17 +101,19 @@ namespace VirusNameSpace.Agents {
 				VirusBoard endState = new VirusBoard();
 				Move action = new Move();
 				double reward;
+				double significance;
 				string data;
 
 				data = reader.ReadLine();
 				NeaReader r = new NeaReader(data);
+				significance = double.Parse(r.ReadUntil(":"));
 				startState.Load(r.ReadUntil(":"));
 				endState.Load(r.ReadUntil(":"));
 				action.Load(r.ReadUntil(":"));
 				reward = r.ReadDouble();
 
 				memory = new VirusMemory(startState, action, endState, reward);
-				LongTermMemory.Add(memory);
+				LongTermMemory.Add(significance, memory);
 			}
 			reader.Close();
 		}
