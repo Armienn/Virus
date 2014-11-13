@@ -66,7 +66,7 @@ namespace VirusNameSpace.Agents {
 
 		public void SaveLongTermMemory(String file)
 		{
-			StreamWriter writer = new StreamWriter(new FileStream(file + ".SMQ", FileMode.Create));
+			StreamWriter writer = new StreamWriter(new FileStream(file + ".MQ", FileMode.Create));
 			VirusMemory memory;
 			string significance;
 			string startState;
@@ -92,7 +92,7 @@ namespace VirusNameSpace.Agents {
 
 		public void LoadlongTermMermory(String file)
 		{
-			NeaReader reader = new NeaReader(new NeaStreamReader(file + ".LMQ"));
+			NeaReader reader = new NeaReader(new StreamReader(file + ".MQ"));
 
 			while (reader.Peek() != -1)
 			{

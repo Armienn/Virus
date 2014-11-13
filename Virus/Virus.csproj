@@ -33,7 +33,7 @@
   <ItemGroup>
     <Reference Include="Nea, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\Nea.dll</HintPath>
+      <HintPath>E:\Dokumenter\Programmer\Visual Studio\Projects\Emperion\Nea\bin\Release\Nea.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -65,7 +65,7 @@
     <Compile Include="VirusBoard.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Nea.dll" />
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

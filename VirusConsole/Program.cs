@@ -653,6 +653,7 @@ namespace VirusConsole
 				virus = new Virus(2, size);
 			}
 			writer.Close();
+			agent.SaveLongTermMemory("m");
 		}
 	}
 }
