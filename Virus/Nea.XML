@@ -1,0 +1,579 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Nea</name>
+    </assembly>
+    <members>
+        <member name="T:Nea.FunctionField">
+            <summary>
+            Defines a field that is runnable
+            </summary>
+        </member>
+        <member name="T:Nea.AssignmentField">
+            <summary>
+            Assigns a value from some expression to a variable in a KeyedList collection when run
+            </summary>
+        </member>
+        <member name="T:Nea.CallField">
+            <summary>
+            Calls given function with the given parameters when run
+            </summary>
+        </member>
+        <member name="T:Nea.ExpressionHolder">
+            <summary>
+            Holds an expression along with the datatype it is supposed to be evaluated to
+            </summary>
+        </member>
+        <member name="T:Nea.FunctionType">
+            <summary>
+            Represents a function that may consist of assignments and calls to other functions
+            </summary>
+        </member>
+        <member name="T:Nea.IKeyed">
+            <summary>
+            An interface that specifies a publicly readable Key string, mainly for use
+            with the KeyedList class
+            </summary>
+        </member>
+        <member name="T:Nea.KeyedList`1">
+            <summary>
+            A custom sorted list for objects that implement the IKeyed interface.
+            </summary>
+            <typeparam name="I">The type of object the list contains.</typeparam>
+        </member>
+        <member name="M:Nea.KeyedList`1.#ctor(System.Int32)">
+            <summary>
+            Initializes the KeyedList with an initial capacity determined by capacity.
+            </summary>
+            <param name="capacity"></param>
+        </member>
+        <member name="M:Nea.KeyedList`1.Add(`0[])">
+            <summary>
+            Adds one ore more items to the list.
+            </summary>
+            <param name="items"></param>
+        </member>
+        <member name="M:Nea.KeyedList`1.Remove(System.String)">
+            <summary>
+            Removes the object with the Key key from the list.
+            </summary>
+            <param name="key"></param>
+        </member>
+        <member name="M:Nea.KeyedList`1.Remove(`0)">
+            <summary>
+            Removes the item from the list.
+            </summary>
+            <param name="item"></param>
+        </member>
+        <member name="M:Nea.KeyedList`1.Contains(System.String)">
+            <summary>
+            Returns true, if the list contains an object with the Key key.
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Nea.KeyedList`1.Contains(`0)">
+            <summary>
+            Returns true, if the item is contained in the list.
+            </summary>
+            <param name="item"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Nea.KeyedList`1.Item(System.String,Nea.KeyedList{`0})">
+            <summary>
+            Returns object in the list with the Key key. If it isn't in the list,
+            the KeyedList alternative will be checked, and if it isn't found in 
+            either, the default value for the object will be returned.
+            </summary>
+            <param name="key"></param>
+            <param name="alternative"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Nea.KeyedList`1.Item(System.Int32)">
+            <summary>
+            Returns the object at the position index in the list. If the index is
+            out of bounds, the default value for the object will be returned. 
+            </summary>
+            <param name="index"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Nea.KeyedListEnum`1">
+            <summary>
+            An enumerator class for KeyedList
+            </summary>
+            <typeparam name="I"></typeparam>
+        </member>
+        <member name="T:Nea.IKeyed`1">
+            <summary>
+            An interface that specifies a publicly readable Key string, mainly for use
+            with the KeyedList class
+            </summary>
+        </member>
+        <member name="T:Nea.KeyedList`2">
+            <summary>
+            A custom sorted list for objects that implement the IKeyed interface.
+            </summary>
+            <typeparam name="I">The type of object the list contains.</typeparam>
+        </member>
+        <member name="M:Nea.KeyedList`2.#ctor(System.Int32)">
+            <summary>
+            Initializes the KeyedList with an initial capacity determined by capacity.
+            </summary>
+            <param name="capacity"></param>
+        </member>
+        <member name="M:Nea.KeyedList`2.Add(`1[])">
+            <summary>
+            Adds one ore more items to the list.
+            </summary>
+            <param name="items"></param>
+        </member>
+        <member name="M:Nea.KeyedList`2.Remove(`0)">
+            <summary>
+            Removes the object with the Key key from the list.
+            </summary>
+            <param name="key"></param>
+        </member>
+        <member name="M:Nea.KeyedList`2.Remove(`1)">
+            <summary>
+            Removes the item from the list.
+            </summary>
+            <param name="item"></param>
+        </member>
+        <member name="M:Nea.KeyedList`2.Contains(`0)">
+            <summary>
+            Returns true, if the list contains an object with the Key key.
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Nea.KeyedList`2.Contains(`1)">
+            <summary>
+            Returns true, if the item is contained in the list.
+            </summary>
+            <param name="item"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Nea.KeyedList`2.Item(`0,Nea.KeyedList{`0,`1})">
+            <summary>
+            Returns object in the list with the Key key. If it isn't in the list,
+            the KeyedList alternative will be checked, and if it isn't found in 
+            either, the default value for the object will be returned.
+            </summary>
+            <param name="key"></param>
+            <param name="alternative"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Nea.KeyedList`2.Item(System.Int32)">
+            <summary>
+            Returns the object at the position index in the list. If the index is
+            out of bounds, the default value for the object will be returned. 
+            </summary>
+            <param name="index"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Nea.KeyedListEnum`2">
+            <summary>
+            An enumerator class for KeyedList
+            </summary>
+            <typeparam name="I"></typeparam>
+        </member>
+        <member name="T:Nea.ValuePair`2">
+            <summary>
+            Defines a key/value pair. Implements IKeyed for use with KeyedList.
+            </summary>
+            <typeparam name="K"></typeparam>
+            <typeparam name="V"></typeparam>
+        </member>
+        <member name="T:Nea.NeaReader">
+            <summary>
+            A custom Reader class. It can read from either a StreamReader object, a 
+            NeaStreamReader object or a String.
+            </summary>
+        </member>
+        <member name="M:Nea.NeaReader.#ctor(System.IO.StreamReader)">
+            <summary>
+            Creates a NeaReader, which encapsulates a StreamReader.
+            </summary>
+            <param name="reader">The StreamReader to read from.</param>
+        </member>
+        <member name="M:Nea.NeaReader.#ctor(Nea.NeaStreamReader)">
+            <summary>
+            Creates a NeaReader, which encapsulates a NeaStreamReader.
+            </summary>
+            <param name="reader">The NeaStreamReader to read from.</param>
+        </member>
+        <member name="M:Nea.NeaReader.#ctor(System.String)">
+            <summary>
+            Creates a NeaReader, which encapsulates a String.
+            </summary>
+            <param name="text">The String to read from.</param>
+        </member>
+        <member name="M:Nea.NeaReader.Read">
+            <summary>
+            Returns any next character. If it is the end of a line, returns '\n'. If 
+            end of stream/file has been reached, -1 is returned.
+            Advances the position of the stream.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Nea.NeaReader.Peek">
+            <summary>
+            Returns any next character. If it is the end of a line, returns '\n'. If
+            end of stream/file has been reached, the -1 is returned. 
+            Does not advance the position of the stream.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Nea.NeaReader.SkipWhiteSpace">
+            <summary>
+            Skips the next whitespace characters in the stream, if any.
+            </summary>
+        </member>
+        <member name="M:Nea.NeaReader.Close">
+            <summary>
+            Closes the underlying NeaStreamReader
+            </summary>
+        </member>
+        <member name="M:Nea.NeaReader.ReadUntil(System.Char,System.Boolean)">
+            <summary>
+            Reads the stream until char t appears (or end of the stream is reached), 
+            and returns the read string without the final character. The value 
+            discard determines whether the final character is discarded.
+            </summary>
+            <param name="t"></param>
+            <param name="discard"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Nea.NeaReader.ReadUntilAny(System.String,System.Boolean)">
+            <summary>
+            Reads the stream until any of the characters in the String t appears (or 
+            end of the stream is reached), and returns the read string without the 
+            final character. The value discard determines whether the final character
+            is discarded.
+            </summary>
+            <param name="t"></param>
+            <param name="discard"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Nea.NeaReader.ReadUntilWhiteSpaceOr(System.String,System.Boolean)">
+            <summary>
+            Reads the stream until whitespace or any of the characters in the String 
+            t appears (or end of the stream is reached), and returns the read string 
+            without the final character. The value discard determines whether the 
+            final character is discarded.
+            </summary>
+            <param name="t"></param>
+            <param name="discard"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Nea.NeaReader.ReadUntilAny(System.String[],System.String@)">
+            <summary>
+            Reads the stream until any of the strings in the String[] t appears (or 
+            end of the stream is reached), and returns the read string without the 
+            terminating string. The terminating string is available as an output
+            parameter.
+            </summary>
+            <param name="t"></param>
+            <param name="terminator"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Nea.NeaReader.ReadUntilNot(System.String,System.Boolean)">
+            <summary>
+            Reads the stream as long as it only has the characters in the String t, 
+            and returns the read string without any following character. The value
+            discard determines whether the immediately following character is 
+            discarded.
+            </summary>
+            <param name="t"></param>
+            <param name="discard"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Nea.NeaReader.ReadUntil(System.String)">
+            <summary>
+            Reads the stream until it reaches the String t, and returns the result
+            without the terminating string.
+            </summary>
+            <param name="t"></param>
+        </member>
+        <member name="M:Nea.NeaReader.SkipUntil(System.String)">
+            <summary>
+            Skips in the stream until the String t is reached. The character 
+            position after this operation is at the character immediately following
+            the first occurrence of the string t.
+            </summary>
+            <param name="t"></param>
+        </member>
+        <member name="M:Nea.NeaReader.SkipUntil(System.Char,System.Boolean)">
+            <summary>
+            Skips in the stream until the char t is reached. The value discard
+            determines whether the terminating character t is discarded.
+            </summary>
+            <param name="t"></param>
+            <param name="discard"></param>
+        </member>
+        <member name="M:Nea.NeaReader.ReadLine">
+            <summary>
+            Reads the stream until next end of line, and returns the read string 
+            without the final newline character. End of line is discarded and the 
+            stream's position is the next line.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Nea.NeaReader.ReadToEnd">
+            <summary>
+            Reads the stream from the current position to the end of the stream.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Nea.NeaReader.ReadWord">
+            <summary>
+            Skips whitespace and returns the characters until the next whitespace.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Nea.NeaReader.ReadChar">
+            <summary>
+            Skips whitespace and returns a character.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Nea.NeaReader.ReadInt">
+            <summary>
+            Skips whitespace and tries to read an Int32.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Nea.NeaReader.ReadDouble">
+            <summary>
+            Skips whitespace and tries to read an Double.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Nea.NeaReader.ReadBoolean">
+            <summary>
+            Skips whitespace and tries to read an Boolean.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Nea.NeaReader.ReadSection(System.String,System.String)">
+            <summary>
+            Skips the stream until the first occurrence of the string start. Then 
+            the text is read until there has been as many occurrences of the string
+            end as the string start.
+            </summary>
+            <param name="start"></param>
+            <param name="end"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Nea.NeaReader.ReadSection(System.Char,System.Char)">
+            <summary>
+            Skips the stream until the first occurrence of the char start. Then the
+            text is read until there has been as many occurrences of the char end as
+            the char start.
+            </summary>
+            <param name="start"></param>
+            <param name="end"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Nea.NeaReader.GetExpression">
+            <summary>
+            Skips whitespace and then tries to read an simple mathematical or 
+            boolean expression from the stream.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Nea.NeaReader.ReadSection(System.String,System.Char,System.Char)">
+            <summary>
+            Reads a section delimited by the characters start and end from the 
+            String source.
+            </summary>
+            <param name="source"></param>
+            <param name="start"></param>
+            <param name="end"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Nea.NeaReader.GetExpression(System.String)">
+            <summary>
+            Tries to read an mathematical or boolean expression from the String 
+            source.
+            </summary>
+            <param name="source"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Nea.NeaReader.ParseBoolean(System.String)">
+            <summary>
+            Tries to parse a Boolean from the String source. This function is more
+            forgiving than the default Boolean.Parse.
+            </summary>
+            <param name="source"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Nea.NeaStreamReader">
+            <summary>
+            A custom version the StreamReader class. It is able to read both from a
+            StreamReader object, as well as from a String.
+            </summary>
+        </member>
+        <member name="M:Nea.NeaStreamReader.#ctor(System.IO.StreamReader)">
+            <summary>
+            Creates a NeaStreamReader, which encapsulates a StreamReader.
+            </summary>
+            <param name="reader">The StreamReader object to read from.</param>
+        </member>
+        <member name="M:Nea.NeaStreamReader.#ctor(System.String)">
+            <summary>
+            Creates a NeaStreamReader, which encapsulates a String.
+            </summary>
+            <param name="text">The String to read from.</param>
+        </member>
+        <member name="M:Nea.NeaStreamReader.Peek">
+            <summary>
+            Returns the next available character, but does not consume it.
+            </summary>
+            <returns>
+            An integer representing the next character to be read, or -1 if there
+            are no characters to be read or if the stream does not support seeking.
+            </returns>
+        </member>
+        <member name="M:Nea.NeaStreamReader.Read">
+            <summary>
+            Returns the next available character and advances the character position
+            by one character.
+            </summary>
+            <returns>
+            An integer representing the next character to be read, or -1 if there
+            are no characters to be read.
+            </returns>
+        </member>
+        <member name="M:Nea.NeaStreamReader.ReadLine">
+            <summary>
+            Reads a line of characters from the current stream and returns the data
+            as a string.
+            </summary>
+            <returns>
+            The next line from the input stream, or null if the end of the input 
+            stream is reached.
+            </returns>
+        </member>
+        <member name="M:Nea.NeaStreamReader.ReadToEnd">
+            <summary>
+            Reads the stream from the current position to the end of the stream.
+            </summary>
+            <returns>
+            The rest of the stream as a string, from the current position to the end.
+            If the current position is at the end of the stream, returns the empty
+            string("").
+            </returns>
+        </member>
+        <member name="M:Nea.NeaStreamReader.Close">
+            <summary>
+            Closes the underlying stream or clears the underlying String, and 
+            releases any system resources associated with the reader.
+            </summary>
+        </member>
+        <member name="T:Nea.ValueField">
+            <summary>
+            Defines a key/values relationship. An object of this class contains a key 
+            and either a single string or one or more other ValueFields.
+            </summary>
+        </member>
+        <member name="M:Nea.ValueField.#ctor(System.String,System.Object)">
+            <summary>
+            Initializes a new ValueField with the given key and value.
+            </summary>
+            <param name="key"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:Nea.ValueField.#ctor(System.String,Nea.ValueField[])">
+            <summary>
+            Initializes a new ValueField with the given key and ValueFields.
+            </summary>
+            <param name="key"></param>
+            <param name="fields"></param>
+        </member>
+        <member name="M:Nea.ValueField.#ctor(System.String,System.Boolean)">
+            <summary>
+            Initializes a new ValueField with the data from the given string.
+            </summary>
+            <param name="data"></param>
+        </member>
+        <member name="M:Nea.ValueField.#ctor(Nea.NeaReader,System.Boolean)">
+            <summary>
+            Initializes a new ValueField with the data from the given NeaReader. If 
+            recursively is set as false, any contained ValueFields will be ignored 
+            and all saved as the Value string.
+            </summary>
+            <param name="reader"></param>
+            <param name="recursively"></param>
+        </member>
+        <member name="M:Nea.ValueField.IsSimple">
+            <summary>
+            Returns whether the ValueField contains just a string.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Nea.ValueField.Add(Nea.ValueField[])">
+            <summary>
+            Adds one or more ValueFields.
+            </summary>
+            <param name="fields"></param>
+        </member>
+        <member name="M:Nea.ValueField.Save(System.Boolean)">
+            <summary>
+            Returns this ValueField serialized as a string.
+            </summary>
+            <param name="indent"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Nea.ValueField.GetSavedStrings">
+            <summary>
+            Returns this ValueField serialized as a list of Strings.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:Nea.ValueField.Item(System.String,Nea.KeyedList{Nea.ValueField})">
+            <summary>
+            Returns the ValueField with the given key.
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Nea.ValueField.Item(System.Int32)">
+            <summary>
+            Returns the ValueField at the given position in the list.
+            </summary>
+            <param name="index"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Nea.ValueField.AsObject">
+            <summary>
+            Returns the value as an object.
+            </summary>
+        </member>
+        <member name="P:Nea.ValueField.AsInt">
+            <summary>
+            Returns the value as an Int32.
+            </summary>
+        </member>
+        <member name="P:Nea.ValueField.AsDouble">
+            <summary>
+            Returns the value as a Double.
+            </summary>
+        </member>
+        <member name="P:Nea.ValueField.AsDecimal">
+            <summary>
+            Returns the value as a Double.
+            </summary>
+        </member>
+        <member name="P:Nea.ValueField.AsBoolean">
+            <summary>
+            Returns the value as a Boolean.
+            </summary>
+        </member>
+        <member name="P:Nea.ValueField.AsStringList">
+            <summary>
+            Returns the value as a list of strings
+            </summary>
+        </member>
+    </members>
+</doc>
