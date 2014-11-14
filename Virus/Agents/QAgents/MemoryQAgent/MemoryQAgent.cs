@@ -62,17 +62,30 @@ namespace VirusNameSpace.Agents
 		}
 
 		private void AddToLongTermMemory(VirusMemory memory, double significance) {
-			if (LongTermMemory.Count < longTermMemorySize)
-				LongTermMemory.Add(new VirusLongTermMemory(memory, significance));
-			else {
-				VirusLongTermMemory min = new VirusLongTermMemory(default(VirusMemory), double.MaxValue);
-				foreach (VirusLongTermMemory ltmem in LongTermMemory) {
-					if (ltmem.Significance < min.Significance)
-						min = ltmem;
+			if (LongTermMemory.Count < longTermMemorySize) {
+				for (int i = 0; i <= LongTermMemory.Count; i++) {
+					if (i == LongTermMemory.Count) {
+						LongTermMemory.Add(new VirusLongTermMemory(memory, significance));
+						break;
+					}
+					else {
+						if (LongTermMemory[i].Significance < significance) {
+							LongTermMemory.Insert(i, new VirusLongTermMemory(memory, significance));
+							break;
+						}
+					}
 				}
-				if (significance > min.Significance) {
-					LongTermMemory.Remove(min);
-					LongTermMemory.Add(new VirusLongTermMemory(memory, significance));
+			}
+			else {
+				if (LongTermMemory[LongTermMemory.Count - 1].Significance > significance)
+					return;
+
+				for (int i = 0; i < LongTermMemory.Count; i++) {
+					if (LongTermMemory[i].Significance <= significance) {
+						LongTermMemory.Insert(i, new VirusLongTermMemory(memory, significance));
+						LongTermMemory.RemoveAt(LongTermMemory.Count - 1);
+						break;
+					}
 				}
 			}
 		}

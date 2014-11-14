@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace VirusNameSpace.Agents {
 	public partial class MemoryQAgent {
 		double initvalue = 0;
-		readonly double discount = 1;
+		readonly double discount = 0.98;
 		double learningRateModifier = 1;
 		double learningRateStart = 0;
 		double explorationModifier = 1;
@@ -16,7 +16,7 @@ namespace VirusNameSpace.Agents {
 		double explorationPower = 0.5;
 		bool explore = true;
 
-		double longTermMemorySize = 50;
+		double longTermMemorySize = 10000;
 
 		public double MinLearning {
 			get;

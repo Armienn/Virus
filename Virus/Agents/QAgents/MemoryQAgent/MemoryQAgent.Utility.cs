@@ -81,6 +81,8 @@ namespace VirusNameSpace.Agents {
 				endState = ltmem.Memory.EndState.Save();
 				action = ltmem.Memory.Action.Save();
 				reward = ltmem.Memory.Reward.ToString();
+				if (reward == "0")
+					reward = "0";
 
 				data = significance + ":" + startState + ":" + endState + ":" + action + ":" + reward + "\n";
 				writer.Write(data);
