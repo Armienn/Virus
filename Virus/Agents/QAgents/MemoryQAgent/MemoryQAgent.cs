@@ -62,16 +62,16 @@ namespace VirusNameSpace.Agents
 
 		private void AddToLongTermMemory(VirusMemory memory, double significance) {
 			if (LongTermMemory.Count < longTermMemorySize)
-				LongTermMemory.Add(significance, memory);
+				LongTermMemory.Add(new VirusLongTermMemory(memory, significance));
 			else {
-				double min = double.MaxValue;
-				foreach (KeyValuePair<double, VirusMemory> pair in LongTermMemory) {
-					if (pair.Key < min)
-						min = pair.Key;
+				VirusLongTermMemory min = new VirusLongTermMemory(default(VirusMemory), double.MaxValue);
+				foreach (VirusLongTermMemory ltmem in LongTermMemory) {
+					if (ltmem.Significance < min.Significance)
+						min = ltmem;
 				}
-				if (significance > min) {
+				if (significance > min.Significance) {
 					LongTermMemory.Remove(min);
-					LongTermMemory.Add(significance, memory);
+					LongTermMemory.Add(new VirusLongTermMemory(memory, significance));
 				}
 			}
 		}

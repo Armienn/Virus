@@ -25,4 +25,14 @@ namespace VirusNameSpace {
 			Reward = reward;
 		}
 	}
+
+	struct VirusLongTermMemory {
+		public readonly VirusMemory Memory;
+		public readonly double Significance;
+
+		public VirusLongTermMemory(VirusMemory memory, double significance) {
+			Memory = memory;
+			Significance = significance;
+		}
+	}
 }

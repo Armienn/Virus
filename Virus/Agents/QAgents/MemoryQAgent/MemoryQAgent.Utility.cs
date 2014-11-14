@@ -67,7 +67,6 @@ namespace VirusNameSpace.Agents {
 		public void SaveLongTermMemory(String file)
 		{
 			StreamWriter writer = new StreamWriter(new FileStream(file + ".MQ", FileMode.Create));
-			VirusMemory memory;
 			string significance;
 			string startState;
 			string endState;
@@ -75,14 +74,13 @@ namespace VirusNameSpace.Agents {
 			string reward;
 			string data;
 
-			foreach (KeyValuePair<double,VirusMemory> pair in LongTermMemory)
+			foreach (VirusLongTermMemory ltmem in LongTermMemory)
 			{
-				memory = pair.Value;
-				significance = pair.Key.ToString();
-				startState = memory.StartState.Save();
-				endState = memory.EndState.Save();
-				action = memory.Action.Save();
-				reward = memory.Reward.ToString();
+				significance = ltmem.Significance.ToString();
+				startState = ltmem.Memory.StartState.Save();
+				endState = ltmem.Memory.EndState.Save();
+				action = ltmem.Memory.Action.Save();
+				reward = ltmem.Memory.Reward.ToString();
 
 				data = significance + ":" + startState + ":" + endState + ":" + action + ":" + reward + "/n";
 				writer.Write(data);
@@ -96,7 +94,7 @@ namespace VirusNameSpace.Agents {
 
 			while (reader.Peek() != -1)
 			{
-				VirusMemory memory = new VirusMemory();
+				VirusMemory memory;
 				VirusBoard startState = new VirusBoard();
 				VirusBoard endState = new VirusBoard();
 				Move action = new Move();
@@ -113,7 +111,7 @@ namespace VirusNameSpace.Agents {
 				reward = r.ReadDouble();
 
 				memory = new VirusMemory(startState, action, endState, reward);
-				LongTermMemory.Add(significance, memory);
+				LongTermMemory.Add(new VirusLongTermMemory(memory, significance));
 			}
 			reader.Close();
 		}
