@@ -82,7 +82,7 @@ namespace VirusNameSpace.Agents {
 				action = ltmem.Memory.Action.Save();
 				reward = ltmem.Memory.Reward.ToString();
 
-				data = significance + ":" + startState + ":" + endState + ":" + action + ":" + reward + "/n";
+				data = significance + ":" + startState + ":" + endState + ":" + action + ":" + reward + "\n";
 				writer.Write(data);
 			}
 			writer.Close();

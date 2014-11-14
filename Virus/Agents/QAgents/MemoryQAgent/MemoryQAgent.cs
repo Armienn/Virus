@@ -28,11 +28,12 @@ namespace VirusNameSpace.Agents
 		}
 
 		public override void EndGame(Virus percept) {
+			VirusBoard newState = percept.GetBoardCopy();
 			double reward = 0;
 			if (percept.Winner == playerNumber) reward = 1;
 			else if (percept.Winner != playerNumber && percept.Winner != 0) reward = -1;
 
-			ShortTermMemory.Add(new VirusMemory(prevState, prevAction, default(VirusBoard), reward));
+			ShortTermMemory.Add(new VirusMemory(prevState, prevAction, newState, reward));
 
 			prevState = default(VirusBoard);
 			prevAction = default(Move);
