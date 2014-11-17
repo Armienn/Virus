@@ -55,10 +55,15 @@ namespace VirusNameSpace.Agents
 
 		public void ProcessShortTermMemory() {
 			foreach (VirusMemory memory in ShortTermMemory) {
-				double change = Learn(memory);
-				AddToLongTermMemory(memory, change);
+				ProcessMemory(memory, true);
 			}
 			ShortTermMemory.Clear();
+		}
+
+		private void ProcessMemory(VirusMemory memory, bool addtolongterm = false) {
+			double change = Learn(memory);
+			if(addtolongterm)
+				AddToLongTermMemory(memory, change);
 		}
 
 		private void AddToLongTermMemory(VirusMemory memory, double significance) {

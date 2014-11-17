@@ -98,6 +98,18 @@ namespace VirusConsole
 						TrainMemoryQ(temp4, temp3, mqagent, command, "log", "TrainingData", temp1, temp2);
 						break;
 
+					case "gather MemQ data":
+						Console.WriteLine("Q is player..?");
+						temp3 = byte.Parse(Console.ReadLine());
+						Console.WriteLine("How many iterations?");
+						temp1 = int.Parse(Console.ReadLine());
+						Console.WriteLine("Save how often?");
+						temp2 = int.Parse(Console.ReadLine());
+						Console.WriteLine("Which opponent?");
+						command = Console.ReadLine();
+						GatherMemQData(command, temp1, temp2, temp3);
+						break;
+
 					case "train mad Q":
 						Console.WriteLine("Q is player..?");
 						temp3 = byte.Parse(Console.ReadLine());
@@ -472,6 +484,18 @@ namespace VirusConsole
 			writer.Close();
 		}
 
+		static void GatherMemQData(String opponent, int iterations, int saveinterval, byte player) {
+			MemoryQAgent agent;
+			String name = opponent + "MemQ";
+			Console.WriteLine("Gathering data for Q: " + name + ":");
+			for (int i = 0; i < 10; i++) {
+				if (!File.Exists(name + ".log" + i)) {
+					agent = new MemoryQAgent(player);
+					TrainMemoryQ(5, player, agent, opponent, name + ".log" + i, name + ".sav" + i, iterations, saveinterval);
+				}
+			}
+		}
+
 		static void TrainMadQ(byte qnumber, QAgent agent, String logname, String savename, int iterations) {
 			Virus virus = new Virus(2, 5);
 			int wins = 0, wins2 = 0;
@@ -624,33 +648,106 @@ namespace VirusConsole
 
 				agent.ProcessShortTermMemory();
 
-				if (i % 100 == 0) {
-					if (agent.RandomRate == 0) {
-						writer.WriteLine(wins2);
-					}
-					wins2 = 0;
-				}
 				if (i % saveinterval == 0) {
 					agent.Save(savename);
 					Console.WriteLine("Iteration: " + i);
 					Console.WriteLine("Wins: " + wins);
 					wins = 0;
-					if (agent.RandomRate > 0) {
-						agent.TurnOffExploration();
-						//agent.TurnOffLearning();
-						for (int j = 1; j <= 1000; j++) {
-							virus = new Virus(2, size);
-							winner = RunGame(virus, qnumber == 1 ? (Agent)agent : opp, qnumber == 2 ? (Agent)agent : opp);
-							wins += winner == 1 ? 1 : 0;
-						}
-						writer.WriteLine(wins);
-						wins = 0;
-						agent.TurnOnExploration();
-						agent.ForgetShortTerm();
-						//agent.TurnOnLearning();
-					}
 				}
 				virus = new Virus(2, size);
+			}
+			for (int n = 0; n < 10; n++) {
+				MemoryQAgent ag = new MemoryQAgent();
+				for (int i = 0; i < 1000; i++) {
+					agent.TellOfMemoryTo(ag);
+				}
+				wins = 0;
+				opp = new BruteForceAgent(oppnumber);
+				for (int i = 1; i <= 10000; i++) {
+					switch (opponent) {
+						case "brute":
+							break;
+						case "minimax4":
+							opp = new MinimaxAgent(4, oppnumber);
+							break;
+						case "minimax3":
+							opp = new MinimaxAgent(3, oppnumber);
+							break;
+						case "minimax2":
+							opp = new MinimaxAgent(2, oppnumber);
+							break;
+						default:
+							opp = new BruteForceAgent(oppnumber);
+							break;
+					}
+
+					int winner = RunGame(virus, qnumber == 1 ? (Agent)ag : opp, qnumber == 2 ? (Agent)ag : opp);
+					wins += winner == 1 ? 1 : 0;
+					virus = new Virus(2, size);
+				}
+				Console.WriteLine("After 1000 memories");
+				Console.WriteLine("Wins: " + wins);
+				writer.Write(((double)wins)/10000.0 + ";");
+				for (int i = 0; i < 9000; i++) {
+					agent.TellOfMemoryTo(ag);
+				}
+				wins = 0;
+				opp = new BruteForceAgent(oppnumber);
+				for (int i = 1; i <= 10000; i++) {
+					switch (opponent) {
+						case "brute":
+							break;
+						case "minimax4":
+							opp = new MinimaxAgent(4, oppnumber);
+							break;
+						case "minimax3":
+							opp = new MinimaxAgent(3, oppnumber);
+							break;
+						case "minimax2":
+							opp = new MinimaxAgent(2, oppnumber);
+							break;
+						default:
+							opp = new BruteForceAgent(oppnumber);
+							break;
+					}
+
+					int winner = RunGame(virus, qnumber == 1 ? (Agent)ag : opp, qnumber == 2 ? (Agent)ag : opp);
+					wins += winner == 1 ? 1 : 0;
+					virus = new Virus(2, size);
+				}
+				Console.WriteLine("After 10000 memories");
+				Console.WriteLine("Wins: " + wins);
+				writer.Write(((double)wins) / 10000.0 + ";");
+				for (int i = 0; i < 90000; i++) {
+					agent.TellOfMemoryTo(ag);
+				}
+				wins = 0;
+				opp = new BruteForceAgent(oppnumber);
+				for (int i = 1; i <= 10000; i++) {
+					switch (opponent) {
+						case "brute":
+							break;
+						case "minimax4":
+							opp = new MinimaxAgent(4, oppnumber);
+							break;
+						case "minimax3":
+							opp = new MinimaxAgent(3, oppnumber);
+							break;
+						case "minimax2":
+							opp = new MinimaxAgent(2, oppnumber);
+							break;
+						default:
+							opp = new BruteForceAgent(oppnumber);
+							break;
+					}
+
+					int winner = RunGame(virus, qnumber == 1 ? (Agent)ag : opp, qnumber == 2 ? (Agent)ag : opp);
+					wins += winner == 1 ? 1 : 0;
+					virus = new Virus(2, size);
+				}
+				Console.WriteLine("After 100000 memories");
+				Console.WriteLine("Wins: " + wins);
+				writer.WriteLine(((double)wins) / 10000.0);
 			}
 			writer.Close();
 			agent.SaveLongTermMemory("m");
