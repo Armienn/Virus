@@ -49,6 +49,7 @@
     <Compile Include="Agents\QAgents\Advanced\QAgentAdvanced.Parameters.cs" />
     <Compile Include="Agents\QAgents\MemoryQAgent\MemoryQAgent.cs" />
     <Compile Include="Agents\QAgents\MemoryQAgent\MemoryQAgent.Learning.cs" />
+    <Compile Include="Agents\QAgents\MemoryQAgent\MemoryQAgent.Memory.cs" />
     <Compile Include="Agents\QAgents\MemoryQAgent\MemoryQAgent.Parameters.cs" />
     <Compile Include="Agents\QAgents\MemoryQAgent\MemoryQAgent.Utility.cs" />
     <Compile Include="Agents\QAgents\MemoryQAgent\VirusMemory.cs" />
