@@ -120,7 +120,7 @@ namespace VirusNameSpace.Agents {
 
 		public void TellOfMemoryTo(MemoryQAgent agent) {
 			VirusMemory memory = LongTermMemory[random.Next(LongTermMemory.Count)].Memory;
-			agent.ProcessMemory(memory);
+			agent.Learn(memory);
 		}
 	}
 }

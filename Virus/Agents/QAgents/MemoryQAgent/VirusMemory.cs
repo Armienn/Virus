@@ -35,4 +35,14 @@ namespace VirusNameSpace {
 			Significance = significance;
 		}
 	}
+
+	struct VirusMemoryEpisode {
+		public readonly VirusMemory[] Memories;
+		public readonly double Significance;
+
+		public VirusMemoryEpisode(VirusMemory[] memories, double significance) {
+			Memories = memories;
+			Significance = significance;
+		}
+	}
 }

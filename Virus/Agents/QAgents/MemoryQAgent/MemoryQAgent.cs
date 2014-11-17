@@ -55,15 +55,41 @@ namespace VirusNameSpace.Agents
 
 		public void ProcessShortTermMemory() {
 			foreach (VirusMemory memory in ShortTermMemory) {
-				ProcessMemory(memory, true);
+				double change = Learn(memory);
+				AddToLongTermMemory(memory, change);
 			}
+			/*VirusMemory[][] episodes = ExtractEpisodesFromMemory();
+			foreach (VirusMemory[] episode in episodes) {
+				double change = LearnFromEpisode(episode);
+				AddToLongTermMemory(episode, change);
+			}*/
 			ShortTermMemory.Clear();
 		}
 
-		private void ProcessMemory(VirusMemory memory, bool addtolongterm = false) {
-			double change = Learn(memory);
-			if(addtolongterm)
-				AddToLongTermMemory(memory, change);
+		private double LearnFromEpisode(VirusMemory[] episode) {
+			double significance = 0;
+			foreach (VirusMemory memory in episode) {
+				significance += Learn(memory);
+			}
+			return significance;
+		}
+
+		private VirusMemory[][] ExtractEpisodesFromMemory() {
+			List<VirusMemory[]> episodes = new List<VirusMemory[]>();
+			List<VirusMemory> episode = new List<VirusMemory>();
+			int n = 0;
+			for (int i = 0; i < ShortTermMemory.Count; i++) {
+				VirusMemory memory = ShortTermMemory[i];
+				byte winner = memory.EndState.winner;
+				episode.Add(memory);
+				if (winner != 0) {
+					episodes.Add(episode.ToArray());
+					episode.Clear();
+					n = i;
+				}
+			}
+			ShortTermMemory.RemoveRange(0, n + 1);
+			return episodes.ToArray();
 		}
 
 		private void AddToLongTermMemory(VirusMemory memory, double significance) {
@@ -94,5 +120,34 @@ namespace VirusNameSpace.Agents
 				}
 			}
 		}
+
+		/*private void AddToLongTermMemory(VirusMemory[] episode, double significance) {
+			if (LongTermMemory.Count < longTermMemorySize) {
+				for (int i = 0; i <= LongTermMemory.Count; i++) {
+					if (i == LongTermMemory.Count) {
+						LongTermMemory.Add(new VirusMemoryEpisode(episode, significance));
+						break;
+					}
+					else {
+						if (LongTermMemory[i].Significance < significance) {
+							LongTermMemory.Insert(i, new VirusMemoryEpisode(episode, significance));
+							break;
+						}
+					}
+				}
+			}
+			else {
+				if (LongTermMemory[LongTermMemory.Count - 1].Significance > significance)
+					return;
+
+				for (int i = 0; i < LongTermMemory.Count; i++) {
+					if (LongTermMemory[i].Significance <= significance) {
+						LongTermMemory.Insert(i, new VirusMemoryEpisode(episode, significance));
+						LongTermMemory.RemoveAt(LongTermMemory.Count - 1);
+						break;
+					}
+				}
+			}
+		}*/
 	}
 }
