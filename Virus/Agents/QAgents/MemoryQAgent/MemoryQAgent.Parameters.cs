@@ -30,7 +30,8 @@ namespace VirusNameSpace.Agents {
 
 		// Memory:
 		List<VirusMemory> ShortTermMemory = new List<VirusMemory>();
-		List<VirusLongTermMemory> LongTermMemory = new List<VirusLongTermMemory>();
+		//List<VirusLongTermMemory> LongTermMemory = new List<VirusLongTermMemory>();
+		List<VirusMemoryEpisode> LongTermMemory = new List<VirusMemoryEpisode>();
 
 		// Q-values:
 		Dictionary<UInt64, Dictionary<UInt32, double>> Q = new Dictionary<UInt64, Dictionary<UInt32, double>>();

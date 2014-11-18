@@ -8,15 +8,11 @@ namespace VirusNameSpace.Agents {
 	public partial class MemoryQAgent {
 
 		public void ProcessShortTermMemory() {
-			foreach (VirusMemory memory in ShortTermMemory) {
-				double change = Learn(memory);
-				AddToLongTermMemory(memory, change);
-			}
-			/*VirusMemory[][] episodes = ExtractEpisodesFromMemory();
+			VirusMemory[][] episodes = ExtractEpisodesFromMemory();
 			foreach (VirusMemory[] episode in episodes) {
 				double change = LearnFromEpisode(episode);
 				AddToLongTermMemory(episode, change);
-			}*/
+			}
 			ShortTermMemory.Clear();
 		}
 
@@ -25,7 +21,7 @@ namespace VirusNameSpace.Agents {
 			foreach (VirusMemory memory in episode) {
 				significance += Learn(memory);
 			}
-			return significance;
+			return significance/episode.Length;
 		}
 
 		private VirusMemory[][] ExtractEpisodesFromMemory() {
@@ -46,7 +42,7 @@ namespace VirusNameSpace.Agents {
 			return episodes.ToArray();
 		}
 
-		private void AddToLongTermMemory(VirusMemory memory, double significance) {
+		/*private void AddToLongTermMemory(VirusMemory memory, double significance) {
 			if (LongTermMemory.Count < longTermMemorySize) {
 				for (int i = 0; i <= LongTermMemory.Count; i++) {
 					if (i == LongTermMemory.Count) {
@@ -73,9 +69,9 @@ namespace VirusNameSpace.Agents {
 					}
 				}
 			}
-		}
+		}*/
 
-		/*private void AddToLongTermMemory(VirusMemory[] episode, double significance) {
+		private void AddToLongTermMemory(VirusMemory[] episode, double significance) {
 			if (LongTermMemory.Count < longTermMemorySize) {
 				for (int i = 0; i <= LongTermMemory.Count; i++) {
 					if (i == LongTermMemory.Count) {
@@ -102,6 +98,6 @@ namespace VirusNameSpace.Agents {
 					}
 				}
 			}
-		}*/
+		}
 	}
 }

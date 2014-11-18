@@ -74,17 +74,19 @@ namespace VirusNameSpace.Agents {
 			string reward;
 			string data;
 
-			foreach (VirusLongTermMemory ltmem in LongTermMemory)
+			foreach (VirusMemoryEpisode episode in LongTermMemory)
 			{
-				significance = ltmem.Significance.ToString();
-				startState = ltmem.Memory.StartState.Save();
-				endState = ltmem.Memory.EndState.Save();
-				action = ltmem.Memory.Action.Save();
-				reward = ltmem.Memory.Reward.ToString();
-				if (reward == "0")
-					reward = "0";
+				significance = episode.Significance.ToString();
+				data = significance;
+				foreach (VirusMemory memory in episode.Memories) {
+					startState = memory.StartState.Save();
+					endState = memory.EndState.Save();
+					action = memory.Action.Save();
+					reward = memory.Reward.ToString();
+					data += ":" + startState + ":" + endState + ":" + action + ":" + reward;
+				}
 
-				data = significance + ":" + startState + ":" + endState + ":" + action + ":" + reward + "\n";
+				data += "\n";
 				writer.Write(data);
 			}
 			writer.Close();
@@ -96,7 +98,7 @@ namespace VirusNameSpace.Agents {
 
 			while (reader.Peek() != -1)
 			{
-				VirusMemory memory;
+				List<VirusMemory> memories = new List<VirusMemory>();
 				VirusBoard startState = new VirusBoard();
 				VirusBoard endState = new VirusBoard();
 				Move action = new Move();
@@ -107,19 +109,27 @@ namespace VirusNameSpace.Agents {
 				data = reader.ReadLine();
 				NeaReader r = new NeaReader(data);
 				significance = double.Parse(r.ReadUntil(":"));
-				startState.Load(r.ReadUntil(":"));
-				endState.Load(r.ReadUntil(":"));
-				action.Load(r.ReadUntil(":"));
-				reward = r.ReadDouble();
+				while (r.Peek() != -1) {
+					startState.Load(r.ReadUntil(":"));
+					endState.Load(r.ReadUntil(":"));
+					action.Load(r.ReadUntil(":"));
+					reward = double.Parse(r.ReadUntil(":"));
+					memories.Add(new VirusMemory(startState, action, endState, reward));
+				}
+				
 
-				memory = new VirusMemory(startState, action, endState, reward);
-				LongTermMemory.Add(new VirusLongTermMemory(memory, significance));
+				//memory = new VirusMemory(startState, action, endState, reward);
+				LongTermMemory.Add(new VirusMemoryEpisode(memories.ToArray(), significance));//new VirusLongTermMemory(memory, significance));
 			}
 			reader.Close();
 		}
 
 		public void TellOfMemoryTo(MemoryQAgent agent) {
-			VirusMemory memory = LongTermMemory[random.Next(LongTermMemory.Count)].Memory;
+			VirusMemory[] memories = LongTermMemory[random.Next(LongTermMemory.Count)].Memories;
+			VirusMemory memory = memories[0];
+			foreach (VirusMemory m in memories)
+				if (m.Reward > memory.Reward)
+					memory = m;
 			agent.Learn(memory);
 		}
 	}
