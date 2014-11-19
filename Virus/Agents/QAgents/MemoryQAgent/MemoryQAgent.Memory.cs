@@ -24,6 +24,7 @@ namespace VirusNameSpace.Agents {
 			foreach (VirusMemory memory in episode) {
 				double temp =  Math.Abs(Learn(memory));
 				significance += temp;
+				temp = Math.Abs(memory.Reward);
 				if (temp > max) {
 					mem = memory;
 					max = temp;
