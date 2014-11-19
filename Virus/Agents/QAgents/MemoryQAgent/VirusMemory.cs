@@ -39,10 +39,12 @@ namespace VirusNameSpace {
 	struct VirusMemoryEpisode {
 		public readonly VirusMemory[] Memories;
 		public readonly double Significance;
+		public readonly VirusMemory Memory;
 
-		public VirusMemoryEpisode(VirusMemory[] memories, double significance) {
+		public VirusMemoryEpisode(VirusMemory[] memories, double significance, VirusMemory memory) {
 			Memories = memories;
 			Significance = significance;
+			Memory = memory;
 		}
 	}
 }

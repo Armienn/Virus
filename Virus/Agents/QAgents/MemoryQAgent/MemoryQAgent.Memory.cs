@@ -10,16 +10,24 @@ namespace VirusNameSpace.Agents {
 		public void ProcessShortTermMemory() {
 			VirusMemory[][] episodes = ExtractEpisodesFromMemory();
 			foreach (VirusMemory[] episode in episodes) {
-				double change = LearnFromEpisode(episode);
-				AddToLongTermMemory(episode, change);
+				VirusMemory mem;
+				double change = LearnFromEpisode(episode, out mem);
+				AddToLongTermMemory(episode, change, mem);
 			}
 			ShortTermMemory.Clear();
 		}
 
-		private double LearnFromEpisode(VirusMemory[] episode) {
+		private double LearnFromEpisode(VirusMemory[] episode, out VirusMemory mem) {
 			double significance = 0;
+			double max = 0;
+			mem = default(VirusMemory);
 			foreach (VirusMemory memory in episode) {
-				significance += Learn(memory);
+				double temp =  Math.Abs(Learn(memory));
+				significance += temp;
+				if (temp > max) {
+					mem = memory;
+					max = temp;
+				}
 			}
 			return significance/episode.Length;
 		}
@@ -71,16 +79,16 @@ namespace VirusNameSpace.Agents {
 			}
 		}*/
 
-		private void AddToLongTermMemory(VirusMemory[] episode, double significance) {
+		private void AddToLongTermMemory(VirusMemory[] episode, double significance, VirusMemory memory) {
 			if (LongTermMemory.Count < longTermMemorySize) {
 				for (int i = 0; i <= LongTermMemory.Count; i++) {
 					if (i == LongTermMemory.Count) {
-						LongTermMemory.Add(new VirusMemoryEpisode(episode, significance));
+						LongTermMemory.Add(new VirusMemoryEpisode(episode, significance, memory));
 						break;
 					}
 					else {
 						if (LongTermMemory[i].Significance < significance) {
-							LongTermMemory.Insert(i, new VirusMemoryEpisode(episode, significance));
+							LongTermMemory.Insert(i, new VirusMemoryEpisode(episode, significance, memory));
 							break;
 						}
 					}
@@ -92,7 +100,7 @@ namespace VirusNameSpace.Agents {
 
 				for (int i = 0; i < LongTermMemory.Count; i++) {
 					if (LongTermMemory[i].Significance <= significance) {
-						LongTermMemory.Insert(i, new VirusMemoryEpisode(episode, significance));
+						LongTermMemory.Insert(i, new VirusMemoryEpisode(episode, significance, memory));
 						LongTermMemory.RemoveAt(LongTermMemory.Count - 1);
 						break;
 					}

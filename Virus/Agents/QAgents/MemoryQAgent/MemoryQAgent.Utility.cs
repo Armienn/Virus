@@ -119,17 +119,13 @@ namespace VirusNameSpace.Agents {
 				
 
 				//memory = new VirusMemory(startState, action, endState, reward);
-				LongTermMemory.Add(new VirusMemoryEpisode(memories.ToArray(), significance));//new VirusLongTermMemory(memory, significance));
+				LongTermMemory.Add(new VirusMemoryEpisode(memories.ToArray(), significance,default(VirusMemory)));//new VirusLongTermMemory(memory, significance));
 			}
 			reader.Close();
 		}
 
 		public void TellOfMemoryTo(MemoryQAgent agent) {
-			VirusMemory[] memories = LongTermMemory[random.Next(LongTermMemory.Count)].Memories;
-			VirusMemory memory = memories[0];
-			foreach (VirusMemory m in memories)
-				if (Math.Abs(m.Reward) > Math.Abs(memory.Reward))
-					memory = m;
+			VirusMemory memory = LongTermMemory[random.Next(LongTermMemory.Count)].Memory;
 			agent.Learn(memory);
 		}
 	}
