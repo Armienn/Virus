@@ -128,7 +128,7 @@ namespace VirusNameSpace.Agents {
 			VirusMemory[] memories = LongTermMemory[random.Next(LongTermMemory.Count)].Memories;
 			VirusMemory memory = memories[0];
 			foreach (VirusMemory m in memories)
-				if (m.Reward > memory.Reward)
+				if (Math.Abs(m.Reward) > Math.Abs(memory.Reward))
 					memory = m;
 			agent.Learn(memory);
 		}
