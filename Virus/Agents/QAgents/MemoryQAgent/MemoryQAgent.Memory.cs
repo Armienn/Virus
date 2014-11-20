@@ -7,17 +7,21 @@ using System.Threading.Tasks;
 namespace VirusNameSpace.Agents {
 	public partial class MemoryQAgent {
 
-		public void ProcessShortTermMemory() {
+		public void ProcessShortTermMemory(bool reverse = false) {
 			VirusMemory[][] episodes = ExtractEpisodesFromMemory();
 			foreach (VirusMemory[] episode in episodes) {
-				double change = LearnFromEpisode(episode);
+				double change = LearnFromEpisode(episode, reverse);
 				AddToLongTermMemory(episode, change);
 			}
 			ShortTermMemory.Clear();
 		}
 
-		private double LearnFromEpisode(VirusMemory[] episode) {
+		private double LearnFromEpisode(VirusMemory[] episode, bool reverse = false) {
 			double significance = 0;
+			for (int i = 0; i < episode.Length; i++) {
+				int index = reverse ? episode.Length - i - 1 : i;
+				significance += Learn(episode[index]);
+			}
 			foreach (VirusMemory memory in episode) {
 				significance += Learn(memory);
 			}

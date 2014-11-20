@@ -9,7 +9,16 @@ namespace VirusNameSpace.Agents
 {
 	public partial class MemoryQAgent : Agent
 	{
-		public MemoryQAgent(byte player, double disc, double lrmod, double lrstrt, double exmod, double exstrt, double lrpow, double expow, double initvalue = 0) {
+		public MemoryQAgent(
+			byte player,
+			double disc = 0.98,
+			double lrmod = 1,
+			double lrstrt = 0,
+			double exmod = 1,
+			double exstrt = 0,
+			double lrpow = 1,
+			double expow = 0.5,
+			double initvalue = 0) {
 			playerNumber = player;
 			discount = disc;
 			learningRateModifier = lrmod;
