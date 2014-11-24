@@ -124,13 +124,19 @@ namespace VirusNameSpace.Agents {
 			reader.Close();
 		}
 
-		public void TellOfMemoryTo(MemoryQAgent agent) {
+		public void TellOfMemoryTo(MemoryQAgent agent, bool fullepisode = false) {
 			VirusMemory[] memories = LongTermMemory[random.Next(LongTermMemory.Count)].Memories;
 			VirusMemory memory = memories[0];
-			foreach (VirusMemory m in memories)
-				if (Math.Abs(m.Reward) > Math.Abs(memory.Reward))
-					memory = m;
-			agent.Learn(memory);
+			if (fullepisode) {
+				foreach (VirusMemory m in memories)
+					agent.Learn(memory);
+			}
+			else {
+				foreach (VirusMemory m in memories)
+					if (Math.Abs(m.Reward) > Math.Abs(memory.Reward))
+						memory = m;
+				agent.Learn(memory);
+			}
 		}
 	}
 }

@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Program.InitialMemQTests.cs" />
+    <Compile Include="Program.MemQTests.cs" />
     <Compile Include="Program.OldTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
