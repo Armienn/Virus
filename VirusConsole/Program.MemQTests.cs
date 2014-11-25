@@ -18,6 +18,10 @@ namespace VirusConsole {
 			const int learninggames = 10000;
 
 			int wins = 0;
+			int n = 0;
+			while (File.Exists("observer" + n + ".log")) n++;
+			StreamWriter writer = new StreamWriter("observer" + n + ".log");
+			writer.WriteLine("sources");
 
 			Virus virus;
 			MemoryQAgent observer = new MemoryQAgent(1);
@@ -36,20 +40,29 @@ namespace VirusConsole {
 						agent.TellOfMemoryTo(observer, true);
 					}
 					if (j % 1000 == 999) {
-						Console.WriteLine("Wins: " + wins);
+						if (j > 9500) {
+							writer.WriteLine(wins);
+							Console.WriteLine("Wins: " + wins);
+						}
+
 						wins = 0;
 					}
 					
 				}
 			}
 
-			wins = 0;
-			for (int i = 0; i < 1000; i++) {
-				virus = new Virus();
-				wins += RunGame(virus, observer, opponent) == 1 ? 1 : 0;
-				observer.ForgetShortTerm();
+			writer.WriteLine("observer");
+			for (int i = 0; i < 5; i++) {
+				wins = 0;
+				for (int j = 0; j < 1000; j++) {
+					virus = new Virus();
+					wins += RunGame(virus, observer, opponent) == 1 ? 1 : 0;
+					observer.ForgetShortTerm();
+				}
+				writer.WriteLine(wins);
+				Console.WriteLine("Observer wins: " + wins);
 			}
-			Console.WriteLine("Observer wins: " + wins);
+			writer.Close();
 		}
 	}
 }

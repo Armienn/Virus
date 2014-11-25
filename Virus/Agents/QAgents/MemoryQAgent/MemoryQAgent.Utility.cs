@@ -129,7 +129,7 @@ namespace VirusNameSpace.Agents {
 			VirusMemory memory = memories[0];
 			if (fullepisode) {
 				foreach (VirusMemory m in memories)
-					agent.Learn(memory);
+					agent.Learn(m);
 			}
 			else {
 				foreach (VirusMemory m in memories)
