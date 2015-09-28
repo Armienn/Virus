@@ -20,11 +20,12 @@ namespace VirusNameSpace.Agents {
 			double significance = 0;
 			for (int i = 0; i < episode.Length; i++) {
 				int index = reverse ? episode.Length - i - 1 : i;
-				significance += Learn(episode[index]);
+				double change = Learn(episode[index]);
+				significance += (change < 0 ? Math.Abs(change) : change*4);
 			}
-			foreach (VirusMemory memory in episode) {
-				significance += Learn(memory);
-			}
+			//foreach (VirusMemory memory in episode) {
+			//	significance += Learn(memory);
+			//}
 			return significance/episode.Length;
 		}
 

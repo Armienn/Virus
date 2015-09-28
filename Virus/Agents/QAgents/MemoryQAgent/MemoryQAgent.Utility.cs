@@ -138,5 +138,23 @@ namespace VirusNameSpace.Agents {
 				agent.Learn(memory);
 			}
 		}
+
+		public int TellOfMemoryToExt(MemoryQAgent agent, bool fullepisode = false) {
+			VirusMemory[] memories = LongTermMemory[random.Next(LongTermMemory.Count)].Memories;
+			VirusMemory memory = memories[0];
+			if (fullepisode) {
+				agent.LearnFromEpisode(memories, true);
+				//foreach (VirusMemory m in memories)
+				//	agent.Learn(m);
+				return memories.Length;
+			}
+			else {
+				foreach (VirusMemory m in memories)
+					if (Math.Abs(m.Reward) > Math.Abs(memory.Reward))
+						memory = m;
+				agent.Learn(memory);
+				return 1;
+			}
+		}
 	}
 }

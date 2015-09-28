@@ -32,7 +32,7 @@ namespace VirusNameSpace.Agents {
 				* (reward + discount * GetMaxQ(endstate) - Q[startstate.CustomHash()][action.CustomHash()]);
 			Q[startstate.CustomHash()][action.CustomHash()] =
 				Q[startstate.CustomHash()][action.CustomHash()] + change;
-			return Math.Abs(change);
+			return change;
 		}
 
 		public static double Reward(VirusBoard startstate, VirusBoard endstate) {

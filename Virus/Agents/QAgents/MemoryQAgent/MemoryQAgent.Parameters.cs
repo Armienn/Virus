@@ -16,7 +16,7 @@ namespace VirusNameSpace.Agents {
 		double explorationPower = 0.5;
 		bool explore = true;
 
-		double longTermMemorySize = 10000;
+		double longTermMemorySize = 5000;
 
 		public double MinLearning {
 			get;

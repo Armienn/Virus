@@ -61,7 +61,7 @@ namespace VirusConsole
 						TestGame(); break;
 
 					case "testmemq":
-						comTestMemQ(); comTestMemQ(); comTestMemQ(); comTestMemQ(); comTestMemQ(); break;
+						comTestMemQ2(); comTestMemQ2(); comTestMemQ2(); break;//comTestMemQ(); comTestMemQ(); break;
 				}
 			}
 		}
