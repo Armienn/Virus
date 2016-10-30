@@ -40,7 +40,8 @@ namespace VirusNameSpace.Agents
 			Move move = teacher.Move(percept);
 			BackPropagationLearning backProp = new BackPropagationLearning(network);
 
-			backProp.Run(boardToInput(currentState), MoveToOutputs(move));
+			VirusBoard currentState = percept.GetBoardCopy();
+			backProp.Run(BoardToInput(currentState), MoveToOutputs(move, currentState.Size));
 
 			//lær fra MiniMax
 
@@ -115,10 +116,13 @@ namespace VirusNameSpace.Agents
 			return new Move(sourceX, sourceY, destinationX, destinationY);
 		}
 
-		private double[] MoveToOutputs(Move move)
+		private double[] MoveToOutputs(Move move, int boardSize)
 		{
-			double[] someArray = new double[10]; 
-			return someArray;
+			int boardFields = boardSize * boardSize;
+			double[] outputs = new double[boardFields * 2];
+			outputs[move.sx * boardSize + move.sy] = 1;
+			outputs[boardFields + move.ex * boardSize + move.ey] = 1;
+			return outputs;
 		}
 	}
 }
