@@ -6,12 +6,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace VirusNameSpace.Agents
 {
 	public class AnnAgent : Agent
 	{
 		ActivationNetwork network;
+		BackPropagationLearning backProp;
 		bool learning = true;
 		MinimaxAgent teacher;
 
@@ -19,8 +21,9 @@ namespace VirusNameSpace.Agents
 		{
 			playerNumber = player;
 			int boardFields = boardSize * boardSize;
-			network = new ActivationNetwork(new SigmoidFunction(), boardFields, 30, 30, boardFields * 2);
-			teacher = new MinimaxAgent(4, player);
+			network = new ActivationNetwork(new BipolarSigmoidFunction(), boardFields, 30, 30, boardFields * 2);
+			backProp = new BackPropagationLearning(network);
+			teacher = new MinimaxAgent(2, player);
 		}
 
 		public override Move Move(Virus percept)
@@ -40,10 +43,14 @@ namespace VirusNameSpace.Agents
 			//lær fra MiniMax
 			Move move = teacher.Move(percept);
 			VirusBoard currentState = percept.GetBoardCopy();
-			BackPropagationLearning backProp = new BackPropagationLearning(network);
 
+			backProp.LearningRate = 0.5;
+			backProp.Momentum = 0.1;
 			double error = backProp.Run(BoardToInput(currentState), MoveToOutputs(move, currentState.Size));
-			Console.WriteLine(error);
+			using (StreamWriter writer = new StreamWriter("blublub.txt",true))
+			{
+				writer.WriteLine(error);
+			}
 
 			return move;
 		}
