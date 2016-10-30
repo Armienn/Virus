@@ -48,7 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Agents\Agent.cs" />
-    <Compile Include="Agents\ANNAgents\ANNAgent.cs" />
+    <Compile Include="Agents\ANNAgents\AnnAgent.cs" />
     <Compile Include="Agents\QAgents\Advanced\QAgentAdvanced.cs" />
     <Compile Include="Agents\QAgents\Advanced\QAgentAdvanced.Parameters.cs" />
     <Compile Include="Agents\QAgents\MemoryQAgent\MemoryQAgent.cs" />
