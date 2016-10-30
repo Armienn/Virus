@@ -37,12 +37,12 @@ namespace VirusNameSpace.Agents
 
 		private Move LearnFromMinimax(Virus percept)
 		{
+			//lær fra MiniMax
 			Move move = teacher.Move(percept);
+			VirusBoard currentState = percept.GetBoardCopy();
 			BackPropagationLearning backProp = new BackPropagationLearning(network);
 
-			backProp.Run(boardToInput(currentState), MoveToOutputs(move));
-
-			//lær fra MiniMax
+			backProp.Run(BoardToInput(currentState), MoveToOutputs(move));
 
 			return move;
 		}
