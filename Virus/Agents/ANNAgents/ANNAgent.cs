@@ -56,6 +56,65 @@ namespace VirusNameSpace.Agents
 			return new Move();
 		}
 
+		private double[] BoardToInput(VirusBoard board)
+		{
+			double[] inputs = new double[board.Size * board.Size];
+			for(int i = 0; i < board.Size; i++)
+			{
+				for (int j = 0; j < board.Size; j++)
+				{
+					byte fieldState = board.board[i, j];
+					if (fieldState == 0)
+						inputs[i * board.Size + j] = 0;
+					else if (fieldState == playerNumber)
+						inputs[i * board.Size + j] = 1;
+					else
+						inputs[i * board.Size + j] = -1;
+				}
+			}
+			return inputs;
+		}
+
+		private Move OutputsToMove(double[] outputs)
+		{
+			int boardFields = outputs.Length / 2;
+			int boardSize = (int)Math.Sqrt(boardFields);
+			double[] source = new double[boardFields];
+			double[] destination = new double[boardFields];
+			for (int i = 0; i < outputs.Length; i++)
+			{
+				if (i < boardFields)
+					source[i] = outputs[i];
+				else
+					destination[i - boardFields] = outputs[i];
+			}
+
+			int sourcePosition = 0;
+			int destinationPosition = 0;
+			double sourceMax = double.MinValue;
+			double destinationMax = double.MinValue;
+
+			for (int i = 0; i < source.Length; i++)
+			{
+				if(source[i]> sourceMax)
+				{
+					sourceMax = source[i];
+					sourcePosition = i;
+				}
+				if (destination[i] > destinationMax)
+				{
+					destinationMax = source[i];
+					destinationPosition = i;
+				}
+			}
+
+			int sourceX = sourcePosition / boardSize;
+			int sourceY = sourcePosition % boardSize;
+			int destinationX = destinationPosition / boardSize;
+			int destinationY = destinationPosition % boardSize;
+			return new Move(sourceX, sourceY, destinationX, destinationY);
+		}
+
 		private double[] MoveToOutputs(Move move)
 		{
 			double[] someArray = new double[10]; 
