@@ -32,12 +32,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DaxCore">
+    <Reference Include="DaxCore, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\DaxCore.dll</HintPath>
     </Reference>
     <Reference Include="Nea, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\Nea.dll</HintPath>
+      <HintPath>..\Nea.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
