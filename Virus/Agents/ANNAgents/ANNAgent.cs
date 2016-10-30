@@ -21,7 +21,7 @@ namespace VirusNameSpace.Agents
 		{
 			playerNumber = player;
 			int boardFields = boardSize * boardSize;
-			network = new ActivationNetwork(new BipolarSigmoidFunction(), boardFields, 30, 30, boardFields * 2);
+			network = new ActivationNetwork(new BipolarSigmoidFunction(), boardFields, 5, boardFields * 2);
 			backProp = new BackPropagationLearning(network);
 			teacher = new MinimaxAgent(2, player);
 		}
@@ -35,6 +35,10 @@ namespace VirusNameSpace.Agents
 
 		public override void EndGame(Virus percept)
 		{
+			using (StreamWriter writer = new StreamWriter("blublub.txt", true))
+			{
+				writer.WriteLine("New Game : ");
+			}
 
 		}
 
@@ -44,7 +48,7 @@ namespace VirusNameSpace.Agents
 			Move move = teacher.Move(percept);
 			VirusBoard currentState = percept.GetBoardCopy();
 
-			backProp.LearningRate = 0.5;
+			backProp.LearningRate = 0.1;
 			backProp.Momentum = 0.1;
 			double error = backProp.Run(BoardToInput(currentState), MoveToOutputs(move, currentState.Size));
 			using (StreamWriter writer = new StreamWriter("blublub.txt",true))

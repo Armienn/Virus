@@ -309,7 +309,7 @@ namespace VirusGUI
 				for (int i = 1; i <= virus.Players; i++) {
 					s += names[i] + ": " + pieces[i] + "\n";
 				}
-				MessageBox.Show(w + " is the winner\n" + s);
+				//MessageBox.Show(w + " is the winner\n" + s);
 			}
 			else {
 				message = names[virus.CurrentPlayer];
