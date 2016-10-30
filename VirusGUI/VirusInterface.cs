@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using VirusNameSpace;
+using VirusNameSpace.Agents;
 using System.IO;
 
 namespace VirusGUI
@@ -53,6 +54,11 @@ namespace VirusGUI
 							((QAgent)agents[i]).TurnOffExploration();
 							((QAgent)agents[i]).TurnOffLearning();
 						}
+						this.names[i] = "AI " + n;
+						n++;
+						break;
+					case "AnnAI":
+						agents[i] = new AnnAgent(virus.Size, i);
 						this.names[i] = "AI " + n;
 						n++;
 						break;

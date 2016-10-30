@@ -42,9 +42,8 @@ namespace VirusNameSpace.Agents
 			VirusBoard currentState = percept.GetBoardCopy();
 			BackPropagationLearning backProp = new BackPropagationLearning(network);
 
-			backProp.Run(BoardToInput(currentState), MoveToOutputs(move, currentState.Size));
-
-			//lær fra MiniMax
+			double error = backProp.Run(BoardToInput(currentState), MoveToOutputs(move, currentState.Size));
+			Console.WriteLine(error);
 
 			return move;
 		}

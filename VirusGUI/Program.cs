@@ -19,7 +19,7 @@ namespace VirusGUI
 			int tilesize = 40;
 			bool immediateness = false;
 
-			String[] players = new String[] { "MinimaxAI", "Player" };
+			String[] players = new String[] { "AnnAI", "Player" };
 
 			if (args.Length > 0) {
 				boardsize = int.Parse(args[0]);
