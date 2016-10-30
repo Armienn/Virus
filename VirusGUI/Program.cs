@@ -15,11 +15,11 @@ namespace VirusGUI
 		/// </summary>
 		[STAThread]
 		static void Main(String[] args) {
-			int boardsize = 5;
+			int boardsize = 8;
 			int tilesize = 40;
-			bool immediateness = false;
+			bool immediateness = true;
 
-			String[] players = new String[] { "AnnAI", "Player" };
+			String[] players = new String[] { "AnnAI", "MixedAI" };
 
 			if (args.Length > 0) {
 				boardsize = int.Parse(args[0]);
