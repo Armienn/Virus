@@ -41,8 +41,12 @@ namespace VirusNameSpace.Agents
 			Move move = teacher.Move(percept);
 			VirusBoard currentState = percept.GetBoardCopy();
 			BackPropagationLearning backProp = new BackPropagationLearning(network);
+			double learningRate = backProp.LearningRate;
+			double momentum = backProp.Momentum;
 
 			double error = backProp.Run(BoardToInput(currentState), MoveToOutputs(move, currentState.Size));
+			if (error > 10)
+				learningRate = learningRate * 10;
 			Console.WriteLine(error);
 
 			return move;
