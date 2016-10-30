@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DaxCore">
+      <HintPath>..\DaxCore.dll</HintPath>
+    </Reference>
     <Reference Include="Nea, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>.\Nea.dll</HintPath>
@@ -45,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Agents\Agent.cs" />
+    <Compile Include="Agents\ANNAgents\ANNAgent.cs" />
     <Compile Include="Agents\QAgents\Advanced\QAgentAdvanced.cs" />
     <Compile Include="Agents\QAgents\Advanced\QAgentAdvanced.Parameters.cs" />
     <Compile Include="Agents\QAgents\MemoryQAgent\MemoryQAgent.cs" />
