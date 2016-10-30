@@ -1,5 +1,6 @@
 ﻿using DaxCore.ActivationFunctions;
 using DaxCore.Networks;
+using DaxCore.Learning;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +38,11 @@ namespace VirusNameSpace.Agents
 		private Move LearnFromMinimax(Virus percept)
 		{
 			Move move = teacher.Move(percept);
-			//lær fra minimax
+			BackPropagationLearning backProp = new BackPropagationLearning(network);
+
+			backProp.Run(boardToInput(currentState), MoveToOutputs(move));
+
+			//lær fra MiniMax
 
 			return move;
 		}
@@ -46,8 +51,15 @@ namespace VirusNameSpace.Agents
 		{
 			VirusBoard currentState = percept.GetBoardCopy();
 			Move[] actions = currentState.GetPossibleMoves(playerNumber);
+
 			Move action = actions[0];
 			return new Move();
+		}
+
+		private double[] MoveToOutputs(Move move)
+		{
+			double[] someArray = new double[10]; 
+			return someArray;
 		}
 	}
 }
