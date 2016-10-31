@@ -18,8 +18,9 @@ namespace VirusNameSpace.Agents
 		bool learning = true;
 		MinimaxAgent teacher;
 
-		public AnnAgent(int boardSize, byte player = 1)
+		public AnnAgent(bool learn, int boardSize, byte player = 1)
 		{
+			learning = learn;
 			playerNumber = player;
 			int boardFields = boardSize * boardSize;
 			if(File.Exists("ann" + boardSize + ".bin"))
@@ -40,10 +41,8 @@ namespace VirusNameSpace.Agents
 		public override void EndGame(Virus percept)
 		{
 			Serialization.SaveNetwork(network, "ann" + percept.Size + ".bin");
-			using (StreamWriter writer = new StreamWriter("blublub.txt", true))
-			{
+			using (StreamWriter writer = new StreamWriter("ann" + percept.Size + "log.txt", true))
 				writer.WriteLine("New Game : ");
-			}
 		}
 
 		private Move LearnFromMinimax(Virus percept)
@@ -54,12 +53,15 @@ namespace VirusNameSpace.Agents
 
 			backProp.LearningRate = 0.1;
 			backProp.Momentum = 0.1;
+			Move annMove = OutputsToMove(network.Compute(BoardToInput(currentState)));
 			double error = backProp.Run(BoardToInput(currentState), MoveToOutputs(move, currentState.Size));
-			using (StreamWriter writer = new StreamWriter("blublub.txt",true))
-			{
-				writer.WriteLine(error);
-			}
 
+			if (move.Equals(annMove))
+				using (StreamWriter writer = new StreamWriter("ann" + percept.Size + "log.txt", true))
+					writer.WriteLine("using right move. E: " + error);
+			else
+				using (StreamWriter writer = new StreamWriter("ann" + percept.Size + "log.txt", true))
+					writer.WriteLine("using wrong move. E: " + error);
 			return move;
 		}
 
@@ -67,9 +69,18 @@ namespace VirusNameSpace.Agents
 		{
 			VirusBoard currentState = percept.GetBoardCopy();
 			Move[] actions = currentState.GetPossibleMoves(playerNumber);
+			Move move = OutputsToMove(network.Compute(BoardToInput(currentState)));
 
-			Move action = actions[0];
-			return new Move();
+			if (actions.Contains(move))
+			{
+				using (StreamWriter writer = new StreamWriter("ann" + percept.Size + "log.txt", true))
+					writer.WriteLine("using learned move");
+				return move;
+			}
+
+			using (StreamWriter writer = new StreamWriter("ann" + percept.Size + "log.txt", true))
+				writer.WriteLine("using default move");
+			return actions[0];
 		}
 
 		private double[] BoardToInput(VirusBoard board)
@@ -119,7 +130,7 @@ namespace VirusNameSpace.Agents
 				}
 				if (destination[i] > destinationMax)
 				{
-					destinationMax = source[i];
+					destinationMax = destination[i];
 					destinationPosition = i;
 				}
 			}

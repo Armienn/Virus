@@ -58,7 +58,7 @@ namespace VirusGUI
 						n++;
 						break;
 					case "AnnAI":
-						agents[i] = new AnnAgent(virus.Size, i);
+						agents[i] = new AnnAgent(false, virus.Size, i);
 						this.names[i] = "AI " + n;
 						n++;
 						break;
@@ -309,7 +309,7 @@ namespace VirusGUI
 				for (int i = 1; i <= virus.Players; i++) {
 					s += names[i] + ": " + pieces[i] + "\n";
 				}
-				//MessageBox.Show(w + " is the winner\n" + s);
+				MessageBox.Show(w + " is the winner\n" + s);
 			}
 			else {
 				message = names[virus.CurrentPlayer];
