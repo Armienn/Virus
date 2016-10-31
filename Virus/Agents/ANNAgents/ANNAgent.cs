@@ -1,6 +1,7 @@
 ﻿using DaxCore.ActivationFunctions;
 using DaxCore.Networks;
 using DaxCore.Learning;
+using DaxCore.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,10 @@ namespace VirusNameSpace.Agents
 		{
 			playerNumber = player;
 			int boardFields = boardSize * boardSize;
-			network = new ActivationNetwork(new BipolarSigmoidFunction(), boardFields, 5, boardFields * 2);
+			if(File.Exists("ann" + boardSize + ".bin"))
+				network = (ActivationNetwork)Serialization.LoadNetwork("ann" + boardSize + ".bin");
+			else
+				network = new ActivationNetwork(new BipolarSigmoidFunction(), boardFields, 5, boardFields * 2);
 			backProp = new BackPropagationLearning(network);
 			teacher = new MinimaxAgent(2, player);
 		}
@@ -35,11 +39,11 @@ namespace VirusNameSpace.Agents
 
 		public override void EndGame(Virus percept)
 		{
+			Serialization.SaveNetwork(network, "ann" + percept.Size + ".bin");
 			using (StreamWriter writer = new StreamWriter("blublub.txt", true))
 			{
 				writer.WriteLine("New Game : ");
 			}
-
 		}
 
 		private Move LearnFromMinimax(Virus percept)
